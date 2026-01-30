@@ -1,0 +1,58 @@
+# Build output
+bin/
+obj/
+
+# IDE files
+.vs/
+*.suo
+*.user
+*.sln.docstates
+
+# Cosmos specific files
+*.vmdk
+*.iso
+*.img
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# OS generated files
+Thumbs.db
+.DS_Store
+
+# Package manager files
+packages/
+.nuget/
+
+# Environment variables
+.env
+
+# Test results
+TestResults/
+coverage/
+
+# Documentation
+*.rst
+
+# Backup files
+*.bak
+*.old
+
+# Misc
+*.swp
+*~
+.project
+.classpath
+.c9/
+.settings/
+
+# Debug files
+*.pdb
+*.mdb
+
+# Release files
+*.release
