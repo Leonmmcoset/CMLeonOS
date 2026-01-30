@@ -84,6 +84,11 @@ namespace CMLeonOS
                     Console.WriteLine("  cat <file>     - Display file content");
                     Console.WriteLine("  echo <text> > <file> - Write text to file");
                     Console.WriteLine("  cpass          - Change password");
+                    Console.WriteLine("  head <file>    - Display first lines of file");
+                    Console.WriteLine("                  Usage: head <file> <lines>");
+                    Console.WriteLine("  tail <file>    - Display last lines of file");
+                    Console.WriteLine("                  Usage: tail <file> <lines>");
+                    Console.WriteLine("  wc <file>      - Count lines, words, characters");
                     Console.WriteLine("  version        - Show OS version");
                     Console.WriteLine("  about          - Show about information");
                     Console.WriteLine("  help           - Show this help message");
@@ -211,6 +216,15 @@ namespace CMLeonOS
                     break;
                 case "cpass":
                     userSystem.ChangePassword();
+                    break;
+                case "head":
+                    HeadFile(args);
+                    break;
+                case "tail":
+                    TailFile(args);
+                    break;
+                case "wc":
+                    WordCount(args);
                     break;
                 default:
                     Console.WriteLine($"Unknown command: {command}");
@@ -481,6 +495,142 @@ namespace CMLeonOS
             catch (Exception ex)
             {
                 Console.WriteLine($"Error starting editor: {ex.Message}");
+            }
+        }
+
+        private void HeadFile(string args)
+        {
+            if (string.IsNullOrEmpty(args))
+            {
+                Console.WriteLine("Error: Please specify a file name");
+                return;
+            }
+            
+            try
+            {
+                string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                string fileName = parts[0];
+                int lineCount = 10; // 默认显示10行
+                
+                if (parts.Length > 1)
+                {
+                    if (int.TryParse(parts[1], out int count))
+                    {
+                        lineCount = count;
+                    }
+                }
+                
+                string content = fileSystem.ReadFile(fileName);
+                if (string.IsNullOrEmpty(content))
+                {
+                    Console.WriteLine("File is empty");
+                    return;
+                }
+                
+                string[] lines = content.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
+                int displayLines = Math.Min(lineCount, lines.Length);
+                
+                Console.WriteLine($"First {displayLines} lines of {fileName}:");
+                Console.WriteLine("--------------------------------");
+                
+                for (int i = 0; i < displayLines; i++)
+                {
+                    Console.WriteLine($"{i + 1}: {lines[i]}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error reading file: {ex.Message}");
+            }
+        }
+
+        private void TailFile(string args)
+        {
+            if (string.IsNullOrEmpty(args))
+            {
+                Console.WriteLine("Error: Please specify a file name");
+                return;
+            }
+            
+            try
+            {
+                string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                string fileName = parts[0];
+                int lineCount = 10; // 默认显示10行
+                
+                if (parts.Length > 1)
+                {
+                    if (int.TryParse(parts[1], out int count))
+                    {
+                        lineCount = count;
+                    }
+                }
+                
+                string content = fileSystem.ReadFile(fileName);
+                if (string.IsNullOrEmpty(content))
+                {
+                    Console.WriteLine("File is empty");
+                    return;
+                }
+                
+                string[] lines = content.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
+                int displayLines = Math.Min(lineCount, lines.Length);
+                int startLine = Math.Max(0, lines.Length - displayLines);
+                
+                Console.WriteLine($"Last {displayLines} lines of {fileName}:");
+                Console.WriteLine("--------------------------------");
+                
+                for (int i = startLine; i < lines.Length; i++)
+                {
+                    Console.WriteLine($"{i + 1}: {lines[i]}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error reading file: {ex.Message}");
+            }
+        }
+
+        private void WordCount(string args)
+        {
+            if (string.IsNullOrEmpty(args))
+            {
+                Console.WriteLine("Error: Please specify a file name");
+                return;
+            }
+            
+            try
+            {
+                string content = fileSystem.ReadFile(args);
+                if (string.IsNullOrEmpty(content))
+                {
+                    Console.WriteLine("File is empty");
+                    return;
+                }
+                
+                string[] lines = content.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
+                int lineCount = lines.Length;
+                int wordCount = 0;
+                int charCount = content.Length;
+                
+                foreach (string line in lines)
+                {
+                    if (!string.IsNullOrWhiteSpace(line))
+                    {
+                        string[] words = line.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                        wordCount += words.Length;
+                    }
+                }
+                
+                Console.WriteLine($"Word count for {args}:");
+                Console.WriteLine("--------------------------------");
+                Console.WriteLine($"Lines: {lineCount}");
+                Console.WriteLine($"Words: {wordCount}");
+                Console.WriteLine($"Characters: {charCount}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error reading file: {ex.Message}");
             }
         }
     }
