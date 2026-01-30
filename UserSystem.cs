@@ -5,12 +5,34 @@ namespace CMLeonOS
 {
     public class UserSystem
     {
-        private string adminPasswordFilePath = @"0:\admin_password.txt";
+        private string sysDirectory = @"0:\sys";
+        private string adminPasswordFilePath;
         private bool isPasswordSet = false;
 
         public UserSystem()
         {
+            // 确保sys目录存在
+            EnsureSysDirectoryExists();
+            
+            // 设置密码文件路径
+            adminPasswordFilePath = Path.Combine(sysDirectory, "admin_password.txt");
+            
             CheckPasswordStatus();
+        }
+
+        private void EnsureSysDirectoryExists()
+        {
+            try
+            {
+                if (!Directory.Exists(sysDirectory))
+                {
+                    Directory.CreateDirectory(sysDirectory);
+                }
+            }
+            catch
+            {
+                // 忽略目录创建错误
+            }
         }
 
         private void CheckPasswordStatus()
@@ -71,27 +93,117 @@ namespace CMLeonOS
             Console.WriteLine("Username: admin");
             Console.WriteLine("Password:");
             
-            string password = ReadPassword();
-            
+            // 检测ALT+Space按键
+            bool useFixMode = false;
+            ConsoleKeyInfo keyInfo;
             try
             {
-                string storedPassword = File.ReadAllText(adminPasswordFilePath);
-                if (password == storedPassword)
+                keyInfo = Console.ReadKey(true);
+                if (keyInfo.Key == ConsoleKey.Spacebar && (keyInfo.Modifiers & ConsoleModifiers.Alt) != 0)
                 {
-                    Console.WriteLine("Login successful!");
-                    return true;
+                    // 检测到ALT+Space，进入修复模式
+                    useFixMode = true;
+                    Console.WriteLine();
+                    Console.WriteLine("Fix Mode Activated");
+                    Console.Write("Enter fix code: ");
+                    
+                    string fixCode = "";
+                    while (true)
+                    {
+                        var codeKey = Console.ReadKey(true);
+                        if (codeKey.Key == ConsoleKey.Enter)
+                        {
+                            Console.WriteLine();
+                            break;
+                        }
+                        else if (codeKey.Key == ConsoleKey.Backspace)
+                        {
+                            if (fixCode.Length > 0)
+                            {
+                                fixCode = fixCode.Substring(0, fixCode.Length - 1);
+                            }
+                        }
+                        else
+                        {
+                            fixCode += codeKey.KeyChar;
+                            Console.Write(codeKey.KeyChar);
+                        }
+                    }
+                    
+                    if (fixCode == "FixMyComputer")
+                    {
+                        Console.WriteLine("Fix mode enabled!");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid fix code. Exiting fix mode.");
+                        useFixMode = false;
+                    }
                 }
                 else
                 {
-                    Console.WriteLine("Invalid password. Please try again.");
-                    return false;
+                    // 正常密码输入
+                    string password = "";
+                    password += keyInfo.KeyChar;
+                    Console.Write("*");
+                    
+                    while (true)
+                    {
+                        var passKey = Console.ReadKey(true);
+                        if (passKey.Key == ConsoleKey.Enter)
+                        {
+                            Console.WriteLine();
+                            break;
+                        }
+                        else if (passKey.Key == ConsoleKey.Backspace)
+                        {
+                            if (password.Length > 0)
+                            {
+                                password = password.Substring(0, password.Length - 1);
+                            }
+                        }
+                        else
+                        {
+                            password += passKey.KeyChar;
+                            Console.Write("*");
+                        }
+                    }
+                    
+                    try
+                    {
+                        string storedPassword = File.ReadAllText(adminPasswordFilePath);
+                        if (password == storedPassword)
+                        {
+                            Console.WriteLine("Login successful!");
+                            return true;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Invalid password. Please try again.");
+                            return false;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error during login: {ex.Message}");
+                        return false;
+                    }
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"Error during login: {ex.Message}");
+                // 如果读取按键失败，使用普通登录
+                Console.WriteLine("Error reading key input. Using normal login.");
                 return false;
             }
+            
+            // 如果使用了修复模式，返回true
+            if (useFixMode)
+            {
+                return true;
+            }
+            
+            return false;
         }
 
         private string ReadPassword()

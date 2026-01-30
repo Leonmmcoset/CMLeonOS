@@ -13,6 +13,9 @@ namespace CMLeonOS
 
         private Shell shell;
         private UserSystem userSystem;
+        
+        // 修复模式变量（硬编码，用于控制是否启用修复模式）
+        public static bool FixMode = false;
 
         protected override void BeforeRun()
         {
@@ -21,7 +24,7 @@ namespace CMLeonOS
             Console.WriteLine(@"  / ___|  \/  | |    ___  ___  _ __  / _ \/ ___| ");
             Console.WriteLine(@" | |   | |\/| | |   / _ \/ _ \| '_ \| | | \___ \ ");
             Console.WriteLine(@" | |___| |  | | |__|  __/ (_) | | | | |_| |___) |");
-            Console.WriteLine(@"  \____|_|  |_|_____\___|\___/|_| |_|__/|____/ ");
+            Console.WriteLine(@"  \____|_|  |_|_____\___|\___/|_| |_|____/|____/ ");
             Console.WriteLine();
             Console.WriteLine("CMLeonOS Test Project");
             Console.WriteLine("By LeonOS 2 Developement Team");

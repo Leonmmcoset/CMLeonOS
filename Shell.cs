@@ -10,18 +10,25 @@ namespace CMLeonOS
         private List<string> commandHistory = new List<string>();
         private FileSystem fileSystem;
         private UserSystem userSystem;
+        private bool fixMode;
 
         public Shell()
         {
             fileSystem = new FileSystem();
             userSystem = new UserSystem();
+            fixMode = Kernel.FixMode;
         }
 
         public void Run()
         {
             while (true)
             {
-                Console.Write(prompt);
+                // 显示当前文件夹路径作为提示符（彩色）
+                string currentPath = fileSystem.CurrentDirectory;
+                ConsoleColor originalColor = Console.ForegroundColor;
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.Write($"{currentPath} | /");
+                Console.ForegroundColor = originalColor;
                 var input = Console.ReadLine();
                 commandHistory.Add(input);
                 var parts = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
@@ -72,6 +79,7 @@ namespace CMLeonOS
                     Console.WriteLine("  pwd            - Show current directory");
                     Console.WriteLine("  mkdir <dir>    - Create directory");
                     Console.WriteLine("  rm <file>      - Remove file");
+                    Console.WriteLine("                  Use -norisk to delete files in sys folder");
                     Console.WriteLine("  rmdir <dir>     - Remove directory");
                     Console.WriteLine("  cat <file>     - Display file content");
                     Console.WriteLine("  echo <text> > <file> - Write text to file");
@@ -130,7 +138,36 @@ namespace CMLeonOS
                     }
                     else
                     {
-                        fileSystem.DeleteFile(args);
+                        // 检查是否在sys文件夹中（修复模式下绕过检测）
+                        bool isInSysFolder = (args.Contains(@"\sys\") || args.Contains(@"/sys/")) && !fixMode;
+                        
+                        if (isInSysFolder)
+                        {
+                            // 检查是否有-norisk参数
+                            string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                            bool hasNorisk = false;
+                            string filePath = args;
+                            
+                            if (parts.Length > 1)
+                            {
+                                hasNorisk = Array.IndexOf(parts, "-norisk") >= 0;
+                                filePath = parts[0];
+                            }
+                            
+                            if (!hasNorisk)
+                            {
+                                Console.WriteLine("Error: Cannot delete files in sys folder without -norisk parameter");
+                                Console.WriteLine("Usage: rm <file> -norisk");
+                            }
+                            else
+                            {
+                                fileSystem.DeleteFile(filePath);
+                            }
+                        }
+                        else
+                        {
+                            fileSystem.DeleteFile(args);
+                        }
                     }
                     break;
                 case "rmdir":
@@ -140,7 +177,18 @@ namespace CMLeonOS
                     }
                     else
                     {
-                        fileSystem.DeleteDirectory(args);
+                        // 检查是否在sys文件夹中（修复模式下绕过检测）
+                        bool isInSysFolder = (args.Contains(@"\sys\") || args.Contains(@"/sys/")) && !fixMode;
+                        
+                        if (isInSysFolder)
+                        {
+                            Console.WriteLine("Error: Cannot delete directories in sys folder");
+                            Console.WriteLine("Use fix mode to bypass this restriction");
+                        }
+                        else
+                        {
+                            fileSystem.DeleteDirectory(args);
+                        }
                     }
                     break;
                 case "cat":
