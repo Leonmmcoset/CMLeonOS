@@ -304,6 +304,8 @@ namespace CMLeonOS
                     if (foundUser.Password == password)
                     {
                         Console.WriteLine("Login successful!");
+
+                        Console.Beep();
                         
                         // 创建用户文件夹
                         CreateUserFolder(foundUser.Username);

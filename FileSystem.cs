@@ -262,7 +262,7 @@ namespace CMLeonOS
             }
         }
 
-        private string GetFullPath(string path)
+        public string GetFullPath(string path)
         {
             if (path.StartsWith(@"0:\"))
             {
@@ -289,6 +289,69 @@ namespace CMLeonOS
                     {
                         return currentDirectory.Substring(0, lastSlash);
                     }
+                }
+            }
+            else if (path.StartsWith("../") || path.StartsWith("..\\"))
+            {
+                // 支持多层..操作
+                int level = 0;
+                string tempPath = path;
+                while (tempPath.StartsWith("../") || tempPath.StartsWith("..\\"))
+                {
+                    level++;
+                    if (tempPath.StartsWith("../"))
+                    {
+                        tempPath = tempPath.Substring(3);
+                    }
+                    else if (tempPath.StartsWith("..\\"))
+                    {
+                        tempPath = tempPath.Substring(3);
+                    }
+                }
+                
+                // 向上移动level级
+                string resultPath = currentDirectory;
+                for (int i = 0; i < level; i++)
+                {
+                    int lastSlash = resultPath.LastIndexOf('\\');
+                    if (lastSlash == 2) // 0:\
+                    {
+                        resultPath = @"0:\";
+                    }
+                    else
+                    {
+                        resultPath = resultPath.Substring(0, lastSlash);
+                    }
+                }
+                return resultPath;
+            }
+            else if (path.StartsWith("dir") || path.StartsWith("DIR"))
+            {
+                // 支持cd dir1/dir2/dir3等格式
+                string dirName = path;
+                
+                // 提取数字部分
+                string numberPart = "";
+                for (int i = 3; i < path.Length; i++)
+                {
+                    if (char.IsDigit(path[i]))
+                    {
+                        numberPart += path[i];
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                
+                // 构建完整路径
+                if (currentDirectory == @"0:\")
+                {
+                    return $@"0:\{dirName}";
+                }
+                else
+                {
+                    return $@"{currentDirectory}\{dirName}";
                 }
             }
             else

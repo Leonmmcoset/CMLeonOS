@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Sys = Cosmos.System;
 
 namespace CMLeonOS
@@ -103,6 +104,8 @@ namespace CMLeonOS
                     Console.WriteLine("  edit <file>      - Simple code editor");
                     Console.WriteLine("  ls <dir>         - List files and directories");
                     Console.WriteLine("  cd <dir>         - Change directory");
+                    Console.WriteLine("                     cd ..              - Go to parent directory");
+                    Console.WriteLine("                     cd dir1/dir2/dir3 - Go to numbered directory");
                     Console.WriteLine("  pwd              - Show current directory");
                     Console.WriteLine("  mkdir <dir>      - Create directory");
                     Console.WriteLine("  rm <file>        - Remove file");
@@ -126,6 +129,8 @@ namespace CMLeonOS
                     Console.WriteLine("                     user delete <username>                  - Delete user");
                     Console.WriteLine("                     user list                               - List all users");
                     Console.WriteLine("  cpass            - Change password");
+                    Console.WriteLine("  beep             - Play beep sound");
+                    Console.WriteLine("  branswe <filename> - Execute Branswe code file");
                     Console.WriteLine("  version          - Show OS version");
                     Console.WriteLine("  about            - Show about information");
                     Console.WriteLine("  help             - Show this help message");
@@ -284,6 +289,12 @@ namespace CMLeonOS
                     break;
                 case "cpass":
                     userSystem.ChangePassword();
+                    break;
+                case "beep":
+                    Console.Beep();
+                    break;
+                case "branswe":
+                    ProcessBransweCommand(args);
                     break;
                 default:
                     Console.WriteLine($"Unknown command: {command}");
@@ -934,6 +945,36 @@ namespace CMLeonOS
             {
                 Console.WriteLine($"Error: Unknown user command '{subCommand}'");
                 Console.WriteLine("Available commands: add, delete, list");
+            }
+        }
+
+        private void ProcessBransweCommand(string args)
+        {
+            if (string.IsNullOrEmpty(args))
+            {
+                Console.WriteLine("Error: Please specify file name");
+                Console.WriteLine("Usage: branswe <filename>");
+                return;
+            }
+            
+            string filePath = fileSystem.GetFullPath(args);
+            
+            if (!File.Exists(filePath))
+            {
+                Console.WriteLine($"Error: File not found: {args}");
+                return;
+            }
+            
+            try
+            {
+                string fileContent = File.ReadAllText(filePath);
+                // Console.WriteLine($"Executing Branswe code from: {args}");
+                Branswe.Run(fileContent);
+                // Console.WriteLine("Branswe execution completed.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error executing Branswe: {ex.Message}");
             }
         }
     }
