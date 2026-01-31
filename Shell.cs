@@ -41,6 +41,17 @@ namespace CMLeonOS
             }
         }
 
+        public void ExecuteCommand(string commandLine)
+        {
+            var parts = commandLine.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length > 0)
+            {
+                var command = parts[0].ToLower();
+                var args = parts.Length > 1 ? string.Join(" ", parts, 1, parts.Length - 1) : "";
+                ProcessCommand(command, args);
+            }
+        }
+
         private void ProcessCommand(string command, string args)
         {
             switch (command)
@@ -89,9 +100,18 @@ namespace CMLeonOS
                     Console.WriteLine("  tail <file>    - Display last lines of file");
                     Console.WriteLine("                  Usage: tail <file> <lines>");
                     Console.WriteLine("  wc <file>      - Count lines, words, characters");
+                    Console.WriteLine("  cp <src> <dst> - Copy file");
+                    Console.WriteLine("  mv <src> <dst> - Move/rename file");
+                    Console.WriteLine("  touch <file>    - Create empty file");
+                    Console.WriteLine("  find <name>     - Find file");
                     Console.WriteLine("  version        - Show OS version");
                     Console.WriteLine("  about          - Show about information");
                     Console.WriteLine("  help           - Show this help message");
+                    Console.WriteLine();
+                    Console.WriteLine("Startup Script: sys\\startup.cm");
+                    Console.WriteLine("  Commands in this file will be executed on startup");
+                    Console.WriteLine("  Each line should contain one command");
+                    Console.WriteLine("  Lines starting with # are treated as comments");
                     break;
                 case "time":
                     Console.WriteLine(DateTime.Now.ToString());
@@ -212,7 +232,6 @@ namespace CMLeonOS
                 case "about":
                     Console.WriteLine("CMLeonOS Test Project");
                     Console.WriteLine("By LeonOS 2 Developement Team");
-                    Console.WriteLine("A simple operating system built with Cosmos");
                     break;
                 case "cpass":
                     userSystem.ChangePassword();
@@ -225,6 +244,18 @@ namespace CMLeonOS
                     break;
                 case "wc":
                     WordCount(args);
+                    break;
+                case "cp":
+                    CopyFile(args);
+                    break;
+                case "mv":
+                    MoveFile(args);
+                    break;
+                case "touch":
+                    CreateEmptyFile(args);
+                    break;
+                case "find":
+                    FindFile(args);
                     break;
                 default:
                     Console.WriteLine($"Unknown command: {command}");
@@ -631,6 +662,147 @@ namespace CMLeonOS
             catch (Exception ex)
             {
                 Console.WriteLine($"Error reading file: {ex.Message}");
+            }
+        }
+
+        private void CopyFile(string args)
+        {
+            if (string.IsNullOrEmpty(args))
+            {
+                Console.WriteLine("Error: Please specify source and destination files");
+                Console.WriteLine("Usage: cp <source> <destination>");
+                return;
+            }
+            
+            try
+            {
+                string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length < 2)
+                {
+                    Console.WriteLine("Error: Please specify both source and destination");
+                    Console.WriteLine("Usage: cp <source> <destination>");
+                    return;
+                }
+                
+                string sourceFile = parts[0];
+                string destFile = parts[1];
+                
+                // 使用FileSystem读取源文件内容
+                string content = fileSystem.ReadFile(sourceFile);
+                if (content == null)
+                {
+                    Console.WriteLine($"Error: Source file '{sourceFile}' does not exist");
+                    return;
+                }
+                
+                // 使用FileSystem写入目标文件
+                fileSystem.WriteFile(destFile, content);
+                Console.WriteLine($"File copied successfully from '{sourceFile}' to '{destFile}'");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error copying file: {ex.Message}");
+            }
+        }
+
+        private void MoveFile(string args)
+        {
+            if (string.IsNullOrEmpty(args))
+            {
+                Console.WriteLine("Error: Please specify source and destination files");
+                Console.WriteLine("Usage: mv <source> <destination>");
+                return;
+            }
+            
+            try
+            {
+                string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length < 2)
+                {
+                    Console.WriteLine("Error: Please specify both source and destination");
+                    Console.WriteLine("Usage: mv <source> <destination>");
+                    return;
+                }
+                
+                string sourceFile = parts[0];
+                string destFile = parts[1];
+                
+                // 使用FileSystem读取源文件内容
+                string content = fileSystem.ReadFile(sourceFile);
+                if (content == null)
+                {
+                    Console.WriteLine($"Error: Source file '{sourceFile}' does not exist");
+                    return;
+                }
+                
+                // 使用FileSystem写入目标文件
+                fileSystem.WriteFile(destFile, content);
+                
+                // 删除源文件
+                fileSystem.DeleteFile(sourceFile);
+                
+                Console.WriteLine($"File moved/renamed successfully from '{sourceFile}' to '{destFile}'");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error moving file: {ex.Message}");
+            }
+        }
+
+        private void CreateEmptyFile(string args)
+        {
+            if (string.IsNullOrEmpty(args))
+            {
+                Console.WriteLine("Error: Please specify a file name");
+                Console.WriteLine("Usage: touch <filename>");
+                return;
+            }
+            
+            try
+            {
+                // 使用FileSystem创建空文件
+                fileSystem.WriteFile(args, "");
+                Console.WriteLine($"Empty file '{args}' created successfully");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating file: {ex.Message}");
+            }
+        }
+
+        private void FindFile(string args)
+        {
+            if (string.IsNullOrEmpty(args))
+            {
+                Console.WriteLine("Error: Please specify a file name to search");
+                Console.WriteLine("Usage: find <filename>");
+                return;
+            }
+            
+            try
+            {
+                // 使用FileSystem获取当前目录的文件列表
+                var files = fileSystem.GetFileList(".");
+                bool found = false;
+                
+                foreach (var file in files)
+                {
+                    // 检查文件名是否包含搜索字符串
+                    if (file.ToLower().Contains(args.ToLower()))
+                    {
+                        Console.WriteLine($"Found: {file}");
+                        found = true;
+                    }
+                }
+                
+                if (!found)
+                {
+                    Console.WriteLine($"No files found matching '{args}'");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error finding file: {ex.Message}");
             }
         }
     }

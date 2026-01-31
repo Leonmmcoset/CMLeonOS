@@ -35,9 +35,10 @@ namespace CMLeonOS
                 Sys.FileSystem.VFS.VFSManager.RegisterVFS(fs);
                 Console.WriteLine("VFS initialized successfully");
                 
-                // 显示可用空间
+                // 显示可用空间（动态单位）
                 var available_space = fs.GetAvailableFreeSpace(@"0:\");
-                Console.WriteLine("Available Free Space: " + available_space + " bytes");
+                string spaceWithUnit = FormatBytes(available_space);
+                Console.WriteLine("Available Free Space: " + spaceWithUnit);
                 
                 // 显示文件系统类型
                 var fs_type = fs.GetFileSystemType(@"0:\");
@@ -85,11 +86,85 @@ namespace CMLeonOS
                 
                 // 登录成功后，初始化Shell
                 shell = new Shell();
+                
+                // 检查并执行启动脚本
+                ExecuteStartupScript();
+                
+                // 系统启动完成，蜂鸣器响一声
+                Console.Beep();
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error initializing system: {ex.Message}");
             }
+        }
+
+        private void ExecuteStartupScript()
+        {
+            string startupFilePath = @"0:\sys\startup.cm";
+            
+            try
+            {
+                // 检查启动脚本文件是否存在
+                if (System.IO.File.Exists(startupFilePath))
+                {
+                    // 读取启动脚本内容
+                    string[] lines = System.IO.File.ReadAllLines(startupFilePath);
+                    
+                    // 检查文件是否为空
+                    if (lines.Length == 0 || (lines.Length == 1 && string.IsNullOrWhiteSpace(lines[0])))
+                    {
+                        Console.WriteLine("Startup script is empty, skipping...");
+                        return;
+                    }
+                    
+                    Console.WriteLine("Executing startup script...");
+                    Console.WriteLine("--------------------------------");
+                    
+                    // 逐行执行命令
+                    foreach (string line in lines)
+                    {
+                        // 跳过空行和注释行
+                        if (string.IsNullOrWhiteSpace(line) || line.Trim().StartsWith("#"))
+                        {
+                            continue;
+                        }
+                        
+                        // 执行命令
+                        Console.WriteLine($"Executing: {line}");
+                        shell.ExecuteCommand(line);
+                    }
+                    
+                    Console.WriteLine("--------------------------------");
+                    Console.WriteLine("Startup script execution completed.");
+                }
+                else
+                {
+                    // 启动脚本不存在，创建空文件
+                    Console.WriteLine("Startup script not found, creating empty file...");
+                    System.IO.File.WriteAllText(startupFilePath, "");
+                    Console.WriteLine("Created empty startup script at: " + startupFilePath);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error executing startup script: {ex.Message}");
+            }
+        }
+
+        private string FormatBytes(long bytes)
+        {
+            string[] units = { "B", "KB", "MB", "GB", "TB" };
+            int unitIndex = 0;
+            double size = bytes;
+            
+            while (size >= 1024 && unitIndex < units.Length - 1)
+            {
+                size /= 1024;
+                unitIndex++;
+            }
+            
+            return $"{size:F2} {units[unitIndex]}";
         }
 
         protected override void Run()

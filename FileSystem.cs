@@ -121,6 +121,33 @@ namespace CMLeonOS
             }
         }
 
+        public List<string> GetFileList(string path = ".")
+        {
+            string fullPath = GetFullPath(path);
+            List<string> fileList = new List<string>();
+            
+            try
+            {
+                if (Directory.Exists(fullPath))
+                {
+                    // 获取文件列表
+                    var files = Directory.GetFiles(fullPath);
+                    foreach (var file in files)
+                    {
+                        // 使用Path.GetFileName获取文件名
+                        string fileName = Path.GetFileName(file);
+                        fileList.Add(fileName);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting file list: {ex.Message}");
+            }
+            
+            return fileList;
+        }
+
         public void CreateFile(string path, string content = "")
         {
             string fullPath = GetFullPath(path);
