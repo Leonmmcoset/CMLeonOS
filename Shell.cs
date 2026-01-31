@@ -21,6 +21,7 @@ namespace CMLeonOS
 
         public void Run()
         {
+            bool shouldExit = false;
             while (true)
             {
                 // 显示当前文件夹路径作为提示符（彩色）
@@ -30,6 +31,15 @@ namespace CMLeonOS
                 Console.Write($"{currentPath} | /");
                 Console.ForegroundColor = originalColor;
                 var input = Console.ReadLine();
+                
+                // 检查是否为退出命令
+                if (input != null && input.ToLower().Trim() == "exit")
+                {
+                    Console.WriteLine("Exiting system...");
+                    shouldExit = true;
+                    break;
+                }
+                
                 commandHistory.Add(input);
                 var parts = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 if (parts.Length > 0)
@@ -37,6 +47,12 @@ namespace CMLeonOS
                     var command = parts[0].ToLower();
                     var args = parts.Length > 1 ? string.Join(" ", parts, 1, parts.Length - 1) : "";
                     ProcessCommand(command, args);
+                }
+                
+                // 如果需要退出，返回到登录页面
+                if (shouldExit)
+                {
+                    return;
                 }
             }
         }
@@ -94,7 +110,6 @@ namespace CMLeonOS
                     Console.WriteLine("  rmdir <dir>     - Remove directory");
                     Console.WriteLine("  cat <file>     - Display file content");
                     Console.WriteLine("  echo <text> > <file> - Write text to file");
-                    Console.WriteLine("  cpass          - Change password");
                     Console.WriteLine("  head <file>    - Display first lines of file");
                     Console.WriteLine("                  Usage: head <file> <lines>");
                     Console.WriteLine("  tail <file>    - Display last lines of file");
@@ -104,6 +119,14 @@ namespace CMLeonOS
                     Console.WriteLine("  mv <src> <dst> - Move/rename file");
                     Console.WriteLine("  touch <file>    - Create empty file");
                     Console.WriteLine("  find <name>     - Find file");
+                    Console.WriteLine("  getdisk        - Show disk information");
+                    Console.WriteLine("  user <cmd>     - User management");
+                    Console.WriteLine("                  user add admin <username> <password> - Add admin user");
+                    Console.WriteLine("                  user add user <username> <password>      - Add regular user");
+                    Console.WriteLine("                  user delete <username>                    - Delete user");
+                    Console.WriteLine("                  user list                                    - List all users");
+                    Console.WriteLine("  logout         - Logout current user");
+                    Console.WriteLine("  cpass          - Change password");
                     Console.WriteLine("  version        - Show OS version");
                     Console.WriteLine("  about          - Show about information");
                     Console.WriteLine("  help           - Show this help message");
@@ -164,7 +187,7 @@ namespace CMLeonOS
                     else
                     {
                         // 检查是否在sys文件夹中（修复模式下绕过检测）
-                        bool isInSysFolder = (args.Contains(@"\sys\") || args.Contains(@"/sys/")) && !fixMode;
+                        bool isInSysFolder = (args.Contains(@"\system\") || args.Contains(@"/sys/")) && !fixMode;
                         
                         if (isInSysFolder)
                         {
@@ -203,7 +226,7 @@ namespace CMLeonOS
                     else
                     {
                         // 检查是否在sys文件夹中（修复模式下绕过检测）
-                        bool isInSysFolder = (args.Contains(@"\sys\") || args.Contains(@"/sys/")) && !fixMode;
+                        bool isInSysFolder = (args.Contains(@"\system\") || args.Contains(@"/sys/")) && !fixMode;
                         
                         if (isInSysFolder)
                         {
@@ -233,9 +256,6 @@ namespace CMLeonOS
                     Console.WriteLine("CMLeonOS Test Project");
                     Console.WriteLine("By LeonOS 2 Developement Team");
                     break;
-                case "cpass":
-                    userSystem.ChangePassword();
-                    break;
                 case "head":
                     HeadFile(args);
                     break;
@@ -256,6 +276,18 @@ namespace CMLeonOS
                     break;
                 case "find":
                     FindFile(args);
+                    break;
+                case "getdisk":
+                    GetDiskInfo();
+                    break;
+                case "user":
+                    ProcessUserCommand(args);
+                    break;
+                case "logout":
+                    userSystem.Logout();
+                    break;
+                case "cpass":
+                    userSystem.ChangePassword();
                     break;
                 default:
                     Console.WriteLine($"Unknown command: {command}");
@@ -803,6 +835,109 @@ namespace CMLeonOS
             catch (Exception ex)
             {
                 Console.WriteLine($"Error finding file: {ex.Message}");
+            }
+        }
+
+        private void GetDiskInfo()
+        {
+            Console.WriteLine("====================================");
+            Console.WriteLine("        Disk Information");
+            Console.WriteLine("====================================");
+            
+            try
+            {
+                // 使用VFSManager获取所有磁盘
+                var disks = Sys.FileSystem.VFS.VFSManager.GetDisks();
+                
+                if (disks == null || disks.Count == 0)
+                {
+                    Console.WriteLine("No disks found.");
+                    return;
+                }
+                
+                Console.WriteLine($"Total Disks: {disks.Count}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting disk info: {ex.Message}");
+            }
+        }
+
+        private string FormatBytes(long bytes)
+        {
+            string[] units = { "B", "KB", "MB", "GB", "TB" };
+            int unitIndex = 0;
+            double size = bytes;
+            
+            while (size >= 1024 && unitIndex < units.Length - 1)
+            {
+                size /= 1024;
+                unitIndex++;
+            }
+            
+            return $"{size:F2} {units[unitIndex]}";
+        }
+
+        private void ProcessUserCommand(string args)
+        {
+            if (string.IsNullOrEmpty(args))
+            {
+                Console.WriteLine("Error: Please specify a user command");
+                Console.WriteLine("Usage: user <add|delete> [args]");
+                Console.WriteLine("  user add admin <username> <password>  - Add admin user");
+                Console.WriteLine("  user add user <username> <password>      - Add regular user");
+                Console.WriteLine("  user delete <username>                    - Delete user");
+                Console.WriteLine("  user list                                    - List all users");
+                return;
+            }
+            
+            string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length < 1)
+            {
+                Console.WriteLine("Error: Please specify a user command");
+                Console.WriteLine("Usage: user <add|delete> [args]");
+                return;
+            }
+            
+            string subCommand = parts[0].ToLower();
+            
+            if (subCommand == "add")
+            {
+                if (parts.Length < 4)
+                {
+                    Console.WriteLine("Error: Please specify user type and username and password");
+                    Console.WriteLine("Usage: user add admin <username> <password>");
+                    Console.WriteLine("Usage: user add user <username> <password>");
+                    return;
+                }
+                
+                string userType = parts[1].ToLower();
+                string username = parts[2];
+                string password = parts[3];
+                bool isAdmin = userType == "admin";
+                
+                userSystem.AddUser($"{username} {password}", isAdmin);
+            }
+            else if (subCommand == "delete")
+            {
+                if (parts.Length < 2)
+                {
+                    Console.WriteLine("Error: Please specify username");
+                    Console.WriteLine("Usage: user delete <username>");
+                    return;
+                }
+                
+                string username = parts[1];
+                userSystem.DeleteUser(username);
+            }
+            else if (subCommand == "list")
+            {
+                userSystem.ListUsers();
+            }
+            else
+            {
+                Console.WriteLine($"Error: Unknown user command '{subCommand}'");
+                Console.WriteLine("Available commands: add, delete, list");
             }
         }
     }

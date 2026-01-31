@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
@@ -19,7 +19,8 @@ namespace CMLeonOS
 
         protected override void BeforeRun()
         {
-            Console.Clear();
+            // Console.Clear();
+            Console.WriteLine(@"-------------------------------------------------");
             Console.WriteLine(@"   ____ __  __ _                      ___  ____  ");
             Console.WriteLine(@"  / ___|  \/  | |    ___  ___  _ __  / _ \/ ___| ");
             Console.WriteLine(@" | |   | |\/| | |   / _ \/ _ \| '_ \| | | \___ \ ");
@@ -44,54 +45,46 @@ namespace CMLeonOS
                 var fs_type = fs.GetFileSystemType(@"0:\");
                 Console.WriteLine("File System Type: " + fs_type);
                 
-                // 删除默认示例文件和文件夹
-                try
+                // 检查并创建system文件夹
+                string systemFolderPath = @"0:\system";
+                if (!System.IO.Directory.Exists(systemFolderPath))
                 {
-                    // 删除示例文件
-                    if (System.IO.File.Exists(@"0:\example.txt"))
-                    {
-                        System.IO.File.Delete(@"0:\example.txt");
-                        Console.WriteLine("Deleted example.txt");
-                    }
-                    
-                    // 删除示例文件夹
-                    if (System.IO.Directory.Exists(@"0:\example"))
-                    {
-                        System.IO.Directory.Delete(@"0:\example", true);
-                        Console.WriteLine("Deleted example directory");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error deleting example files: {ex.Message}");
+                    System.IO.Directory.CreateDirectory(systemFolderPath);
+                    Console.WriteLine("Created system folder.");
                 }
                 
                 // 初始化用户系统
                 userSystem = new UserSystem();
                 
-                // 第一次启动，设置管理员密码
-                if (!userSystem.IsPasswordSet)
+                // 循环直到登录成功或退出
+                while (true)
                 {
-                    userSystem.SetAdminPassword();
-                }
-                // 后续启动，需要登录
-                else
-                {
-                    // 循环直到登录成功
-                    while (!userSystem.Login())
+                    // 第一次启动，设置管理员账户
+                    if (!userSystem.HasUsers)
                     {
-                        // 登录失败，继续尝试
+                        userSystem.FirstTimeSetup();
+                    }
+                    // 后续启动，需要登录
+                    else
+                    {
+                        // 循环直到登录成功
+                        while (!userSystem.Login())
+                        {
+                            // 登录失败，继续尝试
+                        }
+                        
+                        // 登录成功后，初始化Shell
+                        shell = new Shell();
+                        
+                        // 检查并执行启动脚本
+                        ExecuteStartupScript();
+                        
+                        // 运行Shell（用户可以输入exit退出）
+                        shell.Run();
+                        
+                        // 如果用户输入了exit，Shell.Run()会返回，继续循环
                     }
                 }
-                
-                // 登录成功后，初始化Shell
-                shell = new Shell();
-                
-                // 检查并执行启动脚本
-                ExecuteStartupScript();
-                
-                // 系统启动完成，蜂鸣器响一声
-                Console.Beep();
             }
             catch (Exception ex)
             {
@@ -101,7 +94,7 @@ namespace CMLeonOS
 
         private void ExecuteStartupScript()
         {
-            string startupFilePath = @"0:\sys\startup.cm";
+            string startupFilePath = @"0:\system\startup.cm";
             
             try
             {
