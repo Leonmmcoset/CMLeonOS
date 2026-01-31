@@ -124,7 +124,7 @@ namespace CMLeonOS
                         }
                         
                         // 执行命令
-                        Console.WriteLine($"Executing: {line}");
+                        // Console.WriteLine($"Executing: {line}");
                         shell.ExecuteCommand(line);
                     }
                     

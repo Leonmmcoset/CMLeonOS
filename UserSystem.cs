@@ -16,6 +16,7 @@ namespace CMLeonOS
         private string sysDirectory = @"0:\system";
         private string userFilePath;
         private List<User> users;
+        public bool fixmode = Kernel.FixMode;
 
         public UserSystem()
         {
@@ -217,54 +218,55 @@ namespace CMLeonOS
             Console.WriteLine("====================================");
             Console.WriteLine("          System Login");
             Console.WriteLine("====================================");
-            Console.WriteLine("Press any key to continue...");
-            Console.ReadKey(true);
+            // Console.ReadKey(true);
             
             // 检测ALT+Space按键
             bool useFixMode = false;
             ConsoleKeyInfo keyInfo;
             try
             {
-                keyInfo = Console.ReadKey(true);
-                if (keyInfo.Key == ConsoleKey.Spacebar && (keyInfo.Modifiers & ConsoleModifiers.Alt) != 0)
-                {
-                    // 检测到ALT+Space，进入修复模式
-                    useFixMode = true;
-                    Console.WriteLine();
-                    Console.WriteLine("Fix Mode Activated");
-                    Console.Write("Enter fix code: ");
-                    
-                    string fixCode = "";
-                    while (true)
+                if (fixmode == true) {
+                    keyInfo = Console.ReadKey(true);
+                    if (keyInfo.Key == ConsoleKey.Spacebar && (keyInfo.Modifiers & ConsoleModifiers.Alt) != 0)
                     {
-                        var codeKey = Console.ReadKey(true);
-                        if (codeKey.Key == ConsoleKey.Enter)
+                        // 检测到ALT+Space，进入修复模式
+                        useFixMode = true;
+                        Console.WriteLine();
+                        Console.WriteLine("Fix Mode Activated");
+                        Console.Write("Enter fix code: ");
+                        
+                        string fixCode = "";
+                        while (true)
                         {
-                            Console.WriteLine();
-                            break;
-                        }
-                        else if (codeKey.Key == ConsoleKey.Backspace)
-                        {
-                            if (fixCode.Length > 0)
+                            var codeKey = Console.ReadKey(true);
+                            if (codeKey.Key == ConsoleKey.Enter)
                             {
-                                fixCode = fixCode.Substring(0, fixCode.Length - 1);
+                                Console.WriteLine();
+                                break;
                             }
+                            else if (codeKey.Key == ConsoleKey.Backspace)
+                            {
+                                if (fixCode.Length > 0)
+                                {
+                                    fixCode = fixCode.Substring(0, fixCode.Length - 1);
+                                }
+                            }
+                            else
+                            {
+                                fixCode += codeKey.KeyChar;
+                                Console.Write(codeKey.KeyChar);
+                            }
+                        }
+                        
+                        if (fixCode == "FixMyComputer")
+                        {
+                            Console.WriteLine("Fix mode enabled!");
                         }
                         else
                         {
-                            fixCode += codeKey.KeyChar;
-                            Console.Write(codeKey.KeyChar);
+                            Console.WriteLine("Invalid fix code. Exiting fix mode.");
+                            useFixMode = false;
                         }
-                    }
-                    
-                    if (fixCode == "FixMyComputer")
-                    {
-                        Console.WriteLine("Fix mode enabled!");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Invalid fix code. Exiting fix mode.");
-                        useFixMode = false;
                     }
                 }
                 else
