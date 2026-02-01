@@ -343,7 +343,7 @@ namespace CMLeonOS
                     Console.WriteLine("CMLeonOS v1.0");
                     break;
                 case "about":
-                    Console.WriteLine("CMLeonOS Test Project");
+                    Console.WriteLine("CMLeonOS Project");
                     Console.WriteLine("By LeonOS 2 Developement Team");
                     break;
                 case "head":
@@ -384,6 +384,9 @@ namespace CMLeonOS
                     break;
                 case "branswe":
                     ProcessBransweCommand(args);
+                    break;
+                case "grep":
+                    GrepFile(args);
                     break;
                 default:
                     Console.WriteLine($"Unknown command: {command}");
@@ -1064,6 +1067,62 @@ namespace CMLeonOS
             catch (Exception ex)
             {
                 Console.WriteLine($"Error executing Branswe: {ex.Message}");
+            }
+        }
+
+        private void GrepFile(string args)
+        {
+            if (string.IsNullOrEmpty(args))
+            {
+                Console.WriteLine("Error: Please specify file name and search pattern");
+                Console.WriteLine("Usage: grep <pattern> <filename>");
+                return;
+            }
+            
+            string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length < 2)
+            {
+                Console.WriteLine("Error: Please specify both pattern and filename");
+                Console.WriteLine("Usage: grep <pattern> <filename>");
+                return;
+            }
+            
+            string pattern = parts[0];
+            string fileName = parts[1];
+            
+            try
+            {
+                string filePath = fileSystem.GetFullPath(fileName);
+                
+                if (!File.Exists(filePath))
+                {
+                    Console.WriteLine($"Error: File not found: {fileName}");
+                    return;
+                }
+                
+                string content = File.ReadAllText(filePath);
+                string[] lines = content.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
+                
+                int matchCount = 0;
+                Console.WriteLine($"Searching for '{pattern}' in {fileName}:");
+                Console.WriteLine("--------------------------------");
+                
+                foreach (string line in lines)
+                {
+                    if (line.Contains(pattern))
+                    {
+                        matchCount++;
+                        int lineNumber = Array.IndexOf(lines, line) + 1;
+                        Console.WriteLine($"  Line {lineNumber}: {line}");
+                    }
+                }
+                
+                Console.WriteLine("--------------------------------");
+                Console.WriteLine($"Found {matchCount} matches");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error searching file: {ex.Message}");
             }
         }
 

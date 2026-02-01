@@ -27,7 +27,7 @@ namespace CMLeonOS
             Console.WriteLine(@" | |___| |  | | |__|  __/ (_) | | | | |_| |___) |");
             Console.WriteLine(@"  \____|_|  |_|_____\___|\___/|_| |_|____/|____/ ");
             Console.WriteLine();
-            Console.WriteLine("CMLeonOS Test Project");
+            Console.WriteLine("CMLeonOS Project");
             Console.WriteLine("By LeonOS 2 Developement Team");
             
             // 注册VFS
