@@ -19,6 +19,20 @@ namespace CMLeonOS
         public bool fixmode = Kernel.FixMode;
         private User currentLoggedInUser;
 
+        public void ShowError(string error)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"{error}");
+            Console.ResetColor();
+        }
+
+        public void ShowSuccess(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"{message}");
+            Console.ResetColor();
+        }
+
         public UserSystem()
         {
             EnsureSysDirectoryExists();
@@ -102,7 +116,7 @@ namespace CMLeonOS
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error saving users: {ex.Message}");
+                ShowError($"Error saving users: {ex.Message}");
             }
         }
 
@@ -138,7 +152,7 @@ namespace CMLeonOS
             
             while (string.IsNullOrWhiteSpace(username))
             {
-                Console.WriteLine("Username cannot be empty.");
+                ShowError("Username cannot be empty.");
                 Console.Write("Username: ");
                 username = Console.ReadLine();
             }
@@ -151,14 +165,14 @@ namespace CMLeonOS
             
             while (password != confirmPassword)
             {
-                Console.WriteLine("Passwords do not match. Please try again.");
+                ShowError("Passwords do not match. Please try again.");
                 
                 Console.Write("Username: ");
                 username = Console.ReadLine();
                 
                 while (string.IsNullOrWhiteSpace(username))
                 {
-                    Console.WriteLine("Username cannot be empty.");
+                    ShowError("Username cannot be empty.");
                     Console.Write("Username: ");
                     username = Console.ReadLine();
                 }
@@ -180,14 +194,14 @@ namespace CMLeonOS
                 };
                 users.Add(adminUser);
                 SaveUsers();
-                Console.WriteLine("Admin user created successfully!");
+                ShowSuccess("Admin user created successfully!");
                 
                 // 创建用户文件夹
                 CreateUserFolder(username);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error creating admin user: {ex.Message}");
+                ShowError($"Error creating admin user: {ex.Message}");
             }
         }
 
@@ -213,7 +227,7 @@ namespace CMLeonOS
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error creating user folder: {ex.Message}");
+                ShowError($"Error creating user folder: {ex.Message}");
             }
         }
 
@@ -281,7 +295,7 @@ namespace CMLeonOS
                     
                     if (string.IsNullOrWhiteSpace(username))
                     {
-                        Console.WriteLine("Username cannot be empty.");
+                        ShowError("Username cannot be empty.");
                         return false;
                     }
                     
@@ -301,13 +315,13 @@ namespace CMLeonOS
                     
                     if (foundUser == null)
                     {
-                        Console.WriteLine("User not found.");
+                        ShowError("User not found.");
                         return false;
                     }
                     
                     if (foundUser.Password == password)
                     {
-                        Console.WriteLine("Login successful!");
+                        ShowSuccess("Login successful!");
                         Console.Beep();
                         
                         // 设置当前登录用户
@@ -320,7 +334,7 @@ namespace CMLeonOS
                     }
                     else
                     {
-                        Console.WriteLine("Invalid password. Please try again.");
+                        ShowError("Invalid password. Please try again.");
                         return false;
                     }
                 }
@@ -328,7 +342,7 @@ namespace CMLeonOS
             catch
             {
                 // 如果读取按键失败，使用普通登录
-                Console.WriteLine("Error reading key input. Using normal login.");
+                ShowError("Error reading key input. Using normal login.");
                 return false;
             }
             
@@ -350,8 +364,8 @@ namespace CMLeonOS
             string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length < 2)
             {
-                Console.WriteLine("Error: Please specify username and password");
-                Console.WriteLine($"Usage: user add {(isAdmin ? "admin" : "user")} <username> <password>");
+                ShowError("Error: Please specify username and password");
+                ShowError($"Usage: user add {(isAdmin ? "admin" : "user")} <username> <password>");
                 return false;
             }
             
@@ -363,7 +377,7 @@ namespace CMLeonOS
             {
                 if (user.Username.ToLower() == username.ToLower())
                 {
-                    Console.WriteLine($"Error: User '{username}' already exists.");
+                    ShowError($"Error: User '{username}' already exists.");
                     return false;
                 }
             }
@@ -382,14 +396,14 @@ namespace CMLeonOS
                 // 创建用户文件夹
                 CreateUserFolder(username);
 
-                Console.WriteLine($"{(isAdmin ? "Admin" : "User")} '{username}' created successfully!");
-                Console.WriteLine("You shall restart the system to apply the changes.");
+                ShowSuccess($"{(isAdmin ? "Admin" : "User")} '{username}' created successfully!");
+                ShowSuccess("You shall restart the system to apply the changes.");
                 
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error adding user: {ex.Message}");
+                ShowError($"Error adding user: {ex.Message}");
                 return false;
             }
         }
@@ -402,8 +416,8 @@ namespace CMLeonOS
             
             if (string.IsNullOrWhiteSpace(username))
             {
-                Console.WriteLine("Error: Please specify username");
-                Console.WriteLine("Usage: user delete <username>");
+                ShowError("Error: Please specify username");
+                ShowError("Usage: user delete <username>");
                 return false;
             }
             
@@ -420,7 +434,7 @@ namespace CMLeonOS
             
             if (foundUser == null)
             {
-                Console.WriteLine($"Error: User '{username}' not found.");
+                ShowError($"Error: User '{username}' not found.");
                 return false;
             }
             
@@ -436,7 +450,7 @@ namespace CMLeonOS
             
             if (foundUser.IsAdmin && adminCount <= 1)
             {
-                Console.WriteLine("Error: Cannot delete the last admin user.");
+                ShowError("Error: Cannot delete the last admin user.");
                 return false;
             }
             
@@ -444,12 +458,12 @@ namespace CMLeonOS
             {
                 users.Remove(foundUser);
                 SaveUsers();
-                Console.WriteLine($"User '{username}' deleted successfully!");
+                ShowSuccess($"User '{username}' deleted successfully!");
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error deleting user: {ex.Message}");
+                ShowError($"Error deleting user: {ex.Message}");
                 return false;
             }
         }
@@ -486,7 +500,7 @@ namespace CMLeonOS
             // 检查是否有用户登录
             if (currentLoggedInUser == null)
             {
-                Console.WriteLine("Error: No user logged in.");
+                ShowError("Error: No user logged in.");
                 return false;
             }
             
@@ -502,29 +516,20 @@ namespace CMLeonOS
                 {
                     currentLoggedInUser.Password = newPassword;
                     SaveUsers();
-                    Console.WriteLine("Password changed successfully!");
+                    ShowSuccess("Password changed successfully!");
                     return true;
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Error changing password: {ex.Message}");
+                    ShowError($"Error changing password: {ex.Message}");
                     return false;
                 }
             }
             else
             {
-                Console.WriteLine("New passwords do not match.");
+                ShowError("New passwords do not match.");
                 return false;
             }
-        }
-
-        public void Logout()
-        {
-            Console.WriteLine("====================================");
-            Console.WriteLine("        User Logout");
-            Console.WriteLine("====================================");
-            Console.WriteLine("Logging out...");
-            Console.WriteLine("Logout successful!");
         }
 
         private string ReadPassword()

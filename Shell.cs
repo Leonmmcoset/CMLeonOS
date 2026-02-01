@@ -22,6 +22,20 @@ namespace CMLeonOS
             Console.ResetColor();
         }
 
+        public void ShowSuccess(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"{message}");
+            Console.ResetColor();
+        }
+
+        public void ShowWarning(string warning)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"{warning}");
+            Console.ResetColor();
+        }
+
         public Shell(UserSystem userSystem)
         {
             this.userSystem = userSystem;
@@ -849,7 +863,7 @@ namespace CMLeonOS
                 
                 // 使用FileSystem写入目标文件
                 fileSystem.WriteFile(destFile, content);
-                Console.WriteLine($"File copied successfully from '{sourceFile}' to '{destFile}'");
+                ShowSuccess($"File copied successfully from '{sourceFile}' to '{destFile}'");
             }
             catch (Exception ex)
             {
@@ -893,7 +907,7 @@ namespace CMLeonOS
                 // 删除源文件
                 fileSystem.DeleteFile(sourceFile);
                 
-                Console.WriteLine($"File moved/renamed successfully from '{sourceFile}' to '{destFile}'");
+                ShowSuccess($"File moved/renamed successfully from '{sourceFile}' to '{destFile}'");
             }
             catch (Exception ex)
             {
@@ -914,7 +928,7 @@ namespace CMLeonOS
             {
                 // 使用FileSystem创建空文件
                 fileSystem.WriteFile(args, "");
-                Console.WriteLine($"Empty file '{args}' created successfully");
+                ShowSuccess($"Empty file '{args}' created successfully");
             }
             catch (Exception ex)
             {
@@ -1275,14 +1289,14 @@ namespace CMLeonOS
                 
                 if (Directory.Exists(backupPath))
                 {
-                    Console.WriteLine($"BackupSystem: Backup '{backupName}' already exists");
-                    Console.WriteLine("BackupSystem: Returning without creating new backup");
+                    ShowWarning($"Backup '{backupName}' already exists");
+                    ShowWarning("Returning without creating new backup");
                     return;
                 }
                 
                 Console.WriteLine($"BackupSystem: Creating backup directory: {backupPath}");
                 Directory.CreateDirectory(backupPath);
-                Console.WriteLine($"BackupSystem: Backup directory created");
+                ShowSuccess($"Backup directory created");
                 
                 // 备份系统文件
                 string sysPath = @"0:\system";
@@ -1316,8 +1330,8 @@ namespace CMLeonOS
                     Console.WriteLine($"BackupSystem: User path does not exist, skipping user backup");
                 }
                 
-                Console.WriteLine($"BackupSystem: Backup '{backupName}' created successfully");
-                Console.WriteLine($"Backup location: {backupPath}");
+                ShowSuccess($"Backup '{backupName}' created successfully");
+                ShowSuccess($"Backup location: {backupPath}");
             }
             catch (Exception ex)
             {
@@ -1362,8 +1376,8 @@ namespace CMLeonOS
                     CopyDirectory(backupPath, userPath, true);
                 }
                 
-                Console.WriteLine($"Backup '{backupName}' restored successfully");
-                Console.WriteLine($"Backup location: {backupPath}");
+                ShowSuccess($"Backup '{backupName}' restored successfully");
+                ShowSuccess($"Backup location: {backupPath}");
             }
             catch (Exception ex)
             {
@@ -1390,7 +1404,7 @@ namespace CMLeonOS
                 
                 if (sourceFiles.Length == 0)
                 {
-                    Console.WriteLine($"CopyDirectory: Warning: No files found in source directory");
+                    ShowWarning($"CopyDirectory: Warning: No files found in source directory");
                     return;
                 }
                 
