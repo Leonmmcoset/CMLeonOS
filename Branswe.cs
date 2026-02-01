@@ -514,6 +514,169 @@ public static class Branswe
                         Branswe.Run(line);
                         break;
                     }
+                case "cat":
+                    {
+                        // 与CMLeonOS兼容，支持cat命令
+                        var parts = line.Split(" ", 2);
+                        if (parts.Length < 2)
+                        {
+                            Console.WriteLine("Error: Please specify file name");
+                            Console.WriteLine("Usage: cat <filename>");
+                            break;
+                        }
+                        
+                        string filePath = parts[1];
+                        if (!File.Exists(filePath))
+                        {
+                            Console.WriteLine($"Error: File not found: {filePath}");
+                            break;
+                        }
+                        
+                        try
+                        {
+                            string content = File.ReadAllText(filePath);
+                            Console.WriteLine(content);
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error reading file: {ex.Message}");
+                        }
+                        break;
+                    }
+                case "echo":
+                    {
+                        // 与CMLeonOS兼容，支持echo命令
+                        var parts = line.Split(" ", 2);
+                        if (parts.Length < 2)
+                        {
+                            Console.WriteLine("Error: Please specify text");
+                            Console.WriteLine("Usage: echo <text>");
+                            break;
+                        }
+                        
+                        try
+                        {
+                            File.WriteAllText(parts[1], parts[0]);
+                            Console.WriteLine("Text written successfully.");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error writing file: {ex.Message}");
+                        }
+                        break;
+                    }
+                case "ls":
+                    {
+                        // 与CMLeonOS兼容，支持ls命令
+                        var parts = line.Split(" ", 2);
+                        string dirPath = parts.Length >= 2 ? parts[1] : "";
+                        
+                        try
+                        {
+                            if (Directory.Exists(dirPath))
+                            {
+                                var files = Directory.GetFiles(dirPath);
+                                var dirs = Directory.GetDirectories(dirPath);
+                                
+                                foreach (var file in files)
+                                {
+                                    Console.WriteLine($"  {file}");
+                                }
+                                foreach (var dir in dirs)
+                                {
+                                    Console.WriteLine($"  [{dir}]/");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Error: Directory not found: {dirPath}");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error listing directory: {ex.Message}");
+                        }
+                        break;
+                    }
+                case "pwd":
+                    {
+                        // 与CMLeonOS兼容，支持pwd命令
+                        Console.WriteLine("0:\\");
+                        break;
+                    }
+                case "mkdir":
+                    {
+                        // 与CMLeonOS兼容，支持mkdir命令
+                        var parts = line.Split(" ", 2);
+                        if (parts.Length < 2)
+                        {
+                            Console.WriteLine("Error: Please specify directory name");
+                            Console.WriteLine("Usage: mkdir <dirname>");
+                            break;
+                        }
+                        
+                        try
+                        {
+                            Directory.CreateDirectory(parts[1]);
+                            Console.WriteLine($"Directory created: {parts[1]}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error creating directory: {ex.Message}");
+                        }
+                        break;
+                    }
+                case "rm":
+                    {
+                        // 与CMLeonOS兼容，支持rm命令
+                        var parts = line.Split(" ", 2);
+                        if (parts.Length < 2)
+                        {
+                            Console.WriteLine("Error: Please specify file name");
+                            Console.WriteLine("Usage: rm <filename>");
+                            break;
+                        }
+                        
+                        string filePath = parts[1];
+                        try
+                        {
+                            File.Delete(filePath);
+                            Console.WriteLine($"File deleted: {filePath}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error deleting file: {ex.Message}");
+                        }
+                        break;
+                    }
+                case "rmdir":
+                    {
+                        // 与CMLeonOS兼容，支持rmdir命令
+                        var parts = line.Split(" ", 2);
+                        if (parts.Length < 2)
+                        {
+                            Console.WriteLine("Error: Please specify directory name");
+                            Console.WriteLine("Usage: rmdir <dirname>");
+                            break;
+                        }
+                        
+                        try
+                        {
+                            Directory.Delete(parts[1]);
+                            Console.WriteLine($"Directory deleted: {parts[1]}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error deleting directory: {ex.Message}");
+                        }
+                        break;
+                    }
+                // default:
+                //     {
+                //         // û��ƥ��ķ���������ֱ��ִ��
+                //         Branswe.Run(line);
+                //         break;
+                //     }
             }
         }
     }

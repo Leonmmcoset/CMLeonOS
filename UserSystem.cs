@@ -17,6 +17,7 @@ namespace CMLeonOS
         private string userFilePath;
         private List<User> users;
         public bool fixmode = Kernel.FixMode;
+        private User currentLoggedInUser;
 
         public UserSystem()
         {
@@ -24,6 +25,9 @@ namespace CMLeonOS
             
             // 设置用户文件路径
             userFilePath = Path.Combine(sysDirectory, "user.dat");
+            
+            // 初始化当前登录用户
+            currentLoggedInUser = null;
             
             // 加载用户数据
             LoadUsers();
@@ -304,8 +308,10 @@ namespace CMLeonOS
                     if (foundUser.Password == password)
                     {
                         Console.WriteLine("Login successful!");
-
                         Console.Beep();
+                        
+                        // 设置当前登录用户
+                        currentLoggedInUser = foundUser;
                         
                         // 创建用户文件夹
                         CreateUserFolder(foundUser.Username);
@@ -477,18 +483,8 @@ namespace CMLeonOS
             Console.Write("Please enter your current password: ");
             string currentPassword = ReadPassword();
             
-            // 查找当前登录用户
-            User currentUser = null;
-            foreach (User user in users)
-            {
-                if (user.Username.ToLower() == "current")
-                {
-                    currentUser = user;
-                    break;
-                }
-            }
-            
-            if (currentUser == null)
+            // 检查是否有用户登录
+            if (currentLoggedInUser == null)
             {
                 Console.WriteLine("Error: No user logged in.");
                 return false;
@@ -504,7 +500,7 @@ namespace CMLeonOS
             {
                 try
                 {
-                    currentUser.Password = newPassword;
+                    currentLoggedInUser.Password = newPassword;
                     SaveUsers();
                     Console.WriteLine("Password changed successfully!");
                     return true;

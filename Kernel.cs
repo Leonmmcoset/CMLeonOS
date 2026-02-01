@@ -74,7 +74,7 @@ namespace CMLeonOS
                         }
                         
                         // 登录成功后，初始化Shell
-                        shell = new Shell();
+                        shell = new Shell(userSystem);
                         
                         // 检查并执行启动脚本
                         ExecuteStartupScript();

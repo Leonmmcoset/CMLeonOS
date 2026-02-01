@@ -142,7 +142,7 @@ namespace CMLeonOS
             // 设置光标位置
             try
             {
-                Console.SetCursorPosition(currentColumn + 4, cursorY);
+                Console.SetCursorPosition(currentColumn + 3, cursorY);
             }
             catch
             {
@@ -165,9 +165,9 @@ namespace CMLeonOS
                     // 删除字符
                     if (currentColumn > 0)
                     {
-                        string line = lines[currentLine];
-                        line = line.Remove(currentColumn - 1, 1);
-                        lines[currentLine] = line;
+                        string backspaceLineText = lines[currentLine];
+                        string backspaceModifiedLine = backspaceLineText.Remove(currentColumn - 1, 1);
+                        lines[currentLine] = backspaceModifiedLine;
                         currentColumn--;
                     }
                     else if (currentLine > 0)
@@ -183,11 +183,11 @@ namespace CMLeonOS
                     break;
                 case ConsoleKey.Enter:
                     // 插入换行
-                    string currentLineText = lines[currentLine];
-                    string firstPart = currentLineText.Substring(0, currentColumn);
-                    string secondPart = currentLineText.Substring(currentColumn);
-                    lines[currentLine] = firstPart;
-                    lines.Insert(currentLine + 1, secondPart);
+                    string enterLineText = lines[currentLine];
+                    string enterFirstPart = enterLineText.Substring(0, currentColumn);
+                    string enterSecondPart = enterLineText.Substring(currentColumn);
+                    lines[currentLine] = enterFirstPart;
+                    lines.Insert(currentLine + 1, enterSecondPart);
                     currentLine++;
                     currentColumn = 0;
                     break;
@@ -221,13 +221,21 @@ namespace CMLeonOS
                         currentColumn = Math.Min(currentColumn, lines[currentLine].Length);
                     }
                     break;
+                case ConsoleKey.Tab:
+                    // Tab键插入四个空格
+                    string tabLineText = lines[currentLine];
+                    string tabSpaces = "    ";
+                    string tabModifiedLine = tabLineText.Insert(currentColumn, tabSpaces);
+                    lines[currentLine] = tabModifiedLine;
+                    currentColumn += 4;
+                    break;
                 default:
                     // 输入字符
                     if (char.IsLetterOrDigit(keyInfo.KeyChar) || char.IsPunctuation(keyInfo.KeyChar) || char.IsSymbol(keyInfo.KeyChar) || keyInfo.KeyChar == ' ')
                     {
-                        string line = lines[currentLine];
-                        line = line.Insert(currentColumn, keyInfo.KeyChar.ToString());
-                        lines[currentLine] = line;
+                        string defaultLineText = lines[currentLine];
+                        string defaultModifiedLine = defaultLineText.Insert(currentColumn, keyInfo.KeyChar.ToString());
+                        lines[currentLine] = defaultModifiedLine;
                         currentColumn++;
                     }
                     break;
@@ -244,15 +252,36 @@ namespace CMLeonOS
             Console.BackgroundColor = ConsoleColor.DarkGray;
             Console.ForegroundColor = ConsoleColor.White;
             
-            // 简单的弹窗显示
-            Console.WriteLine("+----------------------------+");
-            Console.WriteLine("|          Save File?        |");
-            Console.WriteLine("+----------------------------+");
-            Console.WriteLine("| Do you want to save the    |");
-            Console.WriteLine("| changes?                   |");
-            Console.WriteLine("+----------------------------+");
-            Console.WriteLine("| Y = Yes, N = No            |");
-            Console.WriteLine("+----------------------------+");
+            // 获取控制台窗口大小
+            int consoleWidth = 80; // 假设控制台宽度为80
+            int consoleHeight = 25; // 假设控制台高度为25
+            
+            // 弹窗内容
+            string[] popupLines = {
+                "+----------------------------+",
+                "|          Save File?        |",
+                "+----------------------------+",
+                "| Do you want to save the    |",
+                "| changes?                   |",
+                "+----------------------------+",
+                "| Y = Yes, N = No            |",
+                "+----------------------------+"
+            };
+            
+            // 计算弹窗宽度和高度
+            int popupWidth = 30; // 弹窗宽度
+            int popupHeight = popupLines.Length; // 弹窗高度
+            
+            // 计算弹窗在屏幕中的位置（居中）
+            int popupX = (consoleWidth - popupWidth) / 2;
+            int popupY = (consoleHeight - popupHeight) / 2;
+            
+            // 显示弹窗
+            for (int i = 0; i < popupLines.Length; i++)
+            {
+                Console.SetCursorPosition(popupX, popupY + i);
+                Console.WriteLine(popupLines[i]);
+            }
             
             // 等待用户输入
             while (true)

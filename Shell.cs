@@ -13,10 +13,10 @@ namespace CMLeonOS
         private UserSystem userSystem;
         private bool fixMode;
 
-        public Shell()
+        public Shell(UserSystem userSystem)
         {
+            this.userSystem = userSystem;
             fileSystem = new FileSystem();
-            userSystem = new UserSystem();
             fixMode = Kernel.FixMode;
         }
 
@@ -89,56 +89,135 @@ namespace CMLeonOS
                     Sys.Power.Shutdown();
                     break;
                 case "help":
-                    Console.WriteLine("Available commands:");
-                    Console.WriteLine("  echo <text>      - Display text (supports \\n for newline)");
-                    Console.WriteLine("  clear/cls        - Clear the screen");
-                    Console.WriteLine("  restart          - Restart the system");
-                    Console.WriteLine("  shutdown         - Shutdown the system");
-                    Console.WriteLine("  time             - Display current time");
-                    Console.WriteLine("  date             - Display current date");
-                    Console.WriteLine("  prompt <text>    - Change command prompt");
-                    Console.WriteLine("  calc <expr>      - Simple calculator");
-                    Console.WriteLine("  history          - Show command history");
-                    Console.WriteLine("  background <hex> - Change background color");
-                    Console.WriteLine("  cuitest          - Test CUI framework");
-                    Console.WriteLine("  edit <file>      - Simple code editor");
-                    Console.WriteLine("  ls <dir>         - List files and directories");
-                    Console.WriteLine("  cd <dir>         - Change directory");
-                    Console.WriteLine("                     cd ..              - Go to parent directory");
-                    Console.WriteLine("                     cd dir1/dir2/dir3 - Go to numbered directory");
-                    Console.WriteLine("  pwd              - Show current directory");
-                    Console.WriteLine("  mkdir <dir>      - Create directory");
-                    Console.WriteLine("  rm <file>        - Remove file");
-                    Console.WriteLine("                     Use -norisk to delete files in sys folder");
-                    Console.WriteLine("  rmdir <dir>      - Remove directory");
-                    Console.WriteLine("  cat <file>       - Display file content");
-                    Console.WriteLine("  echo <text> > <file> - Write text to file");
-                    Console.WriteLine("  head <file>      - Display first lines of file");
-                    Console.WriteLine("                     Usage: head <file> <lines>");
-                    Console.WriteLine("  tail <file>      - Display last lines of file");
-                    Console.WriteLine("                     Usage: tail <file> <lines>");
-                    Console.WriteLine("  wc <file>        - Count lines, words, characters");
-                    Console.WriteLine("  cp <src> <dst>   - Copy file");
-                    Console.WriteLine("  mv <src> <dst>   - Move/rename file");
-                    Console.WriteLine("  touch <file>     - Create empty file");
-                    Console.WriteLine("  find <name>      - Find file");
-                    Console.WriteLine("  getdisk          - Show disk information");
-                    Console.WriteLine("  user <cmd>       - User management");
-                    Console.WriteLine("                     user add admin <username> <password>    - Add admin user");
-                    Console.WriteLine("                     user add user <username> <password>     - Add regular user");
-                    Console.WriteLine("                     user delete <username>                  - Delete user");
-                    Console.WriteLine("                     user list                               - List all users");
-                    Console.WriteLine("  cpass            - Change password");
-                    Console.WriteLine("  beep             - Play beep sound");
-                    Console.WriteLine("  branswe <filename> - Execute Branswe code file");
-                    Console.WriteLine("  version          - Show OS version");
-                    Console.WriteLine("  about            - Show about information");
-                    Console.WriteLine("  help             - Show this help message");
-                    Console.WriteLine();
-                    Console.WriteLine("Startup Script: sys\\startup.cm");
-                    Console.WriteLine("  Commands in this file will be executed on startup");
-                    Console.WriteLine("  Each line should contain one command");
-                    Console.WriteLine("  Lines starting with # are treated as comments");
+                    // 分页显示帮助信息
+                    string[] helpArgs = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    int pageNumber = 1;
+                    bool showAll = false;
+                    
+                    if (helpArgs.Length > 0)
+                    {
+                        if (helpArgs[0].ToLower() == "all")
+                        {
+                            showAll = true;
+                        }
+                        else if (int.TryParse(helpArgs[0], out int page))
+                        {
+                            pageNumber = page;
+                        }
+                    }
+                    
+                    string[] allCommands = {
+                        "  echo <text>      - Display text (supports \\n for newline)",
+                        "  clear/cls        - Clear the screen",
+                        "  restart          - Restart the system",
+                        "  shutdown         - Shutdown the system",
+                        "  time             - Display current time",
+                        "  date             - Display current date",
+                        "  prompt <text>    - Change command prompt",
+                        "  calc <expr>      - Simple calculator",
+                        "  history          - Show command history",
+                        "  background <hex> - Change background color",
+                        "  cuitest          - Test CUI framework",
+                        "  edit <file>      - Simple code editor",
+                        "                     Tab key inserts 4 spaces",
+                        "  ls <dir>         - List files and directories",
+                        "  cd <dir>         - Change directory",
+                        "                     cd ..              - Go to parent directory",
+                        "                     cd dir1/dir2/dir3  - Go to numbered directory",
+                        "  pwd              - Show current directory",
+                        "  mkdir <dir>      - Create directory",
+                        "  rm <file>        - Remove file",
+                        "                     Use -norisk to delete files in sys folder",
+                        "  rmdir <dir>      - Remove directory",
+                        "  cat <file>       - Display file content",
+                        "  echo <text> > <file> - Write text to file",
+                        "  head <file>      - Display first lines of file",
+                        "                     Usage: head <file> <lines>",
+                        "  tail <file>      - Display last lines of file",
+                        "                     Usage: tail <file> <lines>",
+                        "  wc <file>        - Count lines, words, characters",
+                        "  cp <src> <dst>   - Copy file",
+                        "  mv <src> <dst>   - Move/rename file",
+                        "  touch <file>     - Create empty file",
+                        "  find <name>      - Find file",
+                        "  getdisk          - Show disk information",
+                        "  user <cmd>       - User management",
+                        "                     user add admin <username> <password>    - Add admin user",
+                        "                     user add user <username> <password>     - Add regular user",
+                        "                     user delete <username>                  - Delete user",
+                        "                     user list                               - List all users",
+                        "  cpass            - Change password",
+                        "  beep             - Play beep sound",
+                        "  branswe <filename> - Execute Branswe code file",
+                        "  version          - Show OS version",
+                        "  about            - Show about information",
+                        "  help <page>      - Show help page (1-3)",
+                        "  help all          - Show all help pages",
+                        "",
+                        "Startup Script: sys\\startup.cm",
+                        "  Commands in this file will be executed on startup",
+                        "  Each line should contain one command",
+                        "  Lines starting with # are treated as comments"
+                    };
+                    
+                    int commandsPerPage = 15;
+                    int totalPages = (int)Math.Ceiling((double)allCommands.Length / commandsPerPage);
+                    
+                    if (showAll)
+                    {
+                        Console.WriteLine("====================================");
+                        Console.WriteLine("        Help - All Pages");
+                        Console.WriteLine("====================================");
+                        Console.WriteLine();
+                        
+                        foreach (var cmd in allCommands)
+                        {
+                            Console.WriteLine(cmd);
+                        }
+                        
+                        Console.WriteLine();
+                        Console.WriteLine("-- End of help --");
+                    }
+                    else
+                    {
+                        if (pageNumber > totalPages)
+                        {
+                            pageNumber = totalPages;
+                        }
+                        if (pageNumber < 1)
+                        {
+                            pageNumber = 1;
+                        }
+                        
+                        int startIndex = (pageNumber - 1) * commandsPerPage;
+                        int endIndex = Math.Min(startIndex + commandsPerPage, allCommands.Length);
+                        
+                        Console.WriteLine("====================================");
+                        Console.WriteLine($"        Help - Page {pageNumber}/{totalPages}");
+                        Console.WriteLine("====================================");
+                        Console.WriteLine();
+                        
+                        for (int i = startIndex; i < endIndex; i++)
+                        {
+                            Console.WriteLine(allCommands[i]);
+                        }
+                        
+                        if (pageNumber < totalPages)
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine($"-- More -- Type 'help {pageNumber + 1}' for next page or 'help all' for all pages --");
+                        }
+                        else
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine("-- End of help --");
+                        }
+                    }
+                    
+                    // Console.WriteLine("Startup Script: sys\\startup.cm");
+                    // Console.WriteLine("  Commands in this file will be executed on startup");
+                    // Console.WriteLine("  Each line should contain one command");
+                    // Console.WriteLine("  Lines starting with # are treated as comments");
                     break;
                 case "time":
                     Console.WriteLine(DateTime.Now.ToString());
