@@ -15,6 +15,13 @@ namespace CMLeonOS
         private bool fixMode;
         private EnvironmentVariableManager envManager;
 
+        public void ShowError(string error)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"{error}");
+            Console.ResetColor();
+        }
+
         public Shell(UserSystem userSystem)
         {
             this.userSystem = userSystem;
@@ -264,7 +271,7 @@ namespace CMLeonOS
                 case "mkdir":
                     if (string.IsNullOrEmpty(args))
                     {
-                        Console.WriteLine("Error: Please specify a directory name");
+                        ShowError("Please specify a directory name");
                     }
                     else
                     {
@@ -274,7 +281,7 @@ namespace CMLeonOS
                 case "rm":
                     if (string.IsNullOrEmpty(args))
                     {
-                        Console.WriteLine("Error: Please specify a file name");
+                        ShowError("Please specify a file name");
                     }
                     else
                     {
@@ -296,8 +303,8 @@ namespace CMLeonOS
                             
                             if (!hasNorisk)
                             {
-                                Console.WriteLine("Error: Cannot delete files in sys folder without -norisk parameter");
-                                Console.WriteLine("Usage: rm <file> -norisk");
+                                ShowError("Cannot delete files in sys folder without -norisk parameter");
+                                ShowError("Usage: rm <file> -norisk");
                             }
                             else
                             {
@@ -313,7 +320,7 @@ namespace CMLeonOS
                 case "rmdir":
                     if (string.IsNullOrEmpty(args))
                     {
-                        Console.WriteLine("Error: Please specify a directory name");
+                        ShowError("Please specify a directory name");
                     }
                     else
                     {
@@ -322,8 +329,8 @@ namespace CMLeonOS
                         
                         if (isInSysFolder)
                         {
-                            Console.WriteLine("Error: Cannot delete directories in sys folder");
-                            Console.WriteLine("Use fix mode to bypass this restriction");
+                            ShowError("Cannot delete directories in sys folder");
+                            ShowError("Use fix mode to bypass this restriction");
                         }
                         else
                         {
@@ -334,7 +341,7 @@ namespace CMLeonOS
                 case "cat":
                     if (string.IsNullOrEmpty(args))
                     {
-                        Console.WriteLine("Error: Please specify a file name");
+                        ShowError("Please specify a file name");
                     }
                     else
                     {
@@ -403,7 +410,7 @@ namespace CMLeonOS
                     RestoreSystem(args);
                     break;
                 default:
-                    Console.WriteLine($"Unknown command: {command}");
+                    ShowError($"Unknown command: {command}");
                     break;
             }
         }
@@ -458,12 +465,12 @@ namespace CMLeonOS
                             }
                             else
                             {
-                                Console.WriteLine("Error: Division by zero");
+                                ShowError("Division by zero");
                                 return;
                             }
                             break;
                         default:
-                            Console.WriteLine("Error: Invalid operator. Use +, -, *, /");
+                            ShowError("Invalid operator. Use +, -, *, /");
                             return;
                     }
 
@@ -471,12 +478,12 @@ namespace CMLeonOS
                 }
                 else
                 {
-                    Console.WriteLine("Error: Invalid expression. Use format: calc <num> <op> <num>");
+                    ShowError("Invalid expression. Use format: calc <num> <op> <num>");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
+                ShowError($"Error: {ex.Message}");
             }
         }
 
@@ -510,12 +517,12 @@ namespace CMLeonOS
                 }
                 else
                 {
-                    Console.WriteLine("Error: Invalid hex color format. Use format: #RRGGBB or RRGGBB");
+                    ShowError("Invalid hex color format. Use format: #RRGGBB or RRGGBB");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error changing background color: {ex.Message}");
+                ShowError($"Error changing background color: {ex.Message}");
             }
         }
 
@@ -659,7 +666,7 @@ namespace CMLeonOS
         {
             if (string.IsNullOrEmpty(fileName))
             {
-                Console.WriteLine("Error: Please specify a file name");
+                ShowError("Please specify a file name");
                 return;
             }
             
@@ -670,7 +677,7 @@ namespace CMLeonOS
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error starting editor: {ex.Message}");
+                ShowError($"Error starting editor: {ex.Message}");
             }
         }
 
@@ -678,7 +685,7 @@ namespace CMLeonOS
         {
             if (string.IsNullOrEmpty(args))
             {
-                Console.WriteLine("Error: Please specify a file name");
+                ShowError("Please specify a file name");
                 return;
             }
             
@@ -716,7 +723,7 @@ namespace CMLeonOS
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error reading file: {ex.Message}");
+                ShowError($"Error reading file: {ex.Message}");
             }
         }
 
@@ -724,7 +731,7 @@ namespace CMLeonOS
         {
             if (string.IsNullOrEmpty(args))
             {
-                Console.WriteLine("Error: Please specify a file name");
+                ShowError("Please specify a file name");
                 return;
             }
             
@@ -763,7 +770,7 @@ namespace CMLeonOS
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error reading file: {ex.Message}");
+                ShowError($"Error reading file: {ex.Message}");
             }
         }
 
@@ -771,7 +778,7 @@ namespace CMLeonOS
         {
             if (string.IsNullOrEmpty(args))
             {
-                Console.WriteLine("Error: Please specify a file name");
+                ShowError("Please specify a file name");
                 return;
             }
             
@@ -806,7 +813,7 @@ namespace CMLeonOS
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error reading file: {ex.Message}");
+                ShowError($"Error reading file: {ex.Message}");
             }
         }
 
@@ -814,8 +821,8 @@ namespace CMLeonOS
         {
             if (string.IsNullOrEmpty(args))
             {
-                Console.WriteLine("Error: Please specify source and destination files");
-                Console.WriteLine("Usage: cp <source> <destination>");
+                ShowError("Please specify source and destination files");
+                ShowError("cp <source> <destination>");
                 return;
             }
             
@@ -824,8 +831,8 @@ namespace CMLeonOS
                 string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 if (parts.Length < 2)
                 {
-                    Console.WriteLine("Error: Please specify both source and destination");
-                    Console.WriteLine("Usage: cp <source> <destination>");
+                    ShowError("Please specify both source and destination");
+                    ShowError("cp <source> <destination>");
                     return;
                 }
                 
@@ -836,7 +843,7 @@ namespace CMLeonOS
                 string content = fileSystem.ReadFile(sourceFile);
                 if (content == null)
                 {
-                    Console.WriteLine($"Error: Source file '{sourceFile}' does not exist");
+                    ShowError($"Source file '{sourceFile}' does not exist");
                     return;
                 }
                 
@@ -846,7 +853,7 @@ namespace CMLeonOS
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error copying file: {ex.Message}");
+                ShowError($"Error copying file: {ex.Message}");
             }
         }
 
@@ -854,8 +861,8 @@ namespace CMLeonOS
         {
             if (string.IsNullOrEmpty(args))
             {
-                Console.WriteLine("Error: Please specify source and destination files");
-                Console.WriteLine("Usage: mv <source> <destination>");
+                ShowError("Please specify source and destination files");
+                ShowError("mv <source> <destination>");
                 return;
             }
             
@@ -864,8 +871,8 @@ namespace CMLeonOS
                 string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 if (parts.Length < 2)
                 {
-                    Console.WriteLine("Error: Please specify both source and destination");
-                    Console.WriteLine("Usage: mv <source> <destination>");
+                    ShowError("Please specify both source and destination");
+                    ShowError("mv <source> <destination>");
                     return;
                 }
                 
@@ -876,7 +883,7 @@ namespace CMLeonOS
                 string content = fileSystem.ReadFile(sourceFile);
                 if (content == null)
                 {
-                    Console.WriteLine($"Error: Source file '{sourceFile}' does not exist");
+                    ShowError($"Source file '{sourceFile}' does not exist");
                     return;
                 }
                 
@@ -890,7 +897,7 @@ namespace CMLeonOS
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error moving file: {ex.Message}");
+                ShowError($"Error moving file: {ex.Message}");
             }
         }
 
@@ -898,8 +905,8 @@ namespace CMLeonOS
         {
             if (string.IsNullOrEmpty(args))
             {
-                Console.WriteLine("Error: Please specify a file name");
-                Console.WriteLine("Usage: touch <filename>");
+                ShowError("Please specify a file name");
+                ShowError("touch <filename>");
                 return;
             }
             
@@ -911,7 +918,7 @@ namespace CMLeonOS
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error creating file: {ex.Message}");
+                ShowError($"Error creating file: {ex.Message}");
             }
         }
 
@@ -919,8 +926,8 @@ namespace CMLeonOS
         {
             if (string.IsNullOrEmpty(args))
             {
-                Console.WriteLine("Error: Please specify a file name to search");
-                Console.WriteLine("Usage: find <filename>");
+                ShowError("Please specify a file name to search");
+                ShowError("find <filename>");
                 return;
             }
             
@@ -947,7 +954,7 @@ namespace CMLeonOS
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error finding file: {ex.Message}");
+                ShowError($"Error finding file: {ex.Message}");
             }
         }
 
@@ -972,7 +979,7 @@ namespace CMLeonOS
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error getting disk info: {ex.Message}");
+                ShowError($"Error getting disk info: {ex.Message}");
             }
         }
 
@@ -995,20 +1002,21 @@ namespace CMLeonOS
         {
             if (string.IsNullOrEmpty(args))
             {
-                Console.WriteLine("Error: Please specify a user command");
-                Console.WriteLine("Usage: user <add|delete> [args]");
-                Console.WriteLine("  user add admin <username> <password>  - Add admin user");
-                Console.WriteLine("  user add user <username> <password>      - Add regular user");
-                Console.WriteLine("  user delete <username>                    - Delete user");
-                Console.WriteLine("  user list                                    - List all users");
+                ShowError("Error: Please specify a user command");
+                ShowError("Please specify a user command");
+                ShowError("user <add|delete> [args]");
+                ShowError("  user add admin <username> <password>  - Add admin user");
+                ShowError("  user add user <username> <password>      - Add regular user");
+                ShowError("  user delete <username>                    - Delete user");
+                ShowError("  user list                                    - List all users");
                 return;
             }
             
             string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length < 1)
             {
-                Console.WriteLine("Error: Please specify a user command");
-                Console.WriteLine("Usage: user <add|delete> [args]");
+                ShowError("Error: Please specify a user command");
+                ShowError("Usage: user <add|delete> [args]");
                 return;
             }
             
@@ -1018,9 +1026,9 @@ namespace CMLeonOS
             {
                 if (parts.Length < 4)
                 {
-                    Console.WriteLine("Error: Please specify user type and username and password");
-                    Console.WriteLine("Usage: user add admin <username> <password>");
-                    Console.WriteLine("Usage: user add user <username> <password>");
+                    ShowError("Error: Please specify user type and username and password");
+                    ShowError("Usage: user add admin <username> <password>");
+                    ShowError("Usage: user add user <username> <password>");
                     return;
                 }
                 
@@ -1035,8 +1043,8 @@ namespace CMLeonOS
             {
                 if (parts.Length < 2)
                 {
-                    Console.WriteLine("Error: Please specify username");
-                    Console.WriteLine("Usage: user delete <username>");
+                    ShowError("Error: Please specify username");
+                    ShowError("Usage: user delete <username>");
                     return;
                 }
                 
@@ -1049,8 +1057,8 @@ namespace CMLeonOS
             }
             else
             {
-                Console.WriteLine($"Error: Unknown user command '{subCommand}'");
-                Console.WriteLine("Available commands: add, delete, list");
+                ShowError($"Error: Unknown user command '{subCommand}'");
+                ShowError("Available commands: add, delete, list");
             }
         }
 
@@ -1058,8 +1066,8 @@ namespace CMLeonOS
         {
             if (string.IsNullOrEmpty(args))
             {
-                Console.WriteLine("Error: Please specify file name");
-                Console.WriteLine("Usage: branswe <filename>");
+                ShowError("Error: Please specify file name");
+                ShowError("Usage: branswe <filename>");
                 return;
             }
             
@@ -1067,7 +1075,7 @@ namespace CMLeonOS
             
             if (!File.Exists(filePath))
             {
-                Console.WriteLine($"Error: File not found: {args}");
+                ShowError($"Error: File not found: {args}");
                 return;
             }
             
@@ -1080,7 +1088,7 @@ namespace CMLeonOS
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error executing Branswe: {ex.Message}");
+                ShowError($"Error executing Branswe: {ex.Message}");
             }
         }
 
@@ -1088,16 +1096,16 @@ namespace CMLeonOS
         {
             if (string.IsNullOrEmpty(args))
             {
-                Console.WriteLine("Error: Please specify file name and search pattern");
-                Console.WriteLine("Usage: grep <pattern> <filename>");
+                ShowError("Error: Please specify file name and search pattern");
+                ShowError("Usage: grep <pattern> <filename>");
                 return;
             }
             
             string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length < 2)
             {
-                Console.WriteLine("Error: Please specify both pattern and filename");
-                Console.WriteLine("Usage: grep <pattern> <filename>");
+                ShowError("Error: Please specify both pattern and filename");
+                ShowError("Usage: grep <pattern> <filename>");
                 return;
             }
             
@@ -1110,7 +1118,7 @@ namespace CMLeonOS
                 
                 if (!File.Exists(filePath))
                 {
-                    Console.WriteLine($"Error: File not found: {fileName}");
+                    ShowError($"Error: File not found: {fileName}");
                     return;
                 }
                 
@@ -1136,7 +1144,7 @@ namespace CMLeonOS
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error searching file: {ex.Message}");
+                ShowError($"Error searching file: {ex.Message}");
             }
         }
 
@@ -1168,13 +1176,13 @@ namespace CMLeonOS
                         }
                         else
                         {
-                            Console.WriteLine($"Error: Environment variable '{varName}' not found");
+                            ShowError($"Error: Environment variable '{varName}' not found");
                         }
                     }
                     else
                     {
-                        Console.WriteLine("Error: Please specify variable name");
-                        Console.WriteLine("Usage: env see <varname>");
+                        ShowError("Error: Please specify variable name");
+                        ShowError("Usage: env see <varname>");
                     }
                     break;
                 case "add":
@@ -1189,13 +1197,13 @@ namespace CMLeonOS
                         }
                         else
                         {
-                            Console.WriteLine($"Error: Failed to add environment variable '{varName}'");
+                            ShowError($"Error: Failed to add environment variable '{varName}'");
                         }
                     }
                     else
                     {
-                        Console.WriteLine("Error: Please specify variable name and value");
-                        Console.WriteLine("Usage: env add <varname> <value>");
+                        ShowError("Error: Please specify variable name and value");
+                        ShowError("Usage: env add <varname> <value>");
                     }
                     break;
                 case "change":
@@ -1210,13 +1218,13 @@ namespace CMLeonOS
                         }
                         else
                         {
-                            Console.WriteLine($"Error: Failed to set environment variable '{varName}'");
+                            ShowError($"Error: Failed to set environment variable '{varName}'");
                         }
                     }
                     else
                     {
-                        Console.WriteLine("Error: Please specify variable name and value");
-                        Console.WriteLine("Usage: env change <varname> <value>");
+                        ShowError("Error: Please specify variable name and value");
+                        ShowError("Usage: env change <varname> <value>");
                     }
                     break;
                 case "delete":
@@ -1230,18 +1238,18 @@ namespace CMLeonOS
                         }
                         else
                         {
-                            Console.WriteLine($"Error: Environment variable '{varName}' not found");
+                            ShowError($"Error: Environment variable '{varName}' not found");
                         }
                     }
                     else
                     {
-                        Console.WriteLine("Error: Please specify variable name");
-                        Console.WriteLine("Usage: env delete <varname>");
+                        ShowError("Error: Please specify variable name");
+                        ShowError("Usage: env delete <varname>");
                     }
                     break;
                 default:
-                    Console.WriteLine("Error: Invalid env command");
-                    Console.WriteLine("Usage: env [list] | env see <varname> | env add <varname> <value> | env change <varname> <value> | env delete <varname>");
+                    ShowError("Error: Invalid env command");
+                    ShowError("Usage: env [list] | env see <varname> | env add <varname> <value> | env change <varname> <value> | env delete <varname>");
                     break;
             }
         }
@@ -1252,8 +1260,8 @@ namespace CMLeonOS
             
             if (parts.Length == 0)
             {
-                Console.WriteLine("Error: Please specify backup name");
-                Console.WriteLine("Usage: backup <backupname>");
+                ShowError("Error: Please specify backup name");
+                ShowError("Usage: backup <backupname>");
                 return;
             }
             
@@ -1313,8 +1321,8 @@ namespace CMLeonOS
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error creating backup: {ex.Message}");
-                Console.WriteLine($"Exception type: {ex.GetType().Name}");
+                ShowError($"Error creating backup: {ex.Message}");
+                ShowError($"Exception type: {ex.GetType().Name}");
             }
         }
 
@@ -1324,8 +1332,8 @@ namespace CMLeonOS
             
             if (parts.Length == 0)
             {
-                Console.WriteLine("Error: Please specify backup name");
-                Console.WriteLine("Usage: restore <backupname>");
+                ShowError("Error: Please specify backup name");
+                ShowError("Usage: restore <backupname>");
                 return;
             }
             
@@ -1336,7 +1344,7 @@ namespace CMLeonOS
             {
                 if (!Directory.Exists(backupPath))
                 {
-                    Console.WriteLine($"Error: Backup '{backupName}' not found");
+                    ShowError($"Error: Backup '{backupName}' not found");
                     return;
                 }
                 
@@ -1359,7 +1367,7 @@ namespace CMLeonOS
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error restoring backup: {ex.Message}");
+                ShowError($"Error restoring backup: {ex.Message}");
             }
         }
 
@@ -1408,8 +1416,8 @@ namespace CMLeonOS
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"CopyDirectory: Error copying {sourceFile}: {ex.Message}");
-                        Console.WriteLine($"CopyDirectory: Exception type: {ex.GetType().Name}");
+                        ShowError($"CopyDirectory: Error copying {sourceFile}: {ex.Message}");
+                        ShowError($"CopyDirectory: Exception type: {ex.GetType().Name}");
                     }
                 }
                 
@@ -1420,8 +1428,8 @@ namespace CMLeonOS
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error copying directory: {ex.Message}");
-                Console.WriteLine($"Exception type: {ex.GetType().Name}");
+                ShowError($"Error copying directory: {ex.Message}");
+                ShowError($"Exception type: {ex.GetType().Name}");
             }
         }
     }

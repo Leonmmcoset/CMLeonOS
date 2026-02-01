@@ -8,6 +8,13 @@ namespace CMLeonOS
 {
     public class Kernel : Sys.Kernel
     {
+        public void ShowError(string error)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"{error}");
+            Console.ResetColor();
+        }
+
         // 创建全局CosmosVFS实例
         Sys.FileSystem.CosmosVFS fs = new Sys.FileSystem.CosmosVFS();
 
@@ -97,7 +104,7 @@ namespace CMLeonOS
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error initializing system: {ex.Message}");
+                ShowError($"Error initializing system: {ex.Message}");
             }
         }
 
@@ -150,7 +157,7 @@ namespace CMLeonOS
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error executing startup script: {ex.Message}");
+                ShowError($"Error executing startup script: {ex.Message}");
             }
         }
 
