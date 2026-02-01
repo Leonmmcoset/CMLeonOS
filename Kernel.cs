@@ -20,6 +20,7 @@ namespace CMLeonOS
         protected override void BeforeRun()
         {
             // Console.Clear();
+            Console.WriteLine("Kernel load done!");
             Console.WriteLine(@"-------------------------------------------------");
             Console.WriteLine(@"   ____ __  __ _                      ___  ____  ");
             Console.WriteLine(@"  / ___|  \/  | |    ___  ___  _ __  / _ \/ ___| ");

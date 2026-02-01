@@ -156,6 +156,8 @@ namespace CMLeonOS
                         "                     env delete <varname>                  - Delete variable",
                         "  beep             - Play beep sound",
                         "  branswe <filename> - Execute Branswe code file",
+                        "  backup <name>    - Backup system files",
+                        "  restore <name>  - Restore system files",
                         "  version          - Show OS version",
                         "  about            - Show about information",
                         "  help <page>      - Show help page (1-3)",
@@ -340,7 +342,13 @@ namespace CMLeonOS
                     }
                     break;
                 case "version":
-                    Console.WriteLine("CMLeonOS v1.0");
+                    Console.WriteLine(Version.DisplayVersion);
+                    Console.WriteLine($"Major: {Version.Major}");
+                    Console.WriteLine($"Minor: {Version.Minor}");
+                    Console.WriteLine($"Patch: {Version.Patch}");
+                    Console.WriteLine($"Build: {Version.Build}");
+                    Console.WriteLine($"Revision: {Version.Revision}");
+                    Console.WriteLine($"Full Version: {Version.FullVersion}");
                     break;
                 case "about":
                     Console.WriteLine("CMLeonOS Project");
@@ -387,6 +395,12 @@ namespace CMLeonOS
                     break;
                 case "grep":
                     GrepFile(args);
+                    break;
+                case "backup":
+                    BackupSystem(args);
+                    break;
+                case "restore":
+                    RestoreSystem(args);
                     break;
                 default:
                     Console.WriteLine($"Unknown command: {command}");
@@ -1229,6 +1243,185 @@ namespace CMLeonOS
                     Console.WriteLine("Error: Invalid env command");
                     Console.WriteLine("Usage: env [list] | env see <varname> | env add <varname> <value> | env change <varname> <value> | env delete <varname>");
                     break;
+            }
+        }
+
+        private void BackupSystem(string args)
+        {
+            string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            
+            if (parts.Length == 0)
+            {
+                Console.WriteLine("Error: Please specify backup name");
+                Console.WriteLine("Usage: backup <backupname>");
+                return;
+            }
+            
+            string backupName = parts[0];
+            string backupPath = $@"0:\backup\{backupName}";
+            
+            try
+            {
+                Console.WriteLine($"BackupSystem: Creating backup '{backupName}'");
+                Console.WriteLine($"Backup path: {backupPath}");
+                
+                if (Directory.Exists(backupPath))
+                {
+                    Console.WriteLine($"BackupSystem: Backup '{backupName}' already exists");
+                    Console.WriteLine("BackupSystem: Returning without creating new backup");
+                    return;
+                }
+                
+                Console.WriteLine($"BackupSystem: Creating backup directory: {backupPath}");
+                Directory.CreateDirectory(backupPath);
+                Console.WriteLine($"BackupSystem: Backup directory created");
+                
+                // 备份系统文件
+                string sysPath = @"0:\system";
+                Console.WriteLine($"BackupSystem: Checking system path: {sysPath}");
+                Console.WriteLine($"BackupSystem: System path exists: {Directory.Exists(sysPath)}");
+                
+                if (Directory.Exists(sysPath))
+                {
+                    Console.WriteLine($"BackupSystem: Copying system files to backup");
+                    CopyDirectory(sysPath, backupPath);
+                    Console.WriteLine($"BackupSystem: System files copied");
+                }
+                else
+                {
+                    Console.WriteLine($"BackupSystem: System path does not exist, skipping system backup");
+                }
+                
+                // 备份用户文件
+                string userPath = @"0:\user";
+                Console.WriteLine($"BackupSystem: Checking user path: {userPath}");
+                Console.WriteLine($"BackupSystem: User path exists: {Directory.Exists(userPath)}");
+                
+                if (Directory.Exists(userPath))
+                {
+                    Console.WriteLine($"BackupSystem: Copying user files to backup");
+                    CopyDirectory(userPath, backupPath);
+                    Console.WriteLine($"BackupSystem: User files copied");
+                }
+                else
+                {
+                    Console.WriteLine($"BackupSystem: User path does not exist, skipping user backup");
+                }
+                
+                Console.WriteLine($"BackupSystem: Backup '{backupName}' created successfully");
+                Console.WriteLine($"Backup location: {backupPath}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating backup: {ex.Message}");
+                Console.WriteLine($"Exception type: {ex.GetType().Name}");
+            }
+        }
+
+        private void RestoreSystem(string args)
+        {
+            string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            
+            if (parts.Length == 0)
+            {
+                Console.WriteLine("Error: Please specify backup name");
+                Console.WriteLine("Usage: restore <backupname>");
+                return;
+            }
+            
+            string backupName = parts[0];
+            string backupPath = $@"0:\backup\{backupName}";
+            
+            try
+            {
+                if (!Directory.Exists(backupPath))
+                {
+                    Console.WriteLine($"Error: Backup '{backupName}' not found");
+                    return;
+                }
+                
+                // 恢复系统文件
+                string sysPath = @"0:\system";
+                if (Directory.Exists(backupPath))
+                {
+                    CopyDirectory(backupPath, sysPath, true);
+                }
+                
+                // 恢复用户文件
+                string userPath = @"0:\user";
+                if (Directory.Exists(backupPath))
+                {
+                    CopyDirectory(backupPath, userPath, true);
+                }
+                
+                Console.WriteLine($"Backup '{backupName}' restored successfully");
+                Console.WriteLine($"Backup location: {backupPath}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error restoring backup: {ex.Message}");
+            }
+        }
+
+        private void CopyDirectory(string sourcePath, string destPath, bool overwrite = false)
+        {
+            try
+            {
+                Console.WriteLine($"CopyDirectory: Starting copy from '{sourcePath}' to '{destPath}'");
+                Console.WriteLine($"CopyDirectory: Overwrite mode: {overwrite}");
+                
+                if (!Directory.Exists(destPath))
+                {
+                    Console.WriteLine($"CopyDirectory: Creating destination directory: {destPath}");
+                    Directory.CreateDirectory(destPath);
+                    Console.WriteLine($"CopyDirectory: Destination directory created");
+                }
+                
+                string[] sourceFiles = Directory.GetFiles(sourcePath);
+                Console.WriteLine($"CopyDirectory: Found {sourceFiles.Length} files in source directory");
+                
+                if (sourceFiles.Length == 0)
+                {
+                    Console.WriteLine($"CopyDirectory: Warning: No files found in source directory");
+                    return;
+                }
+                
+                int copiedCount = 0;
+                int skippedCount = 0;
+                
+                foreach (string sourceFile in sourceFiles)
+                {
+                    string destFile = Path.Combine(destPath, Path.GetFileName(sourceFile));
+                    
+                    if (File.Exists(destFile) && !overwrite)
+                    {
+                        Console.WriteLine($"CopyDirectory: Skipping existing file: {destFile}");
+                        skippedCount++;
+                        continue;
+                    }
+                    
+                    try
+                    {
+                        File.Copy(sourceFile, destFile, true);
+                        copiedCount++;
+                        Console.WriteLine($"CopyDirectory: Copied {sourceFile} -> {destFile}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"CopyDirectory: Error copying {sourceFile}: {ex.Message}");
+                        Console.WriteLine($"CopyDirectory: Exception type: {ex.GetType().Name}");
+                    }
+                }
+                
+                Console.WriteLine($"CopyDirectory: Copy completed");
+                Console.WriteLine($"CopyDirectory: Total files: {sourceFiles.Length}");
+                Console.WriteLine($"CopyDirectory: Copied: {copiedCount}");
+                Console.WriteLine($"CopyDirectory: Skipped: {skippedCount}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error copying directory: {ex.Message}");
+                Console.WriteLine($"Exception type: {ex.GetType().Name}");
             }
         }
     }
