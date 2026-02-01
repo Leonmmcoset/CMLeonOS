@@ -7,7 +7,7 @@
         <SupportsX86Intrinsics>false</SupportsX86Intrinsics>
         <SelfContained>True</SelfContained>
         <Platforms>AnyCPU;x64</Platforms>
-        <Configurations>Debug;Release;Release (Fixed)</Configurations>
+        <Configurations>Debug;Release;Fixed_Release</Configurations>
     </PropertyGroup>
 
     <PropertyGroup>

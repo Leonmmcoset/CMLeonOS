@@ -367,8 +367,6 @@ namespace CMLeonOS
                     Console.WriteLine($"Major: {Version.Major}");
                     Console.WriteLine($"Minor: {Version.Minor}");
                     Console.WriteLine($"Patch: {Version.Patch}");
-                    Console.WriteLine($"Build: {Version.Build}");
-                    Console.WriteLine($"Revision: {Version.Revision}");
                     Console.WriteLine($"Full Version: {Version.FullVersion}");
                     break;
                 case "about":

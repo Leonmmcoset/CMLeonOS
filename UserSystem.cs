@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace CMLeonOS
 {
@@ -31,6 +33,16 @@ namespace CMLeonOS
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"{message}");
             Console.ResetColor();
+        }
+
+        internal static string HashPasswordSha256(string password)
+        {
+            Sha256 sha256 = new Sha256();
+
+            byte[] passwordBytesUnhashed = Encoding.Unicode.GetBytes(password);
+            sha256.AddData(passwordBytesUnhashed, 0, (uint)passwordBytesUnhashed.Length);
+
+            return Convert.ToBase64String(sha256.GetHash());
         }
 
         public UserSystem()
@@ -90,6 +102,9 @@ namespace CMLeonOS
                             users.Add(user);
                         }
                     }
+                    
+                    // Note: Passwords are stored as SHA256 hashes in the file
+                    // When comparing passwords during login, hash the input password first
                 }
                 else
                 {
@@ -109,7 +124,9 @@ namespace CMLeonOS
                 List<string> lines = new List<string>();
                 foreach (User user in users)
                 {
-                    string line = $"{user.Username}|{user.Password}|{(user.IsAdmin ? "admin" : "user")}";
+                    // 使用SHA256加密密码
+                    string hashedPassword = HashPasswordSha256(user.Password);
+                    string line = $"{user.Username}|{hashedPassword}|{(user.IsAdmin ? "admin" : "user")}";
                     lines.Add(line);
                 }
                 File.WriteAllLines(userFilePath, lines.ToArray());
@@ -319,24 +336,27 @@ namespace CMLeonOS
                         return false;
                     }
                     
-                    if (foundUser.Password == password)
+                    // 使用SHA256加密输入的密码后比较
+                    string hashedInputPassword = HashPasswordSha256(password);
+                    // Console.WriteLine($"Hashed Input Password: {hashedInputPassword}");
+                    // Console.WriteLine($"Stored Password: {foundUser.Password}");
+                    
+                    if (foundUser.Password != hashedInputPassword)
                     {
-                        ShowSuccess("Login successful!");
-                        Console.Beep();
-                        
-                        // 设置当前登录用户
-                        currentLoggedInUser = foundUser;
-                        
-                        // 创建用户文件夹
-                        CreateUserFolder(foundUser.Username);
-                        
-                        return true;
-                    }
-                    else
-                    {
-                        ShowError("Invalid password. Please try again.");
+                        ShowError("Invalid password.");
                         return false;
                     }
+                    
+                    ShowSuccess("Login successful!");
+                    Console.Beep();
+                    
+                    // 设置当前登录用户
+                    currentLoggedInUser = foundUser;
+                    
+                    // 创建用户文件夹
+                    CreateUserFolder(foundUser.Username);
+                    
+                    return true;
                 }
             }
             catch
