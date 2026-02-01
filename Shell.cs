@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Sys = Cosmos.System;
 
 namespace CMLeonOS
@@ -12,12 +13,14 @@ namespace CMLeonOS
         private FileSystem fileSystem;
         private UserSystem userSystem;
         private bool fixMode;
+        private EnvironmentVariableManager envManager;
 
         public Shell(UserSystem userSystem)
         {
             this.userSystem = userSystem;
             fileSystem = new FileSystem();
             fixMode = Kernel.FixMode;
+            envManager = EnvironmentVariableManager.Instance;
         }
 
         public void Run()
@@ -147,6 +150,10 @@ namespace CMLeonOS
                         "                     user delete <username>                  - Delete user",
                         "                     user list                               - List all users",
                         "  cpass            - Change password",
+                        "  env <cmd>       - Environment variables",
+                        "                     env see <varname>                    - Show variable value",
+                        "                     env change <varname> <value>           - Set variable value",
+                        "                     env delete <varname>                  - Delete variable",
                         "  beep             - Play beep sound",
                         "  branswe <filename> - Execute Branswe code file",
                         "  version          - Show OS version",
@@ -371,6 +378,9 @@ namespace CMLeonOS
                     break;
                 case "beep":
                     Console.Beep();
+                    break;
+                case "env":
+                    ProcessEnvCommand(args);
                     break;
                 case "branswe":
                     ProcessBransweCommand(args);
@@ -1054,6 +1064,112 @@ namespace CMLeonOS
             catch (Exception ex)
             {
                 Console.WriteLine($"Error executing Branswe: {ex.Message}");
+            }
+        }
+
+        private void ProcessEnvCommand(string args)
+        {
+            string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            
+            if (parts.Length == 0)
+            {
+                envManager.ListVariables();
+                return;
+            }
+            
+            string command = parts[0].ToLower();
+            
+            switch (command)
+            {
+                case "list":
+                    envManager.ListVariables();
+                    break;
+                case "see":
+                    if (parts.Length >= 2)
+                    {
+                        string varName = parts[1];
+                        string varValue = envManager.GetVariable(varName);
+                        if (varValue != null)
+                        {
+                            Console.WriteLine($"  {varName}={varValue}");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Error: Environment variable '{varName}' not found");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error: Please specify variable name");
+                        Console.WriteLine("Usage: env see <varname>");
+                    }
+                    break;
+                case "add":
+                    if (parts.Length >= 3)
+                    {
+                        string varName = parts[1];
+                        string varValue = parts.Length > 2 ? string.Join(" ", parts.Skip(2).ToArray()) : "";
+                        
+                        if (envManager.SetVariable(varName, varValue))
+                        {
+                            Console.WriteLine($"Environment variable '{varName}' added");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Error: Failed to add environment variable '{varName}'");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error: Please specify variable name and value");
+                        Console.WriteLine("Usage: env add <varname> <value>");
+                    }
+                    break;
+                case "change":
+                    if (parts.Length >= 3)
+                    {
+                        string varName = parts[1];
+                        string varValue = parts.Length > 2 ? string.Join(" ", parts.Skip(2).ToArray()) : "";
+                        
+                        if (envManager.SetVariable(varName, varValue))
+                        {
+                            Console.WriteLine($"Environment variable '{varName}' set to '{varValue}'");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Error: Failed to set environment variable '{varName}'");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error: Please specify variable name and value");
+                        Console.WriteLine("Usage: env change <varname> <value>");
+                    }
+                    break;
+                case "delete":
+                    if (parts.Length >= 2)
+                    {
+                        string varName = parts[1];
+                        
+                        if (envManager.DeleteVariable(varName))
+                        {
+                            Console.WriteLine($"Environment variable '{varName}' deleted");
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Error: Environment variable '{varName}' not found");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error: Please specify variable name");
+                        Console.WriteLine("Usage: env delete <varname>");
+                    }
+                    break;
+                default:
+                    Console.WriteLine("Error: Invalid env command");
+                    Console.WriteLine("Usage: env [list] | env see <varname> | env add <varname> <value> | env change <varname> <value> | env delete <varname>");
+                    break;
             }
         }
     }

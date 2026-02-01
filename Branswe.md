@@ -2,7 +2,7 @@
 
 ## 简介
 
-Branswe是一种简单的编程语言，用于CMLeonOS系统中进行脚本编写和自动化操作。它提供了基本的控制台操作、变量管理、条件判断等功能。
+Branswe是一种简单的编程语言，用于CMLeonOS系统中进行脚本编写和自动化操作。它提供了基本的控制台操作、变量管理、条件判断、循环、文件系统操作等功能。
 
 ## 基本语法
 
@@ -18,27 +18,45 @@ Branswe是一种简单的编程语言，用于CMLeonOS系统中进行脚本编�
 
 ## 变量操作
 
-### 定义变量
-```
-var() 变量名 = 值
-```
-
 ### 定义文本变量
 ```
-var(text) 变量名 = 文本内容
+var(text) 变量名 = 值
 ```
 
-### 显示变量
+### 变量赋值
+```
+var() 变量名 = 变量2
+```
+
+### 变量删除
+```
+var() 变量名 rm
+```
+
+### 变量运算
+```
+var() 变量名 =+ 变量2
+var() 变量名 =- 变量2
+var() 变量名 =* 变量2
+var() 变量名 =/ 变量2
+```
+
+### 获取变量值
+```
+ref getvar 变量名
+```
+
+## 控制台操作
+
+### 显示文本（不换行）
 ```
 conshow 变量名
 ```
 
-### 显示变量列表
+### 显示文本（换行）
 ```
-conshowl
+conshowl 变量名
 ```
-
-## 控制台操作
 
 ### 清屏
 ```
@@ -47,133 +65,163 @@ concls
 
 ### 输入
 ```
-coninput 提示文本
+coninput 变量名
 ```
 
-### 显示文本
+### 蜂鸣
 ```
-conshow 文本内容
+conbeep
+```
+
+## 系统引用
+
+### 鼠标位置
+```
+ref mousex
+ref mousey
+```
+
+### 屏幕尺寸
+```
+ref screenx
+ref screeny
+```
+
+### 控制台颜色
+```
+ref concolour-b
+ref concolour-f
+```
+
+### 磁盘信息
+```
+ref getalldisks
 ```
 
 ## 条件判断
 
+### decide语句
+```
+decide 变量1 操作符 变量2
+```
+
+支持的操作符：
+- `==` 等于
+- `!=` 不等于
+- `>` 大于
+- `<` 小于
+- `>=` 大于等于
+- `<=` 小于等于
+
 ### if语句
 ```
-if 条件
-then
-    条件为真时执行的代码
-else
-    条件为假时执行的代码
-end
+if 条件 then 真代码 else 假代码
 ```
 
 ### 示例
 ```
-if hello == world
-then
-    conshow match
-else
-    conshow no match
-end
+var(text) num1 = 10
+var(text) num2 = 20
+decide num1 == num2
+if [] then conshow match else conshow no match
 ```
 
 ## 循环
 
 ### loop语句
 ```
-loop 次数
-    循环体代码
-end
+loop << 变量名
 ```
+
+执行变量中的代码，无限循环。
 
 ### 示例
 ```
-loop 5
-    conshow count: i
-    var(text) count = i
-    conshow count: count
-end
+var(text) code = conshow hello
+loop << code
 ```
 
 ## 字符串操作
 
-### 读取字符串
+### 读取字符串并执行
 ```
 rstr 变量名
 ```
 
+执行变量中存储的代码（支持\n换行）。
+
 ### 示例
 ```
-var() myString = Hello, World!
-rstr myString
-conshow myString
+var(text) mycode = conshow hello\nconshow world
+rstr mycode
 ```
 
-## 数学运算
+## 文件系统操作
 
-### 加法
+### 注册VFS
 ```
-var(text) result = num1
-var(text) num1 = 10
-var(text) num2 = 20
-rstr result + num1 + num2
-conshow result
+diskfile reg
 ```
 
-### 减法
+### 创建文件
 ```
-var(text) result = num1
-var(text) num1 = 10
-var(text) num2 = 20
-rstr result + num1 - num2
-conshow result
+diskfile create file 路径
 ```
 
-### 乘法
+### 创建目录
 ```
-var(text) result = num1
-var(text) num1 = 10
-var(text) num2 = 20
-rstr result + num1 * num2
-conshow result
+diskfile create dir 路径
 ```
 
-### 除法
+### 写入文件
 ```
-var(text) result = num1
-var(text) num1 = 10
-var(text) num2 = 20
-rstr result + num1 / num2
-conshow result
+diskfile write 内容 to 路径
+```
+
+### 示例
+```
+diskfile reg
+diskfile create file /test.txt
+var(text) content = Hello, World!
+diskfile write content to /test.txt
 ```
 
 ## 系统功能
 
-### 扬声器
-```
-conbeep
-```
-
 ### 睡眠
 ```
-sleep 毫秒数
+sleep 变量名
 ```
 
-### 获取磁盘信息
+### 电源管理
 ```
-getalldisks
+power off
+power reboot
+```
+
+### 结束程序
+```
+end
 ```
 
 ## 方法定义
 
 ### 定义方法
 ```
-method 方法名 << 参数名 >> 代码
+method 变量部分 << 代码部分
+```
+
+### 调用方法
+```
+方法名 参数
 ```
 
 ### 示例
 ```
-method print << name >> conshow name
+var(text) printname = print
+var(text) myname = Leon
+method printname [] << conshow []
+printname myname
 ```
 
 ## 完整示例
@@ -181,83 +229,72 @@ method print << name >> conshow name
 ### 示例1：Hello World
 ```
 # 简单的Hello World程序
-conshow hello
 var(text) hello = Hello, Branswe!
 conshow hello
 ```
 
 ### 示例2：变量操作
 ```
-# 变量定义和显示
-var() name = LeonOS
-var(text) greeting = Hello, name!
-conshow greeting
+# 变量定义和运算
+var(text) num1 = 10
+var(text) num2 = 20
+var() num1 =+ num2
+conshowl num1
 ```
 
 ### 示例3：条件判断
 ```
 # 条件判断示例
-if greeting == Hello, name!
-then
-    conshow match
-else
-    conshow no match
-end
+var(text) a = 10
+var(text) b = 20
+decide a < b
+if [] then conshow a is smaller else conshow a is larger
 ```
 
 ### 示例4：循环
 ```
 # 循环示例
-loop 5
-    conshow count: i
-    var(text) count = i
-    conshow count: count
-end
+var(text) code = conshow loop\nsleep 1000
+loop << code
 ```
 
-### 示例5：数学运算
+### 示例5：文件操作
 ```
-# 数学运算示例
-var(text) result = 10
-var(text) num1 = 5
-var(text) num2 = 3
-rstr result + num1 * num2
-conshow result
+# 文件操作示例
+diskfile reg
+diskfile create file /test.txt
+var(text) content = Hello, File System!
+diskfile write content to /test.txt
 ```
 
 ### 示例6：系统功能
 ```
 # 系统功能示例
 conbeep
-sleep 1000
-getalldisks
+var(text) wait = 1000
+sleep wait
+ref mousex
+conshowl []
 ```
 
-## 与CMLeonOS的集成
-
-### 在CMLeonOS中使用
+### 示例7：自定义方法
 ```
-branswe example.bran
+# 自定义方法示例
+var(text) greet = greet
+var(text) name = Leon
+method greet [] << conshow Hello, []!
+greet name
 ```
-
-### 支持的命令
-- `cat` - 显示文件内容
-- `echo` - 写入文件
-- `ls` - 列出目录
-- `pwd` - 显示当前目录
-- `mkdir` - 创建目录
-- `rm` - 删除文件
-- `rmdir` - 删除目录
 
 ## 注意事项
 
 1. **大小写敏感**：命令和变量名区分大小写
 2. **空格处理**：参数之间用空格分隔
-3. **错误处理**：不支持的命令会显示错误消息
+3. **变量存储**：所有变量都作为文本存储，运算时会自动转换
 4. **注释支持**：使用#号添加注释
 5. **变量作用域**：变量在整个脚本中有效
-6. **条件嵌套**：支持多层条件判断
-7. **循环嵌套**：支持多层循环
+6. **无限循环**：loop命令会无限循环，需要使用end或其他方式退出
+7. **文件系统**：使用diskfile前需要先执行diskfile reg注册VFS
 
 ## 最佳实践
 
@@ -275,8 +312,16 @@ branswe example.bran
 
 ## 更新日志
 
+### 版本2.0
+- 更新了所有命令的实际语法
+- 添加了文件系统操作支持
+- 添加了系统引用命令
+- 添加了电源管理功能
+- 添加了自定义方法功能
+- 修正了条件判断和循环的语法
+- 完善了变量操作命令
+
 ### 版本1.0
 - 初始版本
 - 添加了CMLeonOS兼容性支持
 - 完善了错误处理
-- 添加了文件操作支持

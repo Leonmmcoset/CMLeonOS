@@ -56,6 +56,14 @@ namespace CMLeonOS
                 // 初始化用户系统
                 userSystem = new UserSystem();
                 
+                // 检查env.dat文件是否存在，如果不存在则创建并设置Test环境变量
+                string envFilePath = @"0:\system\env.dat";
+                if (!System.IO.File.Exists(envFilePath))
+                {
+                    System.IO.File.WriteAllText(envFilePath, "Test=123");
+                    Console.WriteLine("Created env.dat with Test=123");
+                }
+                
                 // 循环直到登录成功或退出
                 while (true)
                 {
