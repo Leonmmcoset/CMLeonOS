@@ -176,9 +176,11 @@ namespace CMLeonOS
                         "                     env change <varname> <value>           - Set variable value",
                         "                     env delete <varname>                  - Delete variable",
                         "  beep             - Play beep sound",
+                        "  uptime           - Show system uptime",
                         "  branswe <filename> - Execute Branswe code file",
                         "  backup <name>    - Backup system files",
                         "  restore <name>  - Restore system files",
+                        "  grep <pattern> <file> - Search text in file",
                         "  version          - Show OS version",
                         "  about            - Show about information",
                         "  help <page>      - Show help page (1-3)",
@@ -411,6 +413,9 @@ namespace CMLeonOS
                     break;
                 case "branswe":
                     ProcessBransweCommand(args);
+                    break;
+                case "uptime":
+                    ShowUptime();
                     break;
                 case "grep":
                     GrepFile(args);
@@ -1442,6 +1447,46 @@ namespace CMLeonOS
             {
                 ShowError($"Error copying directory: {ex.Message}");
                 ShowError($"Exception type: {ex.GetType().Name}");
+            }
+        }
+
+        private void ShowUptime()
+        {
+            try
+            {
+                Console.WriteLine("====================================");
+                Console.WriteLine("        System Uptime");
+                Console.WriteLine("====================================");
+                Console.WriteLine();
+                
+                // 计算系统运行时间
+                if (Kernel.SystemStartTime != DateTime.MinValue)
+                {
+                    TimeSpan uptime = DateTime.Now - Kernel.SystemStartTime;
+                    
+                    Console.WriteLine("System started: " + Kernel.SystemStartTime.ToString("yyyy-MM-dd HH:mm:ss"));
+                    Console.WriteLine("Current time: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+                    Console.WriteLine();
+                    
+                    // 格式化运行时间
+                    int days = uptime.Days;
+                    int hours = uptime.Hours;
+                    int minutes = uptime.Minutes;
+                    int seconds = uptime.Seconds;
+                    
+                    Console.WriteLine($"System uptime: {days} days, {hours} hours, {minutes} minutes, {seconds} seconds");
+                    Console.WriteLine($"Total uptime: {uptime.TotalHours:F2} hours");
+                }
+                else
+                {
+                    ShowWarning("System start time not available.");
+                    ShowWarning("System may have been started before uptime tracking was implemented.");
+                }
+                Console.WriteLine();
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Error showing uptime: {ex.Message}");
             }
         }
     }

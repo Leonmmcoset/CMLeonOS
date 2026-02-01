@@ -23,7 +23,10 @@ namespace CMLeonOS
         
         // 修复模式变量（硬编码，用于控制是否启用修复模式）
         public static bool FixMode = false;
-
+        
+        // 系统启动时间（用于uptime命令）
+        public static DateTime SystemStartTime;
+        
         protected override void BeforeRun()
         {
             // Console.Clear();
@@ -37,6 +40,10 @@ namespace CMLeonOS
             Console.WriteLine();
             Console.WriteLine("CMLeonOS Project");
             Console.WriteLine("By LeonOS 2 Developement Team");
+            
+            // 记录系统启动时间（用于uptime命令）
+            SystemStartTime = DateTime.Now;
+            Console.WriteLine($"System started at: {SystemStartTime.ToString("yyyy-MM-dd HH:mm:ss")}");
             
             // 注册VFS
             try
