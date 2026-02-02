@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using Sys = Cosmos.System;
+using Cosmos.System.Network.IPv4.UDP.DHCP;
 
 namespace CMLeonOS
 {
@@ -12,6 +13,13 @@ namespace CMLeonOS
         {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"{error}");
+            Console.ResetColor();
+        }
+
+        public void ShowSuccess(string success)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"{success}");
             Console.ResetColor();
         }
 
@@ -44,12 +52,28 @@ namespace CMLeonOS
             // 记录系统启动时间（用于uptime命令）
             SystemStartTime = DateTime.Now;
             Console.WriteLine($"System started at: {SystemStartTime.ToString("yyyy-MM-dd HH:mm:ss")}");
-            
+
+            Console.WriteLine("Starting network...");
+            try
+            {
+                if (Cosmos.HAL.NetworkDevice.Devices.Count == 0)
+                {
+                    throw new Exception("No network devices are available.");
+                }
+                using var dhcp = new DHCPClient();
+                dhcp.SendDiscoverPacket();
+                ShowSuccess("Network started.");
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Could not start network: {ex.ToString()}");
+            }
+
             // 注册VFS
             try
             {
                 Sys.FileSystem.VFS.VFSManager.RegisterVFS(fs);
-                Console.WriteLine("VFS initialized successfully");
+                ShowSuccess("VFS initialized successfully");
                 
                 // 显示可用空间（动态单位）
                 var available_space = fs.GetAvailableFreeSpace(@"0:\");
@@ -76,7 +100,7 @@ namespace CMLeonOS
                 if (!System.IO.File.Exists(envFilePath))
                 {
                     System.IO.File.WriteAllText(envFilePath, "Test=123");
-                    Console.WriteLine("Created env.dat with Test=123");
+                    ShowSuccess("Created env.dat with Test=123");
                 }
                 
                 // 循环直到登录成功或退出
