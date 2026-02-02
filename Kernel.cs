@@ -1,6 +1,10 @@
 using Cosmos.HAL;
+using Cosmos.System.FileSystem;
+using Cosmos.System.FileSystem.FAT;
+using Cosmos.System.FileSystem.VFS;
 using Cosmos.System.Network.Config;
 using Cosmos.System.Network.IPv4.UDP.DHCP;
+using Cosmos.HAL.BlockDevice;
 using Cosmos.System.Network.IPv4;
 using System;
 using System.Collections.Generic;
@@ -76,12 +80,12 @@ namespace CMLeonOS
                 }
                 else
                 {
-                    ShowError("Network device is not ready.");
+                    ShowError("Network device is not ready");
                 }
                 dhcp.SendDiscoverPacket();
                 IPAddress = NetworkConfiguration.CurrentAddress.ToString();
                 Console.WriteLine($"Local IP: {IPAddress}");
-                ShowSuccess("Network started.");
+                ShowSuccess("Network started");
             }
             catch (Exception ex)
             {
@@ -171,6 +175,14 @@ namespace CMLeonOS
             catch (Exception ex)
             {
                 ShowError($"Error initializing system: {ex.Message}");
+                ShowError("Please contact the developers, Email: leonmmcoset@outlook.com");
+                // 这条横线居然和上一条信息的字符数是一样的
+                Console.WriteLine("-------------------------------------------------------------");
+                Console.WriteLine($"Maybe your disk isn't formatted, please format your disk using like PE or something else.");
+                Console.WriteLine("(CMLeonOS need more than 512 MB disk space and FAT32 file system.)");
+                Console.WriteLine("Press any key to restart...");
+                Console.ReadKey();
+                Sys.Power.Reboot();
             }
         }
 
