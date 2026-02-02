@@ -581,6 +581,14 @@ namespace CMLeonOS
                     if (password.Length > 0)
                     {
                         password = password.Substring(0, password.Length - 1);
+                        int cursorLeft = Console.CursorLeft;
+                        int cursorTop = Console.CursorTop;
+                        if (cursorLeft > 0)
+                        {
+                            Console.SetCursorPosition(cursorLeft - 1, cursorTop);
+                            Console.Write(" ");
+                            Console.SetCursorPosition(cursorLeft - 1, cursorTop);
+                        }
                     }
                 }
                 else
