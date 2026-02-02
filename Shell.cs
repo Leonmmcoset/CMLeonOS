@@ -13,6 +13,7 @@ using System.Text;
 using CosmosHttp.Client;
 using Cosmos.Core;
 using Cosmos.Core.Memory;
+using UniLua;
 using Cosmos.HAL;
 
 namespace CMLeonOS
@@ -199,6 +200,7 @@ namespace CMLeonOS
                         "  whoami          - Show current username",
                         "  base64 encrypt <text> - Encode text to Base64",
                         "  base64 decrypt <text> - Decode Base64 to text",
+                        "  lua <file>       - Execute Lua script",
                         "  version          - Show OS version",
                         "  about            - Show about information",
                         "  help <page>      - Show help page (1-3)",
@@ -464,6 +466,9 @@ namespace CMLeonOS
                     break;
                 case "base64":
                     ProcessBase64Command(args);
+                    break;
+                case "lua":
+                    ExecuteLuaScript(args);
                     break;
                 default:
                     ShowError($"Unknown command: {command}");
@@ -2081,6 +2086,82 @@ namespace CMLeonOS
             catch (Exception ex)
             {
                 ShowError($"Base64 error: {ex.Message}");
+            }
+        }
+
+        private void ExecuteLuaScript(string args)
+        {
+            string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            
+            if (parts.Length == 0)
+            {
+                ShowError("Error: Please specify Lua script file");
+                ShowError("Usage: lua <file>");
+                return;
+            }
+            
+            string filePath = parts[0];
+            string originalPath = filePath;
+            
+            if (!filePath.StartsWith("0:\\") && !filePath.StartsWith("0:/"))
+            {
+                if (prompt == "/" || prompt == "\\")
+                {
+                    filePath = "0:\\" + filePath.TrimStart('/').TrimStart('\\');
+                }
+                else
+                {
+                    filePath = Path.Combine(prompt, filePath);
+                }
+            }
+            
+            if (!File.Exists(filePath))
+            {
+                ShowError($"Error: File not found: {filePath}");
+                return;
+            }
+            
+            // Console.WriteLine($"Executing: {filePath}");
+            // Console.WriteLine();
+            
+            try
+            {
+                string scriptContent = File.ReadAllText(filePath);
+                
+                if (string.IsNullOrWhiteSpace(scriptContent))
+                {
+                    ShowWarning("Script file is empty");
+                    return;
+                }
+                
+                ILuaState lua = LuaAPI.NewState();
+                lua.L_OpenLibs();
+                
+                UniLua.ThreadStatus loadResult = lua.L_LoadString(scriptContent);
+                
+                if (loadResult == UniLua.ThreadStatus.LUA_OK)
+                {
+                    UniLua.ThreadStatus callResult = lua.PCall(0, 0, 0);
+                    
+                    if (callResult == UniLua.ThreadStatus.LUA_OK)
+                    {
+                        // ShowSuccess("Script run successfully");
+                    }
+                    else
+                    {
+                        string errorMsg = lua.ToString(-1);
+                        ShowError($"Script execution error: {errorMsg}");
+                    }
+                }
+                else
+                {
+                    string errorMsg = lua.ToString(-1);
+                    ShowError($"Script load error: {errorMsg}");
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Lua execution error: {ex.Message}");
             }
         }
     }
