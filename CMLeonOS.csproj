@@ -42,7 +42,8 @@
         <PackageReference Include="Cosmos.System2" Version="0.1.0-localbuild20260201071815" />
         <PackageReference Include="Cosmos.System2_Plugs" Version="0.1.0-localbuild20260201071815" />
         <PackageReference Include="CosmosFtpServer" Version="1.0.9" />
-        <PackageReference Include="IL2CPU.API" Version="0.1.0-localbuild20260202032053" />
+        <PackageReference Include="CosmosHttp" Version="1.0.4" />
+        <PackageReference Include="IL2CPU.API" Version="0.1.0-localbuild20260203125852" />
     </ItemGroup>
 
 </Project>

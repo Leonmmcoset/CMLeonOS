@@ -159,6 +159,18 @@ namespace CMLeonOS
             }
         }
 
+        public string CurrentUsername
+        {
+            get
+            {
+                if (currentLoggedInUser != null)
+                {
+                    return currentLoggedInUser.Username;
+                }
+                return "Not logged in";
+            }
+        }
+
         public void FirstTimeSetup()
         {
             Console.WriteLine("====================================");

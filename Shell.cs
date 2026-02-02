@@ -10,6 +10,7 @@ using System.Threading;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using CosmosHttp.Client;
 using Cosmos.Core;
 using Cosmos.Core.Memory;
 using Cosmos.HAL;
@@ -194,6 +195,10 @@ namespace CMLeonOS
                         "  ping <ip>        - Ping IP address (5 times)",
                         "  tcpserver <port> - Start TCP server on specified port",
                         "  tcpclient <ip> <port> - Connect to TCP server",
+                        "  wget <url>       - Download file from URL",
+                        "  whoami          - Show current username",
+                        "  base64 encrypt <text> - Encode text to Base64",
+                        "  base64 decrypt <text> - Decode Base64 to text",
                         "  version          - Show OS version",
                         "  about            - Show about information",
                         "  help <page>      - Show help page (1-3)",
@@ -450,6 +455,15 @@ namespace CMLeonOS
                     break;
                 case "tcpclient":
                     ConnectTcpClient(args);
+                    break;
+                case "wget":
+                    DownloadFile(args);
+                    break;
+                case "whoami":
+                    ShowCurrentUsername();
+                    break;
+                case "base64":
+                    ProcessBase64Command(args);
                     break;
                 default:
                     ShowError($"Unknown command: {command}");
@@ -1886,6 +1900,187 @@ namespace CMLeonOS
             catch (Exception ex)
             {
                 ShowError($"TCP client error: {ex.Message}");
+            }
+        }
+
+        private void DownloadFile(string args)
+        {
+            string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            
+            if (parts.Length == 0)
+            {
+                ShowError("Error: Please specify URL");
+                ShowError("Usage: wget <url> [output]");
+                return;
+            }
+            
+            string url = parts[0];
+            string outputPath = parts.Length > 1 ? parts[1] : "";
+            
+            Console.WriteLine("====================================");
+            Console.WriteLine("        WGET - File Downloader");
+            Console.WriteLine("====================================");
+            Console.WriteLine();
+            Console.WriteLine($"Downloading from: {url}");
+            
+            try
+            {
+                HttpRequest request = new HttpRequest();
+                
+                string domain = "";
+                string path = "/";
+                
+                if (url.StartsWith("http://"))
+                {
+                    url = url.Substring(7);
+                }
+                if (url.StartsWith("https://"))
+                {
+                    url = url.Substring(8);
+                }
+                
+                int slashIndex = url.IndexOf('/');
+                if (slashIndex == -1)
+                {
+                    domain = url;
+                }
+                else
+                {
+                    domain = url.Substring(0, slashIndex);
+                    path = url.Substring(slashIndex);
+                }
+                
+                if (string.IsNullOrWhiteSpace(domain))
+                {
+                    ShowError("Error: Invalid URL format");
+                    return;
+                }
+                
+                Console.WriteLine($"Domain: {domain}");
+                Console.WriteLine($"Path: {path}");
+                Console.WriteLine();
+                
+                request.Domain = domain;
+                request.Path = path;
+                request.Method = "GET";
+                
+                Console.WriteLine("Sending request...");
+                request.Send();
+                
+                if (request.Response == null)
+                {
+                    ShowError("Error: No response received");
+                    return;
+                }
+                
+                byte[] content = Encoding.ASCII.GetBytes(request.Response.Content);
+                
+                if (content == null || content.Length == 0)
+                {
+                    ShowError("Error: No content received");
+                    return;
+                }
+                
+                Console.WriteLine($"Downloaded {content.Length} bytes");
+                Console.WriteLine();
+                
+                if (string.IsNullOrWhiteSpace(outputPath))
+                {
+                    int lastSlash = path.LastIndexOf('/');
+                    if (lastSlash >= 0 && lastSlash < path.Length - 1)
+                    {
+                        outputPath = path.Substring(lastSlash + 1);
+                    }
+                    else
+                    {
+                        outputPath = "downloaded_file";
+                    }
+                }
+                
+                if (!outputPath.StartsWith("0:\\") && !outputPath.StartsWith("0:/"))
+                {
+                    outputPath = Path.Combine(prompt, outputPath);
+                }
+                
+                Console.WriteLine($"Saving to: {outputPath}");
+                
+                File.WriteAllBytes(outputPath, content);
+                
+                ShowSuccess($"File saved successfully: {outputPath}");
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Download error: {ex.Message}");
+            }
+        }
+
+        private void ShowCurrentUsername()
+        {
+            Console.WriteLine("====================================");
+            Console.WriteLine("        Current User");
+            Console.WriteLine("====================================");
+            Console.WriteLine();
+            Console.WriteLine($"Username: {userSystem.CurrentUsername}");
+            Console.WriteLine();
+        }
+
+        private void ProcessBase64Command(string args)
+        {
+            string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            
+            if (parts.Length == 0)
+            {
+                ShowError("Error: Please specify subcommand");
+                ShowError("Usage: base64 encrypt <text> | base64 decrypt <text>");
+                return;
+            }
+            
+            string subcommand = parts[0].ToLower();
+            
+            if (subcommand != "encrypt" && subcommand != "decrypt")
+            {
+                ShowError("Error: Invalid subcommand");
+                ShowError("Usage: base64 encrypt <text> | base64 decrypt <text>");
+                return;
+            }
+            
+            if (parts.Length < 2)
+            {
+                ShowError("Error: Please specify text to process");
+                ShowError($"Usage: base64 {subcommand} <text>");
+                return;
+            }
+            
+            string text = string.Join(" ", parts, 1, parts.Length - 1);
+            
+            Console.WriteLine("====================================");
+            Console.WriteLine("        Base64");
+            Console.WriteLine("====================================");
+            Console.WriteLine();
+            
+            try
+            {
+                if (subcommand == "encrypt")
+                {
+                    string encoded = Base64Helper.Encode(text);
+                    Console.WriteLine($"Original: {text}");
+                    Console.WriteLine();
+                    Console.WriteLine($"Encoded: {encoded}");
+                }
+                if (subcommand == "decrypt")
+                {
+                    string decoded = Base64Helper.Decode(text);
+                    Console.WriteLine($"Encoded: {text}");
+                    Console.WriteLine();
+                    Console.WriteLine($"Decoded: {decoded}");
+                }
+                
+                Console.WriteLine();
+                ShowSuccess("Base64 operation completed");
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Base64 error: {ex.Message}");
             }
         }
     }
