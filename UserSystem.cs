@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
+using Sys = Cosmos.System;
 
 namespace CMLeonOS
 {
@@ -213,8 +215,19 @@ namespace CMLeonOS
                 SaveUsers();
                 ShowSuccess("Admin user created successfully!");
                 
-                // 创建用户文件夹
-                CreateUserFolder(username);
+                Console.WriteLine();
+                Console.WriteLine("System will restart in 3 seconds...");
+                Console.WriteLine("Please wait...");
+                Console.WriteLine();
+                
+                for (int i = 3; i > 0; i--)
+                {
+                    Console.Write($"\rRestarting in {i} seconds...   ");
+                    Thread.Sleep(1000);
+                }
+                
+                Console.WriteLine("\rRestarting now!               ");
+                Sys.Power.Reboot();
             }
             catch (Exception ex)
             {
@@ -407,7 +420,7 @@ namespace CMLeonOS
                 User newUser = new User
                 {
                     Username = username,
-                    Password = password,
+                    Password = HashPasswordSha256(password),
                     IsAdmin = isAdmin
                 };
                 users.Add(newUser);
