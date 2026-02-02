@@ -226,7 +226,7 @@ namespace CMLeonOS
                     Thread.Sleep(1000);
                 }
                 
-                Console.WriteLine("\rRestarting now!               ");
+                Console.WriteLine("\rRestarting now!");
                 Sys.Power.Reboot();
             }
             catch (Exception ex)

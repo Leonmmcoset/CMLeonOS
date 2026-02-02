@@ -1,0 +1,41 @@
+Date : 2026-02-02 16:15:16
+Directory : c:\Users\leon\source\repos\CMLeonOS\CMLeonOS
+Total : 14 files,  4271 codes, 214 comments, 649 blanks, all 5134 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| C#       |         10 |      3,477 |        213 |        467 |      4,157 |
+| Markdown |          2 |        746 |          0 |        177 |        923 |
+| XML      |          1 |         42 |          1 |          5 |         48 |
+| JSON     |          1 |          6 |          0 |          0 |          6 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++----------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                       | files      | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                          |         14 |      4,271 |        214 |        649 |      5,134 |
++----------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++----------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                   | language | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Branswe.cs                    | C#       |        482 |         28 |         53 |        563 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Branswe.md                    | Markdown |        261 |          0 |         67 |        328 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\CMLeonOS.csproj               | XML      |         42 |          1 |          5 |         48 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\CUI.cs                        | C#       |        122 |          8 |         28 |        158 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Editor.cs                     | C#       |        257 |         47 |         27 |        331 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\EnvironmentVariableManager.cs | C#       |        151 |          5 |         17 |        173 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\FileSystem.cs                 | C#       |        324 |         17 |         30 |        371 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Kernel.cs                     | C#       |        159 |         28 |         32 |        219 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\LISENCE.md                    | Markdown |        485 |          0 |        110 |        595 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\SHA256.cs                     | C#       |        179 |          6 |         41 |        226 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell.cs                      | C#       |      1,289 |         48 |        156 |      1,493 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\UserSystem.cs                 | C#       |        492 |         26 |         78 |        596 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Version.cs                    | C#       |         22 |          0 |          5 |         27 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\global.json                   | JSON     |          6 |          0 |          0 |          6 |
+| Total                                                                      |          |      4,271 |        214 |        649 |      5,134 |
++----------------------------------------------------------------------------+----------+------------+------------+------------+------------+

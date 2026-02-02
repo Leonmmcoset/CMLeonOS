@@ -1,9 +1,12 @@
+using Cosmos.HAL;
+using Cosmos.System.Network.Config;
+using Cosmos.System.Network.IPv4.UDP.DHCP;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
+using System.Reflection.Metadata.Ecma335;
+using System.Text;
 using Sys = Cosmos.System;
-using Cosmos.System.Network.IPv4.UDP.DHCP;
 
 namespace CMLeonOS
 {
@@ -53,6 +56,7 @@ namespace CMLeonOS
             SystemStartTime = DateTime.Now;
             Console.WriteLine($"System started at: {SystemStartTime.ToString("yyyy-MM-dd HH:mm:ss")}");
 
+            // 初始化网络
             Console.WriteLine("Starting network...");
             try
             {
@@ -60,8 +64,17 @@ namespace CMLeonOS
                 {
                     throw new Exception("No network devices are available.");
                 }
+                var netDevice = NetworkDevice.Devices[0];
                 using var dhcp = new DHCPClient();
+                if (netDevice.Ready == true) {
+                    ShowSuccess("Network device ready.");
+                }
+                else
+                {
+                    ShowError("Network device is not ready.");
+                }
                 dhcp.SendDiscoverPacket();
+                Console.WriteLine($"Local IP: {NetworkConfiguration.CurrentAddress.ToString()}");
                 ShowSuccess("Network started.");
             }
             catch (Exception ex)
@@ -102,6 +115,22 @@ namespace CMLeonOS
                     System.IO.File.WriteAllText(envFilePath, "Test=123");
                     ShowSuccess("Created env.dat with Test=123");
                 }
+
+                // 输出系统启动-初始化完成后的时间
+                TimeSpan uptime = DateTime.Now - Kernel.SystemStartTime;
+                
+                // Console.WriteLine("System started: " + Kernel.SystemStartTime.ToString("yyyy-MM-dd HH:mm:ss"));
+                // Console.WriteLine("Current time: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+                // Console.WriteLine();
+                
+                // 格式化运行时间
+                int days = uptime.Days;
+                int hours = uptime.Hours;
+                int minutes = uptime.Minutes;
+                int seconds = uptime.Seconds;
+                
+                Console.WriteLine($"System uptime: {days} days, {hours} hours, {minutes} minutes, {seconds} seconds");
+                Console.WriteLine($"Total uptime: {uptime.TotalHours:F2} hours");
                 
                 // 循环直到登录成功或退出
                 while (true)

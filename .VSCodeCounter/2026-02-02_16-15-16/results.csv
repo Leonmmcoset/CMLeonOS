@@ -1,0 +1,16 @@
+"filename", "language", "C#", "XML", "Markdown", "JSON", "comment", "blank", "total"
+"c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Branswe.cs", "C#", 482, 0, 0, 0, 28, 53, 563
+"c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Branswe.md", "Markdown", 0, 0, 261, 0, 0, 67, 328
+"c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\CMLeonOS.csproj", "XML", 0, 42, 0, 0, 1, 5, 48
+"c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\CUI.cs", "C#", 122, 0, 0, 0, 8, 28, 158
+"c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Editor.cs", "C#", 257, 0, 0, 0, 47, 27, 331
+"c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\EnvironmentVariableManager.cs", "C#", 151, 0, 0, 0, 5, 17, 173
+"c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\FileSystem.cs", "C#", 324, 0, 0, 0, 17, 30, 371
+"c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Kernel.cs", "C#", 159, 0, 0, 0, 28, 32, 219
+"c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\LISENCE.md", "Markdown", 0, 0, 485, 0, 0, 110, 595
+"c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\SHA256.cs", "C#", 179, 0, 0, 0, 6, 41, 226
+"c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell.cs", "C#", 1289, 0, 0, 0, 48, 156, 1493
+"c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\UserSystem.cs", "C#", 492, 0, 0, 0, 26, 78, 596
+"c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Version.cs", "C#", 22, 0, 0, 0, 0, 5, 27
+"c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\global.json", "JSON", 0, 0, 0, 6, 0, 0, 6
+"Total", "-", 3477, 42, 746, 6, 214, 649, 5134
