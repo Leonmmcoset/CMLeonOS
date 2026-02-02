@@ -7,6 +7,12 @@ using Sys = Cosmos.System;
 using Cosmos.System.Network.IPv4;
 using EndPoint = Cosmos.System.Network.IPv4.EndPoint;
 using System.Threading;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using Cosmos.Core;
+using Cosmos.Core.Memory;
+using Cosmos.HAL;
 
 namespace CMLeonOS
 {
@@ -186,6 +192,8 @@ namespace CMLeonOS
                         "  restore <name>  - Restore system files",
                         "  grep <pattern> <file> - Search text in file",
                         "  ping <ip>        - Ping IP address (5 times)",
+                        "  tcpserver <port> - Start TCP server on specified port",
+                        "  tcpclient <ip> <port> - Connect to TCP server",
                         "  version          - Show OS version",
                         "  about            - Show about information",
                         "  help <page>      - Show help page (1-3)",
@@ -436,6 +444,12 @@ namespace CMLeonOS
                     break;
                 case "ping":
                     PingIP(args);
+                    break;
+                case "tcpserver":
+                    StartTcpServer(args);
+                    break;
+                case "tcpclient":
+                    ConnectTcpClient(args);
                     break;
                 default:
                     ShowError($"Unknown command: {command}");
@@ -1701,6 +1715,178 @@ namespace CMLeonOS
             
             address = new Address(octets[0], octets[1], octets[2], octets[3]);
             return true;
+        }
+
+        private void StartTcpServer(string args)
+        {
+            string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            
+            if (parts.Length == 0)
+            {
+                ShowError("Error: Please specify port number");
+                ShowError("Usage: tcpserver <port>");
+                return;
+            }
+            
+            if (!int.TryParse(parts[0], out int port))
+            {
+                ShowError("Error: Invalid port number");
+                return;
+            }
+            
+            if (port < 1 || port > 65535)
+            {
+                ShowError("Error: Port must be between 1 and 65535");
+                return;
+            }
+            
+            Console.WriteLine("====================================");
+            Console.WriteLine("        TCP Server");
+            Console.WriteLine("====================================");
+            Console.WriteLine();
+            Console.WriteLine($"Starting TCP server on port {port}...");
+            Console.WriteLine($"Local IP: {Kernel.IPAddress}");
+            Console.WriteLine();
+            Console.WriteLine("Press Ctrl+C to stop the server");
+            Console.WriteLine();
+            
+            try
+            {
+                TcpListener listener = new TcpListener(IPAddress.Any, port);
+                listener.Start();
+                
+                ShowSuccess($"TCP server started on port {port}");
+                Console.WriteLine("Waiting for connections...");
+                Console.WriteLine();
+                
+                while (true)
+                {
+                    TcpClient client = listener.AcceptTcpClient();
+                    HandleTcpClient(client);
+                    client.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowError($"TCP server error: {ex.Message}");
+            }
+        }
+
+        private void HandleTcpClient(TcpClient client)
+        {
+            try
+            {
+                NetworkStream stream = client.GetStream();
+                byte[] buffer = new byte[client.ReceiveBufferSize];
+                int bytesRead;
+                
+                Console.WriteLine($"Client connected: {client.Client.RemoteEndPoint}");
+                
+                while (true)
+                {
+                    bytesRead = 0;
+                    bytesRead = stream.Read(buffer, 0, buffer.Length);
+                    
+                    if (bytesRead == 0)
+                    {
+                        Console.WriteLine("Client disconnected");
+                        break;
+                    }
+                    
+                    string received = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                    Console.WriteLine($"Received: {received}");
+                    
+                    byte[] response = Encoding.ASCII.GetBytes("OK");
+                    stream.Write(response, 0, response.Length);
+                    Console.WriteLine("Sent: OK");
+                }
+                
+                stream.Close();
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Error handling client: {ex.Message}");
+            }
+        }
+
+        private void ConnectTcpClient(string args)
+        {
+            string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            
+            if (parts.Length < 2)
+            {
+                ShowError("Error: Please specify IP address and port");
+                ShowError("Usage: tcpclient <ip> <port>");
+                return;
+            }
+            
+            string serverIp = parts[0];
+            
+            if (!int.TryParse(parts[1], out int serverPort))
+            {
+                ShowError("Error: Invalid port number");
+                return;
+            }
+            
+            if (serverPort < 1 || serverPort > 65535)
+            {
+                ShowError("Error: Port must be between 1 and 65535");
+                return;
+            }
+            
+            Console.WriteLine("====================================");
+            Console.WriteLine("        TCP Client");
+            Console.WriteLine("====================================");
+            Console.WriteLine();
+            Console.WriteLine($"Connecting to {serverIp}:{serverPort}...");
+            
+            try
+            {
+                using (TcpClient client = new TcpClient())
+                {
+                    client.Connect(serverIp, serverPort);
+                    ShowSuccess($"Connected to {serverIp}:{serverPort}");
+                    Console.WriteLine();
+                    
+                    NetworkStream stream = client.GetStream();
+                    
+                    Console.WriteLine("Enter message to send (or 'exit' to quit):");
+                    
+                    while (true)
+                    {
+                        Console.Write("> ");
+                        string messageToSend = Console.ReadLine();
+                        
+                        if (messageToSend.ToLower() == "exit")
+                        {
+                            break;
+                        }
+                        
+                        if (string.IsNullOrWhiteSpace(messageToSend))
+                        {
+                            continue;
+                        }
+                        
+                        byte[] dataToSend = Encoding.ASCII.GetBytes(messageToSend);
+                        stream.Write(dataToSend, 0, dataToSend.Length);
+                        Console.WriteLine($"Sent: {messageToSend}");
+                        
+                        byte[] receivedData = new byte[client.ReceiveBufferSize];
+                        int bytesRead = stream.Read(receivedData, 0, receivedData.Length);
+                        string receivedMessage = Encoding.ASCII.GetString(receivedData, 0, bytesRead);
+                        Console.WriteLine($"Received: {receivedMessage}");
+                        Console.WriteLine();
+                    }
+                    
+                    stream.Close();
+                }
+                
+                ShowSuccess("Connection closed");
+            }
+            catch (Exception ex)
+            {
+                ShowError($"TCP client error: {ex.Message}");
+            }
         }
     }
 }
