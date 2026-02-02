@@ -1,8 +1,12 @@
+using CosmosFtpServer;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Sys = Cosmos.System;
+using Cosmos.System.Network.IPv4;
+using EndPoint = Cosmos.System.Network.IPv4.EndPoint;
+using System.Threading;
 
 namespace CMLeonOS
 {
@@ -181,6 +185,7 @@ namespace CMLeonOS
                         "  backup <name>    - Backup system files",
                         "  restore <name>  - Restore system files",
                         "  grep <pattern> <file> - Search text in file",
+                        "  ping <ip>        - Ping IP address (5 times)",
                         "  version          - Show OS version",
                         "  about            - Show about information",
                         "  help <page>      - Show help page (1-3)",
@@ -425,6 +430,12 @@ namespace CMLeonOS
                     break;
                 case "restore":
                     RestoreSystem(args);
+                    break;
+                case "ftp":
+                    CreateFTP();
+                    break;
+                case "ping":
+                    PingIP(args);
                     break;
                 default:
                     ShowError($"Unknown command: {command}");
@@ -1488,6 +1499,208 @@ namespace CMLeonOS
             {
                 ShowError($"Error showing uptime: {ex.Message}");
             }
+        }
+
+        private void CreateFTP()
+        {
+            Console.WriteLine("====================================");
+            Console.WriteLine("        FTP Server");
+            Console.WriteLine("====================================");
+            Console.WriteLine();
+
+            // Console.WriteLine("Starting FTP server...");
+            // Console.WriteLine($"Root directory: 0:\\");
+            // Console.WriteLine($"File system: {Kernel.fs.GetFileSystemType("0:\\")}");
+            // Console.WriteLine($"Available space: {FormatBytes(Kernel.fs.GetAvailableFreeSpace("0:\\"))}");
+            // Console.WriteLine();
+
+            // Console.WriteLine("====================================");
+            // Console.WriteLine("      Connection Information");
+            // Console.WriteLine("====================================");
+
+            try
+            {
+                if (Kernel.NetworkDevice != null && Kernel.IPAddress != "Unknown")
+                {
+                    Console.WriteLine($"FTP Server Address: ftp://{Kernel.IPAddress}");
+                    Console.WriteLine($"FTP Port: 21");
+                    Console.WriteLine($"IP Address: {Kernel.IPAddress}");
+                }
+                else
+                {
+                    Console.WriteLine("FTP Server Address: Not available (network not configured)");
+                    Console.WriteLine("FTP Port: 21");
+                    Console.WriteLine("IP Address: Unknown");
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Error while running: {ex.Message}");
+                Console.WriteLine("FTP Server Address: Not available (network not configured)");
+                Console.WriteLine("FTP Port: 21");
+                Console.WriteLine("IP Address: Unknown");
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("====================================");
+            Console.WriteLine("      Login Information");
+            Console.WriteLine("====================================");
+            Console.WriteLine("Default Username: anonymous");
+            Console.WriteLine("Password: (no password required)");
+            Console.WriteLine();
+            Console.WriteLine("Note: You can also use system users to login");
+            Console.WriteLine();
+
+            Console.WriteLine("FTP server is listening for connections...");
+            Console.WriteLine("Press Ctrl+C to stop the server");
+            Console.WriteLine();
+
+            using (var xServer = new FtpServer(Kernel.fs, "0:\\"))
+            {
+                try
+                {
+                    ShowSuccess("FTP server started successfully!");
+                    // Console.WriteLine($"Server started at: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+                    // Console.WriteLine();
+
+                    xServer.Listen();
+                }
+                catch (Exception ex)
+                {
+                    ShowError($"FTP server error: {ex.Message}");
+                    // Console.WriteLine($"Error occurred at: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+                }
+            }
+
+            Console.WriteLine();
+            ShowWarning("FTP server stopped");
+            // Console.WriteLine($"Server stopped at: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+        }
+
+        private void PingIP(string args)
+        {
+            string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            
+            if (parts.Length == 0)
+            {
+                ShowError("Error: Please specify IP address");
+                ShowError("Usage: ping <ip>");
+                return;
+            }
+            
+            if (Kernel.NetworkDevice == null)
+            {
+                ShowError("Error: Network device not initialized");
+                ShowError("Please check network configuration");
+                return;
+            }
+            
+            string ip = parts[0];
+            
+            if (!ParseAddress(ip, out Address address))
+            {
+                ShowError("Invalid IP address.");
+                return;
+            }
+            
+            Console.WriteLine();
+            Console.WriteLine("====================================");
+            Console.WriteLine($"        Pinging {address.ToString()}");
+            Console.WriteLine("====================================");
+            Console.WriteLine($"Using network device: {Kernel.NetworkDevice.Name}");
+            Console.WriteLine($"Local IP: {Kernel.IPAddress}");
+            Console.WriteLine();
+            
+            try
+            {
+                EndPoint endpoint = new EndPoint(Address.Zero, 0);
+                
+                int sent = 0;
+                int received = 0;
+                const int echoCount = 5;
+                
+                using (var icmp = new ICMPClient())
+                {
+                    icmp.Connect(address);
+                    
+                    for (int i = 0; i < echoCount; i++)
+                    {
+                        icmp.SendEcho();
+                        sent++;
+                        int time = icmp.Receive(ref endpoint);
+                        
+                        if (time != -1)
+                        {
+                            received++;
+                            Console.WriteLine($"Reply from {address.ToString()}: time={time - 1}ms");
+                        }
+                        else
+                        {
+                            ShowError("Request timed out.");
+                        }
+                        
+                        if (i < echoCount - 1)
+                        {
+                            Thread.Sleep(1000);
+                        }
+                    }
+                    
+                    icmp.Close();
+                }
+                
+                Console.WriteLine();
+                Console.WriteLine("====================================");
+                Console.WriteLine("        Ping Statistics");
+                Console.WriteLine("====================================");
+                int lossPercent = (int)((sent - received) / (float)sent * 100);
+                Console.WriteLine($"Packets: Sent = {sent}, Received = {received}, Lost = {sent - received} ({lossPercent}% loss)");
+                Console.WriteLine();
+                
+                if (sent == received)
+                {
+                    ShowSuccess("Ping completed successfully");
+                }
+                else if (received > 0)
+                {
+                    ShowWarning("Ping completed with packet loss");
+                }
+                else
+                {
+                    ShowError("Ping failed - no response received");
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Ping error: {ex.Message}");
+            }
+        }
+
+        private bool ParseAddress(string ip, out Address address)
+        {
+            string[] octetStrings = ip.Split('.');
+            byte[] octets = new byte[4];
+            
+            if (octetStrings.Length != 4)
+            {
+                address = Address.Zero;
+                return false;
+            }
+            
+            for (int i = 0; i < octetStrings.Length; i++)
+            {
+                if (byte.TryParse(octetStrings[i], out byte octet))
+                {
+                    octets[i] = octet;
+                }
+                else
+                {
+                    address = Address.Zero;
+                    return false;
+                }
+            }
+            
+            address = new Address(octets[0], octets[1], octets[2], octets[3]);
+            return true;
         }
     }
 }

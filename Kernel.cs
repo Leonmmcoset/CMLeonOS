@@ -1,6 +1,7 @@
 using Cosmos.HAL;
 using Cosmos.System.Network.Config;
 using Cosmos.System.Network.IPv4.UDP.DHCP;
+using Cosmos.System.Network.IPv4;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,7 +28,7 @@ namespace CMLeonOS
         }
 
         // 创建全局CosmosVFS实例
-        Sys.FileSystem.CosmosVFS fs = new Sys.FileSystem.CosmosVFS();
+        public static Sys.FileSystem.CosmosVFS fs = new Sys.FileSystem.CosmosVFS();
 
         private Shell shell;
         private UserSystem userSystem;
@@ -37,6 +38,10 @@ namespace CMLeonOS
         
         // 系统启动时间（用于uptime命令）
         public static DateTime SystemStartTime;
+        
+        // 网络配置信息
+        public static Cosmos.HAL.NetworkDevice NetworkDevice = null;
+        public static string IPAddress = "Unknown";
         
         protected override void BeforeRun()
         {
@@ -64,9 +69,9 @@ namespace CMLeonOS
                 {
                     throw new Exception("No network devices are available.");
                 }
-                var netDevice = NetworkDevice.Devices[0];
+                NetworkDevice = NetworkDevice.Devices[0];
                 using var dhcp = new DHCPClient();
-                if (netDevice.Ready == true) {
+                if (NetworkDevice.Ready == true) {
                     ShowSuccess("Network device ready.");
                 }
                 else
@@ -74,7 +79,8 @@ namespace CMLeonOS
                     ShowError("Network device is not ready.");
                 }
                 dhcp.SendDiscoverPacket();
-                Console.WriteLine($"Local IP: {NetworkConfiguration.CurrentAddress.ToString()}");
+                IPAddress = NetworkConfiguration.CurrentAddress.ToString();
+                Console.WriteLine($"Local IP: {IPAddress}");
                 ShowSuccess("Network started.");
             }
             catch (Exception ex)
@@ -130,7 +136,7 @@ namespace CMLeonOS
                 int seconds = uptime.Seconds;
                 
                 Console.WriteLine($"System uptime: {days} days, {hours} hours, {minutes} minutes, {seconds} seconds");
-                Console.WriteLine($"Total uptime: {uptime.TotalHours:F2} hours");
+                // Console.WriteLine($"Total uptime: {uptime.TotalHours:F2} hours");
                 
                 // 循环直到登录成功或退出
                 while (true)
