@@ -2491,8 +2491,14 @@ namespace CMLeonOS
             
             if (parts.Length == 0)
             {
-                ShowError("Error: Please specify Lua script file");
-                ShowError("Usage: lua <file>");
+                ShowError("Error: Please specify Lua script file or use --shell for interactive mode");
+                ShowError("Usage: lua <file> or lua --shell");
+                return;
+            }
+            
+            if (parts.Length == 1 && parts[0] == "--shell")
+            {
+                EnterLuaShell();
                 return;
             }
             
@@ -2517,9 +2523,6 @@ namespace CMLeonOS
                 return;
             }
             
-            // Console.WriteLine($"Executing: {filePath}");
-            // Console.WriteLine();
-            
             try
             {
                 string scriptContent = File.ReadAllText(filePath);
@@ -2541,23 +2544,121 @@ namespace CMLeonOS
                     
                     if (callResult == UniLua.ThreadStatus.LUA_OK)
                     {
+                        // 不要动这里
                         // ShowSuccess("Script run successfully");
                     }
                     else
                     {
                         string errorMsg = lua.ToString(-1);
-                        ShowError($"Script execution error: {errorMsg}");
+                        if (string.IsNullOrWhiteSpace(errorMsg))
+                        {
+                            ShowError($"Script execution error: Unknown error");
+                        }
+                        else
+                        {
+                            ShowError($"Script execution error: {errorMsg}");
+                        }
                     }
                 }
                 else
                 {
                     string errorMsg = lua.ToString(-1);
-                    ShowError($"Script load error: {errorMsg}");
+                    if (string.IsNullOrWhiteSpace(errorMsg))
+                    {
+                        ShowError($"Script load error: Unknown error");
+                    }
+                    else
+                    {
+                        ShowError($"Script load error: {errorMsg}");
+                    }
                 }
             }
             catch (Exception ex)
             {
                 ShowError($"Lua execution error: {ex.Message}");
+            }
+        }
+
+        private void EnterLuaShell()
+        {
+            Console.WriteLine("====================================");
+            Console.WriteLine("        Lua Interactive Shell");
+            Console.WriteLine("====================================");
+            Console.WriteLine("Type 'exit' or 'quit' to exit");
+            Console.WriteLine();
+            
+            ILuaState lua = LuaAPI.NewState();
+            lua.L_OpenLibs();
+            
+            while (true)
+            {
+                Console.Write("lua> ");
+                string input = Console.ReadLine();
+                
+                if (string.IsNullOrWhiteSpace(input))
+                {
+                    continue;
+                }
+                
+                if (input.ToLower() == "exit" || input.ToLower() == "quit")
+                {
+                    Console.WriteLine("Exiting Lua shell...");
+                    break;
+                }
+                
+                try
+                {
+                    UniLua.ThreadStatus loadResult = lua.L_LoadString(input);
+                    
+                    if (loadResult == UniLua.ThreadStatus.LUA_OK)
+                    {
+                        UniLua.ThreadStatus callResult = lua.PCall(0, 0, 0);
+                        
+                        if (callResult == UniLua.ThreadStatus.LUA_OK)
+                        {
+                            int top = lua.GetTop();
+                            if (top > 0)
+                            {
+                                for (int i = 1; i <= top; i++)
+                                {
+                                    string result = lua.ToString(i);
+                                    if (!string.IsNullOrWhiteSpace(result))
+                                    {
+                                        Console.WriteLine(result);
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            string errorMsg = lua.ToString(-1);
+                            if (string.IsNullOrWhiteSpace(errorMsg))
+                            {
+                                ShowError($"Execution error: Unknown error");
+                            }
+                            else
+                            {
+                                ShowError($"Execution error: {errorMsg}");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        string errorMsg = lua.ToString(-1);
+                        if (string.IsNullOrWhiteSpace(errorMsg))
+                        {
+                            ShowError($"Load error: Unknown error");
+                        }
+                        else
+                        {
+                            ShowError($"Load error: {errorMsg}");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ShowError($"Lua error: {ex.Message}");
+                }
             }
         }
     }

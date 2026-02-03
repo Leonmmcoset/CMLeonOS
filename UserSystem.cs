@@ -253,6 +253,18 @@ namespace CMLeonOS
             }
         }
 
+        public bool CurrentUserIsAdmin
+        {
+            get
+            {
+                if (currentLoggedInUser != null)
+                {
+                    return currentLoggedInUser.IsAdmin;
+                }
+                return false;
+            }
+        }
+
         public void FirstTimeSetup()
         {
             Console.WriteLine("====================================");

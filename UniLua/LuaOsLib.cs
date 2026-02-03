@@ -29,6 +29,8 @@ namespace UniLua
 				new NameFuncPair("sleep", OS_Sleep),
 				new NameFuncPair("beep", OS_Beep),
 				new NameFuncPair("clear", OS_Clear),
+				new NameFuncPair("getusername", OS_Getusername),
+				new NameFuncPair("isadmin", OS_Isadmin),
 #endif
 			};
 
@@ -159,6 +161,20 @@ namespace UniLua
 		{
 			Console.Clear();
 			lua.PushBoolean(true);
+			return 1;
+		}
+
+		private static int OS_Getusername( ILuaState lua )
+		{
+			string username = CMLeonOS.Kernel.userSystem?.CurrentUsername ?? "Not logged in";
+			lua.PushString(username);
+			return 1;
+		}
+
+		private static int OS_Isadmin( ILuaState lua )
+		{
+			bool isAdmin = CMLeonOS.Kernel.userSystem?.CurrentUserIsAdmin ?? false;
+			lua.PushBoolean(isAdmin);
 			return 1;
 		}
 #endif
