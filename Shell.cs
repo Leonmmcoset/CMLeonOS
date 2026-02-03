@@ -295,6 +295,9 @@ namespace CMLeonOS
                 case "edit":
                     EditFile(args);
                     break;
+                case "nano":
+                    NanoFile(args);
+                    break;
                 case "ls":
                     fileSystem.ListFiles(args);
                     break;
@@ -739,6 +742,25 @@ namespace CMLeonOS
             catch (Exception ex)
             {
                 ShowError($"Error starting editor: {ex.Message}");
+            }
+        }
+
+        private void NanoFile(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+            {
+                ShowError("Please specify a file name");
+                return;
+            }
+            
+            try
+            {
+                var nano = new Nano(fileName, true, fileSystem, userSystem, this);
+                nano.Start();
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Error starting nano: {ex.Message}");
             }
         }
 

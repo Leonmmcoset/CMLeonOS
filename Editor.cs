@@ -108,45 +108,56 @@ namespace CMLeonOS
         {
             Console.Clear();
             
-            // 显示标题栏
-            Console.WriteLine($"CMLeonOS Editor - {fileName}");
-            Console.WriteLine("--------------------------------");
-            Console.WriteLine("Commands: Esc = Exit");
-            Console.WriteLine();
+            Console.BackgroundColor = ConsoleColor.Gray;
+            Console.ForegroundColor = ConsoleColor.Black;
             
-            // 显示文件内容（限制显示行数，避免超出控制台高度）
-            int maxVisibleLines = 15; // 假设控制台高度为25行，留10行给其他内容
+            int consoleWidth = 80;
+            
+            string titleLine = $"CMLeonOS Editor - {fileName}".PadRight(consoleWidth);
+            Console.WriteLine(titleLine);
+            
+            string separatorLine = new string('-', consoleWidth);
+            Console.WriteLine(separatorLine);
+            
+            string commandLine = "Commands: Esc = Exit".PadRight(consoleWidth);
+            Console.WriteLine(commandLine);
+            
+            Console.ResetColor();
+            
+            int maxVisibleLines = 15;
             int startLine = Math.Max(0, currentLine - maxVisibleLines / 2);
             int endLine = Math.Min(lines.Count, startLine + maxVisibleLines);
             
             for (int i = startLine; i < endLine; i++)
             {
                 string line = lines[i];
-                Console.WriteLine($"{i + 1}: {line}");
+                Console.WriteLine(line);
             }
             
-            // 显示光标位置
-            Console.WriteLine();
-            Console.WriteLine($"Cursor: Line {currentLine + 1}, Column {currentColumn + 1}");
-            Console.WriteLine($"Lines: {lines.Count}");
+            Console.BackgroundColor = ConsoleColor.Gray;
+            Console.ForegroundColor = ConsoleColor.Black;
             
-            // 计算光标位置，确保不超出控制台高度
-            int consoleHeight = 25; // 假设控制台高度为25行
-            int titleLines = 4; // 标题栏占用的行数
+            string cursorLine = $"Cursor: Line {currentLine + 1}, Column {currentColumn + 1}".PadRight(consoleWidth);
+            Console.WriteLine(cursorLine);
+            
+            string linesLine = $"Lines: {lines.Count}".PadRight(consoleWidth);
+            Console.WriteLine(linesLine);
+            
+            Console.ResetColor();
+            
+            int consoleHeight = 25;
+            int titleLines = 3;
             int visibleLines = endLine - startLine;
             int cursorY = titleLines + (currentLine - startLine);
             
-            // 确保光标Y位置在有效范围内
-            cursorY = Math.Max(titleLines, Math.Min(cursorY, consoleHeight - 5)); // 留5行给状态信息
+            cursorY = Math.Max(titleLines, Math.Min(cursorY, consoleHeight - 5));
             
-            // 设置光标位置
             try
             {
-                Console.SetCursorPosition(currentColumn + 3, cursorY);
+                Console.SetCursorPosition(currentColumn, cursorY);
             }
             catch
             {
-                // 如果设置光标位置失败，忽略错误
             }
         }
 
@@ -245,18 +256,14 @@ namespace CMLeonOS
         // 显示保存确认弹窗
         private void ShowSaveConfirmation()
         {
-            // 简化版本，避免使用可能在Cosmos中不支持的功能
             Console.Clear();
             
-            // 显示灰色背景的确认弹窗
-            Console.BackgroundColor = ConsoleColor.DarkGray;
-            Console.ForegroundColor = ConsoleColor.White;
+            Console.BackgroundColor = ConsoleColor.Gray;
+            Console.ForegroundColor = ConsoleColor.Black;
             
-            // 获取控制台窗口大小
-            int consoleWidth = 80; // 假设控制台宽度为80
-            int consoleHeight = 25; // 假设控制台高度为25
+            int consoleWidth = 80;
+            int consoleHeight = 25;
             
-            // 弹窗内容
             string[] popupLines = {
                 "+----------------------------+",
                 "|          Save File?        |",
@@ -268,22 +275,18 @@ namespace CMLeonOS
                 "+----------------------------+"
             };
             
-            // 计算弹窗宽度和高度
-            int popupWidth = 30; // 弹窗宽度
-            int popupHeight = popupLines.Length; // 弹窗高度
+            int popupWidth = 30;
+            int popupHeight = popupLines.Length;
             
-            // 计算弹窗在屏幕中的位置（居中）
             int popupX = (consoleWidth - popupWidth) / 2;
             int popupY = (consoleHeight - popupHeight) / 2;
             
-            // 显示弹窗
             for (int i = 0; i < popupLines.Length; i++)
             {
                 Console.SetCursorPosition(popupX, popupY + i);
                 Console.WriteLine(popupLines[i]);
             }
             
-            // 等待用户输入
             while (true)
             {
                 ConsoleKeyInfo keyInfo;
@@ -293,7 +296,6 @@ namespace CMLeonOS
                 }
                 catch
                 {
-                    // 如果ReadKey失败，直接退出
                     Console.ResetColor();
                     Console.Clear();
                     isRunning = false;
@@ -302,7 +304,6 @@ namespace CMLeonOS
                 
                 if (keyInfo.Key == ConsoleKey.Y)
                 {
-                    // 保存文件
                     try
                     {
                         SaveFile();
@@ -318,7 +319,6 @@ namespace CMLeonOS
                 }
                 else if (keyInfo.Key == ConsoleKey.N)
                 {
-                    // 不保存文件
                     Console.ResetColor();
                     Console.Clear();
                     isRunning = false;
