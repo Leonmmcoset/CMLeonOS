@@ -13,6 +13,7 @@ namespace CMLeonOS
         public string Username { get; set; }
         public string Password { get; set; }
         public bool IsAdmin { get; set; }
+        public string Hostname { get; set; }
     }
 
     public class UserSystem
@@ -51,14 +52,13 @@ namespace CMLeonOS
         {
             EnsureSysDirectoryExists();
             
-            // 设置用户文件路径
             userFilePath = Path.Combine(sysDirectory, "user.dat");
             
-            // 初始化当前登录用户
             currentLoggedInUser = null;
             
-            // 加载用户数据
             LoadUsers();
+            
+            LoadHostname();
         }
 
         private void EnsureSysDirectoryExists()
@@ -74,6 +74,87 @@ namespace CMLeonOS
             {
                 // 忽略目录创建错误
             }
+        }
+
+        private void LoadHostname()
+        {
+            string hostnameFilePath = Path.Combine(sysDirectory, "hostname.dat");
+            
+            try
+            {
+                if (File.Exists(hostnameFilePath))
+                {
+                    string hostname = File.ReadAllText(hostnameFilePath);
+                    if (!string.IsNullOrWhiteSpace(hostname))
+                    {
+                        if (users.Count > 0)
+                        {
+                            users[0].Hostname = hostname;
+                        }
+                    }
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        private void SaveHostname()
+        {
+            string hostnameFilePath = Path.Combine(sysDirectory, "hostname.dat");
+            
+            try
+            {
+                if (users.Count > 0)
+                {
+                    string hostname = users[0].Hostname;
+                    File.WriteAllText(hostnameFilePath, hostname);
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Error saving hostname: {ex.Message}");
+            }
+        }
+
+        public string GetHostname()
+        {
+            if (users.Count > 0)
+            {
+                return users[0].Hostname;
+            }
+            return "Not set";
+        }
+
+        public void SetHostname(string hostname)
+        {
+            if (string.IsNullOrWhiteSpace(hostname))
+            {
+                ShowError("Hostname cannot be empty");
+                return;
+            }
+            
+            if (users.Count > 0)
+            {
+                users[0].Hostname = hostname;
+                SaveHostname();
+                ShowSuccess($"Hostname set to: {hostname}");
+            }
+            else
+            {
+                ShowError("No users found. Please create a user first.");
+            }
+        }
+
+        public void ProcessHostnameCommand(string args)
+        {
+            if (string.IsNullOrEmpty(args))
+            {
+                ShowError("Usage: hostname <new_hostname>");
+                return;
+            }
+            
+            SetHostname(args);
         }
 
         private void LoadUsers()
@@ -99,7 +180,8 @@ namespace CMLeonOS
                             {
                                 Username = parts[0].Trim(),
                                 Password = parts[1].Trim(),
-                                IsAdmin = parts.Length >= 3 && parts[2].Trim().ToLower() == "admin"
+                                IsAdmin = parts.Length >= 3 && parts[2].Trim().ToLower() == "admin",
+                                Hostname = parts.Length >= 4 ? parts[3].Trim() : ""
                             };
                             users.Add(user);
                         }
@@ -128,7 +210,7 @@ namespace CMLeonOS
                 {
                     // 使用SHA256加密密码
                     string hashedPassword = HashPasswordSha256(user.Password);
-                    string line = $"{user.Username}|{hashedPassword}|{(user.IsAdmin ? "admin" : "user")}";
+                    string line = $"{user.Username}|{hashedPassword}|{(user.IsAdmin ? "admin" : "user")}|{user.Hostname}";
                     lines.Add(line);
                 }
                 File.WriteAllLines(userFilePath, lines.ToArray());
@@ -226,6 +308,25 @@ namespace CMLeonOS
                 users.Add(adminUser);
                 SaveUsers();
                 ShowSuccess("Admin user created successfully!");
+                
+                Console.WriteLine();
+                Console.WriteLine("Please set system hostname:");
+                Console.Write("Hostname: ");
+                string hostname = Console.ReadLine();
+                
+                while (string.IsNullOrWhiteSpace(hostname))
+                {
+                    ShowError("Hostname cannot be empty.");
+                    Console.Write("Hostname: ");
+                    hostname = Console.ReadLine();
+                }
+                
+                if (users.Count > 0)
+                {
+                    users[0].Hostname = hostname;
+                    SaveHostname();
+                    ShowSuccess($"Hostname set to: {hostname}");
+                }
                 
                 Console.WriteLine();
                 Console.WriteLine("System will restart in 3 seconds...");

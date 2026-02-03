@@ -443,6 +443,9 @@ namespace CMLeonOS
                 case "user":
                     ProcessUserCommand(args);
                     break;
+                case "hostname":
+                    ProcessHostnameCommand(args);
+                    break;
                 case "cpass":
                     userSystem.ChangePassword();
                     break;
@@ -1439,6 +1442,17 @@ namespace CMLeonOS
             }
             
             return $"{size:F2} {units[unitIndex]}";
+        }
+
+        private void ProcessHostnameCommand(string args)
+        {
+            if (string.IsNullOrEmpty(args))
+            {
+                ShowError("Usage: hostname <new_hostname>");
+                return;
+            }
+            
+            userSystem.ProcessHostnameCommand(args);
         }
 
         private void ProcessUserCommand(string args)
