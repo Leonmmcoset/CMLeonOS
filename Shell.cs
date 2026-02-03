@@ -298,6 +298,18 @@ namespace CMLeonOS
                 case "nano":
                     NanoFile(args);
                     break;
+                case "diff":
+                    DiffFiles(args);
+                    break;
+                case "cal":
+                    ShowCalendar(args);
+                    break;
+                case "sleep":
+                    SleepCommand(args);
+                    break;
+                case "com":
+                    ExecuteCommandFile(args);
+                    break;
                 case "ls":
                     fileSystem.ListFiles(args);
                     break;
@@ -412,6 +424,9 @@ namespace CMLeonOS
                     break;
                 case "mv":
                     MoveFile(args);
+                    break;
+                case "rename":
+                    RenameFile(args);
                     break;
                 case "touch":
                     CreateEmptyFile(args);
@@ -764,6 +779,225 @@ namespace CMLeonOS
             }
         }
 
+        private void DiffFiles(string args)
+        {
+            if (string.IsNullOrEmpty(args))
+            {
+                ShowError("Usage: diff <file1> <file2>");
+                return;
+            }
+            
+            string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            
+            if (parts.Length < 2)
+            {
+                ShowError("Usage: diff <file1> <file2>");
+                return;
+            }
+            
+            string file1Path = fileSystem.GetFullPath(parts[0]);
+            string file2Path = fileSystem.GetFullPath(parts[1]);
+            
+            if (!System.IO.File.Exists(file1Path))
+            {
+                ShowError($"File not found: {parts[0]}");
+                return;
+            }
+            
+            if (!System.IO.File.Exists(file2Path))
+            {
+                ShowError($"File not found: {parts[1]}");
+                return;
+            }
+            
+            try
+            {
+                string[] file1Lines = fileSystem.ReadFile(file1Path).Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
+                string[] file2Lines = fileSystem.ReadFile(file2Path).Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
+                
+                int maxLines = Math.Max(file1Lines.Length, file2Lines.Length);
+                bool hasDifferences = false;
+                
+                Console.WriteLine($"Comparing {parts[0]} and {parts[1]}:");
+                Console.WriteLine();
+                
+                for (int i = 0; i < maxLines; i++)
+                {
+                    string line1 = i < file1Lines.Length ? file1Lines[i] : "";
+                    string line2 = i < file2Lines.Length ? file2Lines[i] : "";
+                    
+                    if (line1 != line2)
+                    {
+                        hasDifferences = true;
+                        
+                        if (i < file1Lines.Length && i < file2Lines.Length)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"< {line1}");
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine($"> {line2}");
+                        }
+                        else if (i < file1Lines.Length)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine($"< {line1}");
+                        }
+                        else
+                        {
+                            Console.ForegroundColor = ConsoleColor.Green;
+                            Console.WriteLine($"> {line2}");
+                        }
+                        
+                        Console.ResetColor();
+                    }
+                }
+                
+                if (!hasDifferences)
+                {
+                    ShowSuccess("Files are identical");
+                }
+                else
+                {
+                    Console.WriteLine();
+                    Console.WriteLine($"Differences found. Total lines: {maxLines}");
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Error comparing files: {ex.Message}");
+            }
+        }
+
+        private void ShowCalendar(string args)
+        {
+            int year = DateTime.Now.Year;
+            int month = DateTime.Now.Month;
+            
+            if (!string.IsNullOrEmpty(args))
+            {
+                string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                
+                if (parts.Length >= 1)
+                {
+                    if (int.TryParse(parts[0], out int m) && m >= 1 && m <= 12)
+                    {
+                        month = m;
+                    }
+                }
+                
+                if (parts.Length >= 2)
+                {
+                    if (int.TryParse(parts[1], out int y) && y >= 1 && y <= 9999)
+                    {
+                        year = y;
+                    }
+                }
+            }
+            
+            DateTime firstDay = new DateTime(year, month, 1);
+            int daysInMonth = DateTime.DaysInMonth(year, month);
+            DayOfWeek startDayOfWeek = firstDay.DayOfWeek;
+            
+            string[] monthNames = { 
+                "January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+            };
+            
+            Console.WriteLine($"     {monthNames[month - 1]} {year}");
+            Console.WriteLine("  Su Mo Tu We Th Fr Sa");
+            
+            int dayOfWeek = (int)startDayOfWeek;
+            if (dayOfWeek == 0) dayOfWeek = 7;
+            
+            for (int i = 1; i < dayOfWeek; i++)
+            {
+                Console.Write("   ");
+            }
+            
+            for (int day = 1; day <= daysInMonth; day++)
+            {
+                Console.Write($"{day,2} ");
+                
+                dayOfWeek++;
+                if (dayOfWeek > 7)
+                {
+                    dayOfWeek = 1;
+                    Console.WriteLine();
+                    Console.Write("  ");
+                }
+            }
+            
+            Console.WriteLine();
+        }
+
+        private void SleepCommand(string args)
+        {
+            if (string.IsNullOrEmpty(args))
+            {
+                ShowError("Usage: sleep <seconds>");
+                return;
+            }
+            
+            if (int.TryParse(args, out int seconds) && seconds > 0)
+            {
+                // Console.WriteLine($"Sleeping for {seconds} second(s)...");
+                Thread.Sleep(seconds * 1000);
+                // Console.WriteLine("Done.");
+            }
+            else
+            {
+                ShowError("Invalid time. Please specify a positive integer in seconds.");
+            }
+        }
+
+        private void ExecuteCommandFile(string args)
+        {
+            if (string.IsNullOrEmpty(args))
+            {
+                ShowError("Usage: com <filename.cm>");
+                return;
+            }
+            
+            string filePath = fileSystem.GetFullPath(args);
+            
+            if (!System.IO.File.Exists(filePath))
+            {
+                ShowError($"File not found: {args}");
+                return;
+            }
+            
+            try
+            {
+                string[] lines = fileSystem.ReadFile(filePath).Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
+                
+                if (lines.Length == 0 || (lines.Length == 1 && string.IsNullOrWhiteSpace(lines[0])))
+                {
+                    ShowWarning("Command file is empty");
+                    return;
+                }
+                
+                // Console.WriteLine($"Executing command file: {args}");
+                // Console.WriteLine("--------------------------------");
+                
+                foreach (string line in lines)
+                {
+                    if (string.IsNullOrWhiteSpace(line) || line.Trim().StartsWith("#"))
+                    {
+                        continue;
+                    }
+                    
+                    ExecuteCommand(line);
+                }
+                
+                // Console.WriteLine("--------------------------------");
+                // ShowSuccess("Command file execution completed");
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Error executing command file: {ex.Message}");
+            }
+        }
+
         private void HeadFile(string args)
         {
             if (string.IsNullOrEmpty(args))
@@ -981,6 +1215,55 @@ namespace CMLeonOS
             catch (Exception ex)
             {
                 ShowError($"Error moving file: {ex.Message}");
+            }
+        }
+
+        private void RenameFile(string args)
+        {
+            if (string.IsNullOrEmpty(args))
+            {
+                ShowError("Please specify source and new name");
+                ShowError("rename <source> <newname>");
+                return;
+            }
+            
+            try
+            {
+                string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length < 2)
+                {
+                    ShowError("Please specify both source and new name");
+                    ShowError("rename <source> <newname>");
+                    return;
+                }
+                
+                string sourceFile = parts[0];
+                string newName = parts[1];
+                
+                string sourcePath = fileSystem.GetFullPath(sourceFile);
+                string destPath = fileSystem.GetFullPath(newName);
+                
+                if (!System.IO.File.Exists(sourcePath))
+                {
+                    ShowError($"Source file '{sourceFile}' does not exist");
+                    return;
+                }
+                
+                if (System.IO.File.Exists(destPath))
+                {
+                    ShowError($"Destination '{newName}' already exists");
+                    return;
+                }
+                
+                string content = fileSystem.ReadFile(sourcePath);
+                System.IO.File.WriteAllText(destPath, content);
+                fileSystem.DeleteFile(sourcePath);
+                
+                ShowSuccess($"File renamed successfully from '{sourceFile}' to '{newName}'");
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Error renaming file: {ex.Message}");
             }
         }
 
