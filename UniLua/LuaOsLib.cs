@@ -3,6 +3,7 @@ namespace UniLua
 {
 	using System.Diagnostics;
 	using CMLeonOS;
+	using Sys = Cosmos.System;
 	
 	internal class LuaOSLib
 	{
@@ -19,6 +20,10 @@ namespace UniLua
 				new NameFuncPair("setenv", OS_Setenv),
 				new NameFuncPair("delenv", OS_Delenv),
 				new NameFuncPair("addenv", OS_Addenv),
+				new NameFuncPair("execute", OS_Execute),
+				new NameFuncPair("executefile", OS_Executefile),
+				new NameFuncPair("reboot", OS_Reboot),
+				new NameFuncPair("shutdown", OS_Shutdown),
 #endif
 			};
 
@@ -77,6 +82,48 @@ namespace UniLua
 			string varName = lua.L_CheckString(1);
 			string varValue = lua.L_CheckString(2);
 			EnvironmentVariableManager.Instance.SetVariable(varName, varValue);
+			lua.PushBoolean(true);
+			return 1;
+		}
+
+		private static int OS_Execute( ILuaState lua )
+		{
+			string command = lua.L_CheckString(1);
+			if (string.IsNullOrWhiteSpace(command))
+			{
+				lua.PushNil();
+				return 1;
+			}
+			
+			CMLeonOS.Kernel.shell?.ExecuteCommand(command);
+			lua.PushBoolean(true);
+			return 1;
+		}
+
+		private static int OS_Executefile( ILuaState lua )
+		{
+			string filePath = lua.L_CheckString(1);
+			if (string.IsNullOrWhiteSpace(filePath))
+			{
+				lua.PushNil();
+				return 1;
+			}
+			
+			CMLeonOS.Kernel.shell?.ExecuteCommand($"com {filePath}");
+			lua.PushBoolean(true);
+			return 1;
+		}
+
+		private static int OS_Reboot( ILuaState lua )
+		{
+			Sys.Power.Reboot();
+			lua.PushBoolean(true);
+			return 1;
+		}
+
+		private static int OS_Shutdown( ILuaState lua )
+		{
+			Sys.Power.Shutdown();
 			lua.PushBoolean(true);
 			return 1;
 		}
