@@ -33,17 +33,12 @@ namespace CMLeonOS
 
         // 创建全局CosmosVFS实例
         public static Sys.FileSystem.CosmosVFS fs = new Sys.FileSystem.CosmosVFS();
-
-        private Shell shell;
-        private UserSystem userSystem;
+        public static Shell shell;
+        public static UserSystem userSystem;
         
-        // 修复模式变量（硬编码，用于控制是否启用修复模式）
         public static bool FixMode = false;
-        
-        // 系统启动时间（用于uptime命令）
         public static DateTime SystemStartTime;
         
-        // 网络配置信息
         public static Cosmos.HAL.NetworkDevice NetworkDevice = null;
         public static string IPAddress = "Unknown";
         

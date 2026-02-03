@@ -13,6 +13,7 @@ namespace UniLua
 			{
 #if !UNITY_WEBPLAYER
 				new NameFuncPair("clock", 	OS_Clock),
+				new NameFuncPair("gethostname", OS_Gethostname),
 #endif
 			};
 
@@ -23,7 +24,14 @@ namespace UniLua
 #if !UNITY_WEBPLAYER
 		private static int OS_Clock( ILuaState lua )
 		{
-			lua.PushNumber(0); //TO PLUG
+			lua.PushNumber(0);
+			return 1;
+		}
+
+		private static int OS_Gethostname( ILuaState lua )
+		{
+			string hostname = CMLeonOS.Kernel.userSystem?.GetHostname() ?? "Not set";
+			lua.PushString(hostname);
 			return 1;
 		}
 #endif
