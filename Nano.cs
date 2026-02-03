@@ -661,7 +661,7 @@ namespace CMLeonOS
             Console.BackgroundColor = ConsoleColor.White;
             Console.ForegroundColor = ConsoleColor.Black;
             Console.SetCursorPosition(0, 0);
-            string text = "  Nano Editor 1.2";
+            string text = "  CMLeonOS Nano Editor";
             Console.WriteLine(text + new string(' ', consoleWidth - text.Length));
 
             string displayName = path == null ? "New File" : System.IO.Path.GetFileName(path);

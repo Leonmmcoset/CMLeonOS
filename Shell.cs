@@ -434,6 +434,9 @@ namespace CMLeonOS
                 case "find":
                     FindFile(args);
                     break;
+                case "tree":
+                    ShowTree(args);
+                    break;
                 case "getdisk":
                     GetDiskInfo();
                     break;
@@ -1321,6 +1324,80 @@ namespace CMLeonOS
             catch (Exception ex)
             {
                 ShowError($"Error finding file: {ex.Message}");
+            }
+        }
+
+        private void ShowTree(string args)
+        {
+            string startPath = string.IsNullOrEmpty(args) ? "." : args;
+            string fullPath = fileSystem.GetFullPath(startPath);
+            
+            if (!System.IO.Directory.Exists(fullPath))
+            {
+                ShowError($"Directory not found: {startPath}");
+                return;
+            }
+            
+            try
+            {
+                Console.WriteLine(fullPath);
+                PrintDirectoryTree(fullPath, "", true);
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Error displaying tree: {ex.Message}");
+            }
+        }
+
+        private void PrintDirectoryTree(string path, string prefix, bool isLast)
+        {
+            try
+            {
+                var dirs = fileSystem.GetFullPathDirectoryList(path);
+                var files = fileSystem.GetFullPathFileList(path);
+                
+                int totalItems = dirs.Count + files.Count;
+                int current = 0;
+                
+                foreach (var dir in dirs)
+                {
+                    current++;
+                    bool isLastItem = current == totalItems;
+                    string connector = isLastItem ? "+-- " : "|-- ";
+                    string newPrefix = prefix + (isLastItem ? "    " : "|   ");
+                    
+                    string dirName = System.IO.Path.GetFileName(dir);
+                    Console.WriteLine($"{prefix}{connector}{dirName}/");
+                    
+                    PrintDirectoryTree(dir, newPrefix, isLastItem);
+                }
+                
+                foreach (var file in files)
+                {
+                    current++;
+                    bool isLastItem = current == totalItems;
+                    string connector = isLastItem ? "+-- " : "|-- ";
+                    
+                    string fileName = System.IO.Path.GetFileName(file);
+                    Console.WriteLine($"{prefix}{connector}{fileName}");
+                }
+            }
+            catch (System.IO.DirectoryNotFoundException)
+            {
+                ShowError($"Directory not found: {path}");
+            }
+            // catch (System.IO.UnauthorizedAccessException)
+            // {
+            //     ShowError($"Access denied to directory: {path}");
+            // }
+            catch (Exception ex)
+            {
+                string errorMsg = ex.Message;
+                if (string.IsNullOrEmpty(errorMsg))
+                {
+                    errorMsg = $"Error type: {ex.GetType().Name}";
+                }
+                ShowError($"Error reading directory {path}: {errorMsg}");
             }
         }
 

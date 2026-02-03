@@ -149,6 +149,79 @@ namespace CMLeonOS
             return fileList;
         }
 
+        public List<string> GetDirectoryList(string path = ".")
+        {
+            string fullPath = GetFullPath(path);
+            List<string> dirList = new List<string>();
+            
+            try
+            {
+                if (Directory.Exists(fullPath))
+                {
+                    var dirs = Directory.GetDirectories(fullPath);
+                    foreach (var dir in dirs)
+                    {
+                        string dirName = Path.GetFileName(dir);
+                        dirList.Add(dirName);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting directory list: {ex.Message}");
+            }
+            
+            return dirList;
+        }
+
+        public List<string> GetFullPathFileList(string path = ".")
+        {
+            string fullPath = GetFullPath(path);
+            List<string> fileList = new List<string>();
+            
+            try
+            {
+                if (Directory.Exists(fullPath))
+                {
+                    var files = Directory.GetFiles(fullPath);
+                    foreach (var file in files)
+                    {
+                        fileList.Add(file);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting file list: {ex.Message}");
+            }
+            
+            return fileList;
+        }
+
+        public List<string> GetFullPathDirectoryList(string path = ".")
+        {
+            string fullPath = GetFullPath(path);
+            List<string> dirList = new List<string>();
+            
+            try
+            {
+                if (Directory.Exists(fullPath))
+                {
+                    var dirs = Directory.GetDirectories(fullPath);
+                    foreach (var dir in dirs)
+                    {
+                        dirList.Add(dir);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting directory list: {ex.Message}");
+            }
+            
+            return dirList;
+        }
+
         public void CreateFile(string path, string content = "")
         {
             string fullPath = GetFullPath(path);
