@@ -2,8 +2,10 @@
 namespace UniLua
 {
 	using System.Diagnostics;
+	using System;
 	using CMLeonOS;
 	using Sys = Cosmos.System;
+	using System.Threading;
 	
 	internal class LuaOSLib
 	{
@@ -24,6 +26,9 @@ namespace UniLua
 				new NameFuncPair("executefile", OS_Executefile),
 				new NameFuncPair("reboot", OS_Reboot),
 				new NameFuncPair("shutdown", OS_Shutdown),
+				new NameFuncPair("sleep", OS_Sleep),
+				new NameFuncPair("beep", OS_Beep),
+				new NameFuncPair("clear", OS_Clear),
 #endif
 			};
 
@@ -124,6 +129,35 @@ namespace UniLua
 		private static int OS_Shutdown( ILuaState lua )
 		{
 			Sys.Power.Shutdown();
+			lua.PushBoolean(true);
+			return 1;
+		}
+
+		private static int OS_Sleep( ILuaState lua )
+		{
+			double seconds = lua.L_CheckNumber(1);
+			if (seconds < 0)
+			{
+				lua.PushNil();
+				return 1;
+			}
+			
+			int milliseconds = (int)(seconds * 1000);
+			Thread.Sleep(milliseconds);
+			lua.PushBoolean(true);
+			return 1;
+		}
+
+		private static int OS_Beep( ILuaState lua )
+		{
+			Console.Beep();
+			lua.PushBoolean(true);
+			return 1;
+		}
+
+		private static int OS_Clear( ILuaState lua )
+		{
+			Console.Clear();
 			lua.PushBoolean(true);
 			return 1;
 		}
