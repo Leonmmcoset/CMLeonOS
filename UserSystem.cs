@@ -38,7 +38,7 @@ namespace CMLeonOS
             Console.ResetColor();
         }
 
-        internal static string HashPasswordSha256(string password)
+        public static string HashPasswordSha256(string password)
         {
             Sha256 sha256 = new Sha256();
 

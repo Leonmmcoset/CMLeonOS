@@ -31,6 +31,9 @@ namespace UniLua
 				new NameFuncPair("clear", OS_Clear),
 				new NameFuncPair("getusername", OS_Getusername),
 				new NameFuncPair("isadmin", OS_Isadmin),
+				new NameFuncPair("sha256", OS_Sha256),
+				new NameFuncPair("base64encrypt", OS_Base64Encrypt),
+				new NameFuncPair("base64decrypt", OS_Base64Decrypt),
 #endif
 			};
 
@@ -175,6 +178,30 @@ namespace UniLua
 		{
 			bool isAdmin = CMLeonOS.Kernel.userSystem?.CurrentUserIsAdmin ?? false;
 			lua.PushBoolean(isAdmin);
+			return 1;
+		}
+
+		private static int OS_Sha256( ILuaState lua )
+		{
+			string input = lua.L_CheckString(1);
+			string hash = CMLeonOS.UserSystem.HashPasswordSha256(input) ?? "";
+			lua.PushString(hash);
+			return 1;
+		}
+
+		private static int OS_Base64Encrypt( ILuaState lua )
+		{
+			string input = lua.L_CheckString(1);
+			string encoded = CMLeonOS.Base64Helper.Encode(input);
+			lua.PushString(encoded);
+			return 1;
+		}
+
+		private static int OS_Base64Decrypt( ILuaState lua )
+		{
+			string input = lua.L_CheckString(1);
+			string decoded = CMLeonOS.Base64Helper.Decode(input);
+			lua.PushString(decoded);
 			return 1;
 		}
 #endif
