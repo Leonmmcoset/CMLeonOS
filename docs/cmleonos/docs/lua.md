@@ -1086,7 +1086,54 @@ print(decoded)
 ```
 
 ---
+## JSON 库
 
+### json.encode(table)
+将 Lua 表编码为 JSON 字符串。
+
+```lua
+local data = {name = "John", age = 30}
+local jsonStr = json.encode(data)
+print(jsonStr)
+```
+
+### json.decode(string)
+将 JSON 字符串解码为 Lua 表。
+
+```lua
+local jsonStr = '{"name": "John", "age": 30}'
+local data = json.decode(jsonStr)
+print(data.name)
+print(data.age)
+```
+
+### json.null()
+返回 null 值。
+
+```lua
+local nullValue = json.null()
+print(nullValue)
+```
+
+### json.parse(string)
+解析 JSON 字符串（同 decode）。
+
+```lua
+local jsonStr = '{"name": "John", "age": 30}'
+local data = json.parse(jsonStr)
+print(data.name)
+```
+
+### json.stringify(table)
+将 Lua 表转换为 JSON 字符串（同 encode）。
+
+```lua
+local data = {name = "John", age = 30}
+local jsonStr = json.stringify(data)
+print(jsonStr)
+```
+
+---
 ## 包库 (package)
 
 ### package.loaded

@@ -589,6 +589,7 @@ namespace UniLua
 				new NameFuncPair( LuaMathLib.LIB_NAME, 	LuaMathLib.OpenLib  ),
 				new NameFuncPair( LuaDebugLib.LIB_NAME, LuaDebugLib.OpenLib ),
 				new NameFuncPair( LuaEncLib.LIB_NAME,	LuaEncLib.OpenLib	),
+				new NameFuncPair( LuaJsonLib.LIB_NAME,	LuaJsonLib.OpenLib	),
             };
 
 			for( var i=0; i<define.Length; ++i)
