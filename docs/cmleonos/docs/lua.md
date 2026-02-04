@@ -1,22 +1,6 @@
 # CMLeonOS Lua API 文档
 
-本文档记录了 CMLeonOS 中 UniLua 支持的所有函数和库。
-
-## 目录
-
-- [基础库](#基础库)
-- [数学库](#数学库)
-- [字符串库](#字符串库)
-- [操作系统库](#操作系统库)
-- [输入输出库](#输入输出库)
-- [协程库](#协程库)
-- [表库](#表库)
-- [调试库](#调试库)
-- [位运算库](#位运算库)
-- [编码库](#编码库)
-- [包库](#包库)
-
----
+本文档记录了 CMLeonOS 中 Lua 支持的所有函数和库。
 
 ## 基础库 (base)
 
@@ -45,6 +29,14 @@ collectgarbage("count")
 
 ```lua
 dofile("script.lua")
+```
+
+### input([prompt])
+从控制台读取一行输入。
+
+```lua
+local name = input("Enter your name: ")
+print("Hello, " .. name)
 ```
 
 ### error(message [, level])
@@ -1201,8 +1193,6 @@ print("Encoded:", encoded)
 print("Decoded:", decoded)
 ```
 
----
-
 ## 注意事项
 
 1. **交互模式**：使用 `lua --shell` 进入交互式 Lua Shell
@@ -1211,18 +1201,7 @@ print("Decoded:", decoded)
 4. **加密支持**：支持 SHA256 和 Base64 编码/解码
 5. **标准 Lua**：完全兼容 Lua 5.1 标准
 
----
-
 ## 版本信息
 
 - **Lua 版本**：5.2
-- **UniLua 版本**：自定义实现
 - **CMLeonOS 版本**：最新
-
----
-
-## 更新日志
-
-- 2026-02-04: 初始文档创建
-- 添加了所有 UniLua 支持的库和函数
-- 包含 CMLeonOS 特定的系统扩展函数

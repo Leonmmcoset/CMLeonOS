@@ -19,6 +19,7 @@ namespace UniLua
 				new NameFuncPair( "dofile", 		LuaBaseLib.B_DoFile ),
 				new NameFuncPair( "error", 			LuaBaseLib.B_Error ),
 				new NameFuncPair( "ipairs", 		LuaBaseLib.B_Ipairs ),
+				new NameFuncPair( "input", 			LuaBaseLib.B_Input ),
 				new NameFuncPair( "loadfile", 		LuaBaseLib.B_LoadFile ),
 				new NameFuncPair( "load", 			LuaBaseLib.B_Load ),
 				new NameFuncPair( "loadstring", 	LuaBaseLib.B_Load ),
@@ -113,6 +114,21 @@ namespace UniLua
 				lua.Concat( 2 );
 			}
 			return lua.Error();
+		}
+
+		public static int B_Input( ILuaState lua )
+		{
+			string prompt = lua.L_OptString( 1, "> " );
+			lua.SetTop( 1 );
+			Console.Write( prompt );
+			string input = Console.ReadLine();
+			if( input != null )
+			{
+				lua.PushString( input );
+				return 1;
+			}
+			lua.PushNil();
+			return 1;
 		}
 
 		private static int LoadAux( ILuaState lua, ThreadStatus status, int envidx )
