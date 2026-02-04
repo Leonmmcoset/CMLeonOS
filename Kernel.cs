@@ -78,8 +78,16 @@ namespace CMLeonOS
                     ShowError("Network device is not ready");
                 }
                 dhcp.SendDiscoverPacket();
+                
                 IPAddress = NetworkConfiguration.CurrentAddress.ToString();
                 Console.WriteLine($"Local IP: {IPAddress}");
+                
+                string gateway = NetworkConfigManager.Instance.GetGateway();
+                Console.WriteLine($"Gateway: {gateway}");
+                
+                string dns = NetworkConfigManager.Instance.GetDNS();
+                Console.WriteLine($"DNS Server: {dns}");
+                
                 ShowSuccess("Network started");
             }
             catch (Exception ex)

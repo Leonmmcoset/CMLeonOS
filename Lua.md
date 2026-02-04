@@ -1215,7 +1215,7 @@ print("Decoded:", decoded)
 
 ## 版本信息
 
-- **Lua 版本**：5.1
+- **Lua 版本**：5.2
 - **UniLua 版本**：自定义实现
 - **CMLeonOS 版本**：最新
 

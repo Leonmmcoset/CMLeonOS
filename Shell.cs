@@ -4,7 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Sys = Cosmos.System;
+using Cosmos.System.Network;
+using Cosmos.System.Network.Config;
 using Cosmos.System.Network.IPv4;
+using Cosmos.System.Network.IPv4.UDP.DNS;
 using EndPoint = Cosmos.System.Network.IPv4.EndPoint;
 using System.Threading;
 using System.Net;
@@ -197,6 +200,10 @@ namespace CMLeonOS
                         "  tcpserver <port> - Start TCP server on specified port",
                         "  tcpclient <ip> <port> - Connect to TCP server",
                         "  wget <url>       - Download file from URL",
+                        "  setdns <ip>     - Set DNS server",
+                        "  setgateway <ip>  - Set gateway",
+                        "  ipconfig         - Show network configuration",
+                        "  nslookup <domain> - DNS lookup",
                         "  whoami          - Show current username",
                         "  base64 encrypt <text> - Encode text to Base64",
                         "  base64 decrypt <text> - Decode Base64 to text",
@@ -445,6 +452,18 @@ namespace CMLeonOS
                     break;
                 case "hostname":
                     ProcessHostnameCommand(args);
+                    break;
+                case "setdns":
+                    SetDnsServer(args);
+                    break;
+                case "setgateway":
+                    SetGateway(args);
+                    break;
+                case "ipconfig":
+                    ShowNetworkConfig();
+                    break;
+                case "nslookup":
+                    NsLookup(args);
                     break;
                 case "cpass":
                     userSystem.ChangePassword();
@@ -2326,8 +2345,6 @@ namespace CMLeonOS
             
             try
             {
-                HttpRequest request = new HttpRequest();
-                
                 string domain = "";
                 string path = "/";
                 
@@ -2361,6 +2378,7 @@ namespace CMLeonOS
                 Console.WriteLine($"Path: {path}");
                 Console.WriteLine();
                 
+                HttpRequest request = new HttpRequest();
                 request.Domain = domain;
                 request.Path = path;
                 request.Method = "GET";
@@ -2659,6 +2677,124 @@ namespace CMLeonOS
                 {
                     ShowError($"Lua error: {ex.Message}");
                 }
+            }
+        }
+
+        private void SetDnsServer(string args)
+        {
+            if (string.IsNullOrWhiteSpace(args))
+            {
+                ShowError("Usage: setdns <ip_address>");
+                ShowError("Example: setdns 8.8.8.8");
+                return;
+            }
+            
+            string dnsIp = args.Trim();
+            
+            try
+            {
+                NetworkConfigManager.Instance.SetDNS(dnsIp);
+                ShowSuccess($"DNS server set to: {dnsIp}");
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Error setting DNS: {ex.Message}");
+            }
+        }
+
+        private void SetGateway(string args)
+        {
+            if (string.IsNullOrWhiteSpace(args))
+            {
+                ShowError("Usage: setgateway <ip_address>");
+                ShowError("Example: setgateway 192.168.1.1");
+                return;
+            }
+            
+            string gatewayIp = args.Trim();
+            
+            try
+            {
+                NetworkConfigManager.Instance.SetGateway(gatewayIp);
+                ShowSuccess($"Gateway set to: {gatewayIp}");
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Error setting gateway: {ex.Message}");
+            }
+        }
+
+        private void ShowNetworkConfig()
+        {
+            Console.WriteLine("====================================");
+            Console.WriteLine("        Network Configuration");
+            Console.WriteLine("====================================");
+            Console.WriteLine();
+            
+            Console.WriteLine($"Network Device: {Kernel.NetworkDevice?.Name ?? "Not available"}");
+            Console.WriteLine($"Local IP: {Kernel.IPAddress}");
+            
+            string gateway = NetworkConfigManager.Instance.GetGateway();
+            Console.WriteLine($"Gateway: {gateway}");
+            
+            string dns = NetworkConfigManager.Instance.GetDNS();
+            Console.WriteLine($"DNS Server: {dns}");
+            
+            Console.WriteLine();
+        }
+
+        private void NsLookup(string args)
+        {
+            if (string.IsNullOrWhiteSpace(args))
+            {
+                ShowError("Usage: nslookup <domain>");
+                ShowError("Example: nslookup github.com");
+                return;
+            }
+            
+            string domain = args.Trim();
+            
+            string dnsStr = NetworkConfigManager.Instance.GetDNS();
+            if (string.IsNullOrWhiteSpace(dnsStr))
+            {
+                ShowError("DNS server not configured. Use 'setdns' command first.");
+                return;
+            }
+            
+            Address dns = Address.Parse(dnsStr);
+            
+            Console.WriteLine("====================================");
+            Console.WriteLine("        DNS Lookup");
+            Console.WriteLine("====================================");
+            Console.WriteLine();
+            Console.WriteLine($"Domain: {domain}");
+            Console.WriteLine($"DNS Server: {dnsStr}");
+            Console.WriteLine();
+            
+            try
+            {
+                using (var dnsClient = new DnsClient())
+                {
+                    dnsClient.Connect(dns);
+                    Console.WriteLine("Sending DNS query...");
+                    
+                    dnsClient.SendAsk(domain);
+                    
+                    Address result = dnsClient.Receive();
+                    
+                    if (result != null)
+                    {
+                        ShowSuccess($"Resolved: {domain} -> {result}");
+                    }
+                    else
+                    {
+                        ShowError("DNS query failed or timed out");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowError($"DNS lookup error: {ex.Message}");
             }
         }
     }
