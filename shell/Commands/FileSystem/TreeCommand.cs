@@ -9,7 +9,7 @@ namespace CMLeonOS.Commands.FileSystem
             string startPath = string.IsNullOrEmpty(args) ? "." : args;
             string fullPath = fileSystem.GetFullPath(startPath);
             
-            if (!System.IO.Directory.Exists(fullPath))
+            if (!global::System.IO.Directory.Exists(fullPath))
             {
                 showError($"Directory not found: {startPath}");
                 return;
@@ -43,7 +43,7 @@ namespace CMLeonOS.Commands.FileSystem
                     string connector = isLastItem ? "+-- " : "|-- ";
                     string newPrefix = prefix + (isLastItem ? "    " : "|   ");
                     
-                    string dirName = System.IO.Path.GetFileName(dir);
+                    string dirName = global::System.IO.Path.GetFileName(dir);
                     Console.WriteLine($"{prefix}{connector}{dirName}/");
                     
                     PrintDirectoryTree(fileSystem, dir, newPrefix, isLastItem, showError);
@@ -55,11 +55,11 @@ namespace CMLeonOS.Commands.FileSystem
                     bool isLastItem = current == totalItems;
                     string connector = isLastItem ? "+-- " : "|-- ";
                     
-                    string fileName = System.IO.Path.GetFileName(file);
+                    string fileName = global::System.IO.Path.GetFileName(file);
                     Console.WriteLine($"{prefix}{connector}{fileName}");
                 }
             }
-            catch (System.IO.DirectoryNotFoundException)
+            catch (global::System.IO.DirectoryNotFoundException)
             {
                 showError($"Directory not found: {path}");
             }

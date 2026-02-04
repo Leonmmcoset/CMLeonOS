@@ -115,13 +115,12 @@ namespace CMLeonOS
 
         public void ProcessEcho(string args)
         {
-            var processedArgs = args.Replace("\\n", "\n");
-            Console.WriteLine(processedArgs);
+            Commands.System.EchoCommand.ProcessEcho(args);
         }
 
         public void ProcessClear()
         {
-            Console.Clear();
+            Commands.System.ClearCommand.ProcessClear();
         }
 
         public void ProcessRestart()
@@ -141,12 +140,12 @@ namespace CMLeonOS
 
         public void ProcessTime()
         {
-            Console.WriteLine(DateTime.Now.ToString());
+            Commands.System.TimeCommand.ProcessTime();
         }
 
         public void ProcessDate()
         {
-            Console.WriteLine(DateTime.Now.ToShortDateString());
+            Commands.System.DateCommand.ProcessDate();
         }
 
         public void ProcessLs(string args)
@@ -715,40 +714,7 @@ namespace CMLeonOS
 
         public void ShowUptime()
         {
-            try
-            {
-                Console.WriteLine("====================================");
-                Console.WriteLine("        System Uptime");
-                Console.WriteLine("====================================");
-                Console.WriteLine();
-                
-                if (Kernel.SystemStartTime != DateTime.MinValue)
-                {
-                    TimeSpan uptime = DateTime.Now - Kernel.SystemStartTime;
-                    
-                    Console.WriteLine("System started: " + Kernel.SystemStartTime.ToString("yyyy-MM-dd HH:mm:ss"));
-                    Console.WriteLine("Current time: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-                    Console.WriteLine();
-                    
-                    int days = uptime.Days;
-                    int hours = uptime.Hours;
-                    int minutes = uptime.Minutes;
-                    int seconds = uptime.Seconds;
-                    
-                    Console.WriteLine($"System uptime: {days} days, {hours} hours, {minutes} minutes, {seconds} seconds");
-                    Console.WriteLine($"Total uptime: {uptime.TotalHours:F2} hours");
-                }
-                else
-                {
-                    ShowWarning("System start time not available.");
-                    ShowWarning("System may have been started before uptime tracking was implemented.");
-                }
-                Console.WriteLine();
-            }
-            catch (Exception ex)
-            {
-                ShowError($"Error showing uptime: {ex.Message}");
-            }
+            Commands.System.UptimeCommand.ShowUptime(ShowError, ShowWarning);
         }
 
         public void CreateFTP()
@@ -1237,12 +1203,7 @@ namespace CMLeonOS
 
         public void ShowCurrentUsername()
         {
-            Console.WriteLine("====================================");
-            Console.WriteLine("        Current User");
-            Console.WriteLine("====================================");
-            Console.WriteLine();
-            Console.WriteLine($"Username: {userSystem.CurrentUsername}");
-            Console.WriteLine();
+            Commands.System.WhoamiCommand.ShowCurrentUsername(userSystem);
         }
 
         public void ProcessBase64Command(string args)

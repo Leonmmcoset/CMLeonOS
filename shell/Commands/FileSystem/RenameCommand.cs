@@ -29,20 +29,20 @@ namespace CMLeonOS.Commands.FileSystem
                 string sourcePath = fileSystem.GetFullPath(sourceFile);
                 string destPath = fileSystem.GetFullPath(newName);
                 
-                if (!System.IO.File.Exists(sourcePath))
+                if (!global::System.IO.File.Exists(sourcePath))
                 {
                     showError($"Source file '{sourceFile}' does not exist");
                     return;
                 }
                 
-                if (System.IO.File.Exists(destPath))
+                if (global::System.IO.File.Exists(destPath))
                 {
                     showError($"Destination '{newName}' already exists");
                     return;
                 }
                 
                 string content = fileSystem.ReadFile(sourcePath);
-                System.IO.File.WriteAllText(destPath, content);
+                global::System.IO.File.WriteAllText(destPath, content);
                 fileSystem.DeleteFile(sourcePath);
                 
                 showSuccess($"File renamed successfully from '{sourceFile}' to '{newName}'");
