@@ -201,198 +201,27 @@ namespace CMLeonOS
 
         public void ProcessBeep()
         {
-            Console.Beep();
+            Commands.Utility.BeepCommand.ProcessBeep();
         }
 
         public void ChangePrompt(string args)
         {
-            if (!string.IsNullOrEmpty(args))
-            {
-                prompt = args;
-            }
-            else
-            {
-                prompt = "/";
-            }
+            Commands.Utility.PromptCommand.ChangePrompt(args, ref prompt);
         }
 
         public void Calculate(string expression)
         {
-            try
-            {
-                // 简单的计算器，只支持加减乘除
-                var parts = expression.Split(' ');
-                if (parts.Length == 3)
-                {
-                    double num1 = double.Parse(parts[0]);
-                    string op = parts[1];
-                    double num2 = double.Parse(parts[2]);
-                    double result = 0;
-
-                    switch (op)
-                    {
-                        case "+":
-                            result = num1 + num2;
-                            break;
-                        case "-":
-                            result = num1 - num2;
-                            break;
-                        case "*":
-                            result = num1 * num2;
-                            break;
-                        case "/":
-                            if (num2 != 0)
-                            {
-                                result = num1 / num2;
-                            }
-                            else
-                            {
-                                ShowError("Division by zero");
-                                return;
-                            }
-                            break;
-                        default:
-                            ShowError("Invalid operator. Use +, -, *, /");
-                            return;
-                    }
-
-                    Console.WriteLine($"Result: {result}");
-                }
-                else
-                {
-                    ShowError("Invalid expression. Use format: calc <num> <op> <num>");
-                }
-            }
-            catch (Exception ex)
-            {
-                ShowError($"Error: {ex.Message}");
-            }
+            Commands.Utility.CalcCommand.Calculate(expression, ShowError);
         }
 
         public void ShowHistory()
         {
-            for (int i = 0; i < commandHistory.Count; i++)
-            {
-                Console.WriteLine($"{i + 1}: {commandHistory[i]}");
-            }
+            Commands.Utility.HistoryCommand.ShowHistory(commandHistory);
         }
 
         public void ChangeBackground(string hexColor)
         {
-            try
-            {
-                // 移除#前缀（如果有）
-                hexColor = hexColor.TrimStart('#');
-
-                // 解析16进制颜色代码
-                if (hexColor.Length == 6)
-                {
-                    int r = Convert.ToInt32(hexColor.Substring(0, 2), 16);
-                    int g = Convert.ToInt32(hexColor.Substring(2, 2), 16);
-                    int b = Convert.ToInt32(hexColor.Substring(4, 2), 16);
-
-                    // 简单的颜色映射，将RGB值映射到最接近的ConsoleColor
-                    ConsoleColor color = GetClosestConsoleColor(r, g, b);
-                    Console.BackgroundColor = color;
-                    Console.Clear();
-                    Console.WriteLine($"Background color changed to: #{hexColor}");
-                }
-                else
-                {
-                    ShowError("Invalid hex color format. Use format: #RRGGBB or RRGGBB");
-                }
-            }
-            catch (Exception ex)
-            {
-                ShowError($"Error changing background color: {ex.Message}");
-            }
-        }
-
-        private ConsoleColor GetClosestConsoleColor(int r, int g, int b)
-        {
-            // 简单的颜色映射逻辑
-            // 将RGB值映射到最接近的ConsoleColor
-            ConsoleColor[] colors = new ConsoleColor[]
-            {
-                ConsoleColor.Black,
-                ConsoleColor.DarkBlue,
-                ConsoleColor.DarkGreen,
-                ConsoleColor.DarkCyan,
-                ConsoleColor.DarkRed,
-                ConsoleColor.DarkMagenta,
-                ConsoleColor.DarkYellow,
-                ConsoleColor.Gray,
-                ConsoleColor.DarkGray,
-                ConsoleColor.Blue,
-                ConsoleColor.Green,
-                ConsoleColor.Cyan,
-                ConsoleColor.Red,
-                ConsoleColor.Magenta,
-                ConsoleColor.Yellow,
-                ConsoleColor.White
-            };
-            ConsoleColor closestColor = ConsoleColor.Black;
-            double smallestDistance = double.MaxValue;
-
-            foreach (ConsoleColor color in colors)
-            {
-                // 为每个ConsoleColor计算RGB值
-                // 这里使用简单的映射，实际效果可能不是很准确
-                int cr, cg, cb;
-                GetRGBFromConsoleColor(color, out cr, out cg, out cb);
-
-                // 计算欧几里得距离
-                double distance = Math.Sqrt(Math.Pow(r - cr, 2) + Math.Pow(g - cg, 2) + Math.Pow(b - cb, 2));
-                if (distance < smallestDistance)
-                {
-                    smallestDistance = distance;
-                    closestColor = color;
-                }
-            }
-
-            return closestColor;
-        }
-
-        private void GetRGBFromConsoleColor(ConsoleColor color, out int r, out int g, out int b)
-        {
-            // 简单的ConsoleColor到RGB的映射
-            switch (color)
-            {
-                case ConsoleColor.Black:
-                    r = 0; g = 0; b = 0; break;
-                case ConsoleColor.DarkBlue:
-                    r = 0; g = 0; b = 128; break;
-                case ConsoleColor.DarkGreen:
-                    r = 0; g = 128; b = 0; break;
-                case ConsoleColor.DarkCyan:
-                    r = 0; g = 128; b = 128; break;
-                case ConsoleColor.DarkRed:
-                    r = 128; g = 0; b = 0; break;
-                case ConsoleColor.DarkMagenta:
-                    r = 128; g = 0; b = 128; break;
-                case ConsoleColor.DarkYellow:
-                    r = 128; g = 128; b = 0; break;
-                case ConsoleColor.Gray:
-                    r = 192; g = 192; b = 192; break;
-                case ConsoleColor.DarkGray:
-                    r = 128; g = 128; b = 128; break;
-                case ConsoleColor.Blue:
-                    r = 0; g = 0; b = 255; break;
-                case ConsoleColor.Green:
-                    r = 0; g = 255; b = 0; break;
-                case ConsoleColor.Cyan:
-                    r = 0; g = 255; b = 255; break;
-                case ConsoleColor.Red:
-                    r = 255; g = 0; b = 0; break;
-                case ConsoleColor.Magenta:
-                    r = 255; g = 0; b = 255; break;
-                case ConsoleColor.Yellow:
-                    r = 255; g = 255; b = 0; break;
-                case ConsoleColor.White:
-                    r = 255; g = 255; b = 255; break;
-                default:
-                    r = 0; g = 0; b = 0; break;
-            }
+            Commands.Utility.BackgroundCommand.ChangeBackground(hexColor, ShowError);
         }
 
         public void TestCUI()
@@ -536,64 +365,7 @@ namespace CMLeonOS
 
         public void ShowCalendar(string args)
         {
-            int year = DateTime.Now.Year;
-            int month = DateTime.Now.Month;
-            
-            if (!string.IsNullOrEmpty(args))
-            {
-                string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                
-                if (parts.Length >= 1)
-                {
-                    if (int.TryParse(parts[0], out int m) && m >= 1 && m <= 12)
-                    {
-                        month = m;
-                    }
-                }
-                
-                if (parts.Length >= 2)
-                {
-                    if (int.TryParse(parts[1], out int y) && y >= 1 && y <= 9999)
-                    {
-                        year = y;
-                    }
-                }
-            }
-            
-            DateTime firstDay = new DateTime(year, month, 1);
-            int daysInMonth = DateTime.DaysInMonth(year, month);
-            DayOfWeek startDayOfWeek = firstDay.DayOfWeek;
-            
-            string[] monthNames = { 
-                "January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"
-            };
-            
-            Console.WriteLine($"     {monthNames[month - 1]} {year}");
-            Console.WriteLine("  Su Mo Tu We Th Fr Sa");
-            
-            int dayOfWeek = (int)startDayOfWeek;
-            if (dayOfWeek == 0) dayOfWeek = 7;
-            
-            for (int i = 1; i < dayOfWeek; i++)
-            {
-                Console.Write("   ");
-            }
-            
-            for (int day = 1; day <= daysInMonth; day++)
-            {
-                Console.Write($"{day,2} ");
-                
-                dayOfWeek++;
-                if (dayOfWeek > 7)
-                {
-                    dayOfWeek = 1;
-                    Console.WriteLine();
-                    Console.Write("  ");
-                }
-            }
-            
-            Console.WriteLine();
+            Commands.Utility.CalendarCommand.ShowCalendar(args);
         }
 
         public void SleepCommand(string args)
@@ -1641,62 +1413,7 @@ namespace CMLeonOS
 
         public void ProcessBase64Command(string args)
         {
-            string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            
-            if (parts.Length == 0)
-            {
-                ShowError("Error: Please specify subcommand");
-                ShowError("Usage: base64 encrypt <text> | base64 decrypt <text>");
-                return;
-            }
-            
-            string subcommand = parts[0].ToLower();
-            
-            if (subcommand != "encrypt" && subcommand != "decrypt")
-            {
-                ShowError("Error: Invalid subcommand");
-                ShowError("Usage: base64 encrypt <text> | base64 decrypt <text>");
-                return;
-            }
-            
-            if (parts.Length < 2)
-            {
-                ShowError("Error: Please specify text to process");
-                ShowError($"Usage: base64 {subcommand} <text>");
-                return;
-            }
-            
-            string text = string.Join(" ", parts, 1, parts.Length - 1);
-            
-            Console.WriteLine("====================================");
-            Console.WriteLine("        Base64");
-            Console.WriteLine("====================================");
-            Console.WriteLine();
-            
-            try
-            {
-                if (subcommand == "encrypt")
-                {
-                    string encoded = Base64Helper.Encode(text);
-                    Console.WriteLine($"Original: {text}");
-                    Console.WriteLine();
-                    Console.WriteLine($"Encoded: {encoded}");
-                }
-                if (subcommand == "decrypt")
-                {
-                    string decoded = Base64Helper.Decode(text);
-                    Console.WriteLine($"Encoded: {text}");
-                    Console.WriteLine();
-                    Console.WriteLine($"Decoded: {decoded}");
-                }
-                
-                Console.WriteLine();
-                ShowSuccess("Base64 operation completed");
-            }
-            catch (Exception ex)
-            {
-                ShowError($"Base64 error: {ex.Message}");
-            }
+            Commands.Utility.Base64Command.ProcessBase64Command(args, ShowError, ShowSuccess);
         }
 
         public void ExecuteLuaScript(string args)
