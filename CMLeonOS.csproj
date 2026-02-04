@@ -19,13 +19,14 @@
         <Profile>VMware</Profile>
         <Description>Use VMware Player or Workstation to deploy and debug.</Description>
         <PxeInterface>192.168.0.8</PxeInterface>
-        <CompressionType>Gzip</CompressionType>
+        <CompressionType>None</CompressionType>
         <BinFormat>Elf</BinFormat>
         <DebugEnabled>False</DebugEnabled>
         <CompileVBEMultiboot>False</CompileVBEMultiboot>
         <RemoveBootDebugOutput>False</RemoveBootDebugOutput>
 		<CosmosDisableDebugger>true</CosmosDisableDebugger>
 		<CosmosDebugLevel>None</CosmosDebugLevel>
+		<OptimizationLevel>1</OptimizationLevel>
     </PropertyGroup>
 
     <ItemGroup>

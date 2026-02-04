@@ -2,12 +2,14 @@ using CosmosFtpServer;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using CMLeonOS.Logger;
 
 namespace CMLeonOS
 {
     public class FileSystem
     {
         private string currentDirectory;
+        private static CMLeonOS.Logger.Logger _logger = CMLeonOS.Logger.Logger.Instance;
 
         public FileSystem()
         {
@@ -24,9 +26,9 @@ namespace CMLeonOS
             if (string.IsNullOrEmpty(path))
             {
                 currentDirectory = @"0:\";
+                _logger.Info("FileSystem", "Changed to root directory");
                 return;
             }
-
             string fullPath = GetFullPath(path);
             
             try
@@ -34,15 +36,16 @@ namespace CMLeonOS
                 if (Directory.Exists(fullPath))
                 {
                     currentDirectory = fullPath;
+                    _logger.Info("FileSystem", $"Changed directory to: {path}");
                 }
                 else
                 {
-                    Console.WriteLine($"Directory not found: {path}");
+                    _logger.Warning("FileSystem", $"Directory not found: {path}");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error changing directory: {ex.Message}");
+                _logger.Error("FileSystem", $"Error changing directory: {ex.Message}");
             }
         }
 
@@ -55,16 +58,16 @@ namespace CMLeonOS
                 if (!Directory.Exists(fullPath))
                 {
                     Directory.CreateDirectory(fullPath);
-                    Console.WriteLine($"Directory created: {path}");
+                    _logger.Info("FileSystem", $"Directory created: {path}");
                 }
                 else
                 {
-                    Console.WriteLine($"Directory already exists: {path}");
+                    _logger.Warning("FileSystem", $"Directory already exists: {path}");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error creating directory: {ex.Message}");
+                _logger.Error("FileSystem", $"Error creating directory: {ex.Message}");
             }
         }
 
@@ -230,11 +233,11 @@ namespace CMLeonOS
             {
                 // 创建或覆盖文件
                 File.WriteAllText(fullPath, content);
-                Console.WriteLine($"File created: {path}");
+                _logger.Info("FileSystem", $"File created: {path}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error creating file: {ex.Message}");
+                _logger.Error("FileSystem", $"Error creating file: {ex.Message}");
             }
         }
 
@@ -247,16 +250,16 @@ namespace CMLeonOS
                 if (File.Exists(fullPath))
                 {
                     File.WriteAllText(fullPath, content);
-                    Console.WriteLine($"File written: {path}");
+                    _logger.Info("FileSystem", $"File written: {path}");
                 }
                 else
                 {
-                    Console.WriteLine($"File not found: {path}");
+                    _logger.Warning("FileSystem", $"File not found: {path}");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error writing file: {ex.Message}");
+                _logger.Error("FileSystem", $"Error writing file: {ex.Message}");
             }
         }
 

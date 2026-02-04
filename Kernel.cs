@@ -57,9 +57,10 @@ namespace CMLeonOS
             Console.WriteLine(@" | |___| |  | | |__|  __/ (_) | | | | |_| |___) |");
             Console.WriteLine(@"  \____|_|  |_|_____\___|\___/|_| |_|____/|____/ ");
             Console.WriteLine();
-            Console.WriteLine("CMLeonOS Project");
+            Console.WriteLine("The CMLeonOS Project");
             Console.WriteLine("By LeonOS 2 Developement Team");
-            
+            Console.WriteLine(@"-------------------------------------------------");
+
             // 记录系统启动时间（用于uptime命令）
             SystemStartTime = DateTime.Now;
             _logger.Info("Kernel", $"System started at: {SystemStartTime.ToString("yyyy-MM-dd HH:mm:ss")}");
@@ -223,7 +224,6 @@ namespace CMLeonOS
                     // 检查文件是否为空
                     if (lines.Length == 0 || (lines.Length == 1 && string.IsNullOrWhiteSpace(lines[0])))
                     {
-                        Console.WriteLine("Startup script is empty, skipping...");
                         _logger.Warning("Kernel", "Startup script is empty, skipping");
                         return;
                     }

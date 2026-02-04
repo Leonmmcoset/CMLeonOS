@@ -89,7 +89,7 @@ namespace CMLeonOS.Logger
                     Console.ForegroundColor = ConsoleColor.Gray;
                     break;
                 case LogLevel.Info:
-                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.ForegroundColor = ConsoleColor.DarkCyan;
                     break;
                 case LogLevel.Warning:
                     Console.ForegroundColor = ConsoleColor.Yellow;
