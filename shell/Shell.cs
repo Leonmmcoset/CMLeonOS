@@ -196,7 +196,7 @@ namespace CMLeonOS
 
         public void ProcessCpass()
         {
-            userSystem.ChangePassword();
+            Commands.User.CpassCommand.ProcessCpass(userSystem);
         }
 
         public void ProcessBeep()
@@ -460,77 +460,12 @@ namespace CMLeonOS
 
         public void ProcessHostnameCommand(string args)
         {
-            if (string.IsNullOrEmpty(args))
-            {
-                ShowError("Usage: hostname <new_hostname>");
-                return;
-            }
-            
-            userSystem.ProcessHostnameCommand(args);
+            Commands.User.HostnameCommand.ProcessHostnameCommand(args, userSystem, ShowError);
         }
 
         public void ProcessUserCommand(string args)
         {
-            if (string.IsNullOrEmpty(args))
-            {
-                ShowError("Error: Please specify a user command");
-                ShowError("Please specify a user command");
-                ShowError("user <add|delete> [args]");
-                ShowError("  user add admin <username> <password>  - Add admin user");
-                ShowError("  user add user <username> <password>      - Add regular user");
-                ShowError("  user delete <username>                    - Delete user");
-                ShowError("  user list                                    - List all users");
-                return;
-            }
-            
-            string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            if (parts.Length < 1)
-            {
-                ShowError("Error: Please specify a user command");
-                ShowError("Usage: user <add|delete> [args]");
-                return;
-            }
-            
-            string subCommand = parts[0].ToLower();
-            
-            if (subCommand == "add")
-            {
-                if (parts.Length < 4)
-                {
-                    ShowError("Error: Please specify user type and username and password");
-                    ShowError("Usage: user add admin <username> <password>");
-                    ShowError("Usage: user add user <username> <password>");
-                    return;
-                }
-                
-                string userType = parts[1].ToLower();
-                string username = parts[2];
-                string password = parts[3];
-                bool isAdmin = userType == "admin";
-                
-                userSystem.AddUser($"{username} {password}", isAdmin);
-            }
-            else if (subCommand == "delete")
-            {
-                if (parts.Length < 2)
-                {
-                    ShowError("Error: Please specify username");
-                    ShowError("Usage: user delete <username>");
-                    return;
-                }
-                
-                string username = parts[1];
-                userSystem.DeleteUser(username);
-            }
-            else if (subCommand == "list")
-            {
-                userSystem.ListUsers();
-            }
-            else
-            {
-                ShowError($"Error: Unknown user command '{subCommand}'");
-                ShowError("Available commands: add, delete, list");
-            }
+            Commands.User.UserCommand.ProcessUserCommand(args, userSystem, ShowError);
         }
 
         public void ProcessBransweCommand(string args)
