@@ -126,14 +126,12 @@ namespace CMLeonOS
 
         public void ProcessRestart()
         {
-            Console.WriteLine("Restarting system...");
-            Sys.Power.Reboot();
+            Commands.Power.RestartCommand.ProcessRestart();
         }
 
         public void ProcessShutdown()
         {
-            Console.WriteLine("Shutting down system...");
-            Sys.Power.Shutdown();
+            Commands.Power.ShutdownCommand.ProcessShutdown();
         }
 
         public void ProcessHelp(string args)
@@ -153,102 +151,37 @@ namespace CMLeonOS
 
         public void ProcessLs(string args)
         {
-            fileSystem.ListFiles(args);
+            Commands.FileSystem.LsCommand.ProcessLs(fileSystem, args);
         }
 
         public void ProcessCd(string args)
         {
-            fileSystem.ChangeDirectory(args);
+            Commands.FileSystem.CdCommand.ProcessCd(fileSystem, args);
         }
 
         public void ProcessPwd()
         {
-            Console.WriteLine(fileSystem.CurrentDirectory);
+            Commands.FileSystem.PwdCommand.ProcessPwd(fileSystem);
         }
 
         public void ProcessMkdir(string args)
         {
-            if (string.IsNullOrEmpty(args))
-            {
-                ShowError("Please specify a directory name");
-            }
-            else
-            {
-                fileSystem.MakeDirectory(args);
-            }
+            Commands.FileSystem.MkdirCommand.ProcessMkdir(fileSystem, args);
         }
 
         public void ProcessRm(string args)
         {
-            if (string.IsNullOrEmpty(args))
-            {
-                ShowError("Please specify a file name");
-            }
-            else
-            {
-                bool isInSysFolder = (args.Contains(@"\system\") || args.Contains(@"/sys/")) && !fixMode;
-                
-                if (isInSysFolder)
-                {
-                    string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    bool hasNorisk = false;
-                    string filePath = args;
-                    
-                    if (parts.Length > 1)
-                    {
-                        hasNorisk = Array.IndexOf(parts, "-norisk") >= 0;
-                        filePath = parts[0];
-                    }
-                    
-                    if (!hasNorisk)
-                    {
-                        ShowError("Cannot delete files in sys folder without -norisk parameter");
-                        ShowError("Usage: rm <file> -norisk");
-                    }
-                    else
-                    {
-                        fileSystem.DeleteFile(filePath);
-                    }
-                }
-                else
-                {
-                    fileSystem.DeleteFile(args);
-                }
-            }
+            Commands.FileSystem.RmCommand.ProcessRm(fileSystem, args, fixMode, ShowError);
         }
 
         public void ProcessRmdir(string args)
         {
-            if (string.IsNullOrEmpty(args))
-            {
-                ShowError("Please specify a directory name");
-            }
-            else
-            {
-                bool isInSysFolder = (args.Contains(@"\system\") || args.Contains(@"/sys/")) && !fixMode;
-                
-                if (isInSysFolder)
-                {
-                    ShowError("Cannot delete directories in sys folder");
-                    ShowError("Use fix mode to bypass this restriction");
-                }
-                else
-                {
-                    fileSystem.DeleteDirectory(args);
-                }
-            }
+            Commands.FileSystem.RmdirCommand.ProcessRmdir(fileSystem, args, fixMode, ShowError);
         }
 
         public void ProcessCat(string args)
         {
-            if (string.IsNullOrEmpty(args))
-            {
-                ShowError("Please specify a file name");
-            }
-            else
-            {
-                Console.WriteLine(fileSystem.ReadFile(args));
-            }
+            Commands.FileSystem.CatCommand.ProcessCat(fileSystem, args, ShowError);
         }
 
         public void ProcessVersion()
@@ -755,422 +688,52 @@ namespace CMLeonOS
 
         public void HeadFile(string args)
         {
-            if (string.IsNullOrEmpty(args))
-            {
-                ShowError("Please specify a file name");
-                return;
-            }
-            
-            try
-            {
-                string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                string fileName = parts[0];
-                int lineCount = 10; // 默认显示10行
-                
-                if (parts.Length > 1)
-                {
-                    if (int.TryParse(parts[1], out int count))
-                    {
-                        lineCount = count;
-                    }
-                }
-                
-                string content = fileSystem.ReadFile(fileName);
-                if (string.IsNullOrEmpty(content))
-                {
-                    Console.WriteLine("File is empty");
-                    return;
-                }
-                
-                string[] lines = content.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
-                int displayLines = Math.Min(lineCount, lines.Length);
-                
-                Console.WriteLine($"First {displayLines} lines of {fileName}:");
-                Console.WriteLine("--------------------------------");
-                
-                for (int i = 0; i < displayLines; i++)
-                {
-                    Console.WriteLine($"{i + 1}: {lines[i]}");
-                }
-            }
-            catch (Exception ex)
-            {
-                ShowError($"Error reading file: {ex.Message}");
-            }
+            Commands.FileSystem.HeadCommand.HeadFile(fileSystem, args, ShowError);
         }
 
         public void TailFile(string args)
         {
-            if (string.IsNullOrEmpty(args))
-            {
-                ShowError("Please specify a file name");
-                return;
-            }
-            
-            try
-            {
-                string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                string fileName = parts[0];
-                int lineCount = 10;
-                
-                if (parts.Length > 1)
-                {
-                    if (int.TryParse(parts[1], out int count))
-                    {
-                        lineCount = count;
-                    }
-                }
-                
-                string content = fileSystem.ReadFile(fileName);
-                if (string.IsNullOrEmpty(content))
-                {
-                    Console.WriteLine("File is empty");
-                    return;
-                }
-                
-                string[] lines = content.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
-                int displayLines = Math.Min(lineCount, lines.Length);
-                int startLine = Math.Max(0, lines.Length - displayLines);
-                
-                Console.WriteLine($"Last {displayLines} lines of {fileName}:");
-                Console.WriteLine("--------------------------------");
-                
-                for (int i = startLine; i < lines.Length; i++)
-                {
-                    Console.WriteLine($"{i + 1}: {lines[i]}");
-                }
-            }
-            catch (Exception ex)
-            {
-                ShowError($"Error reading file: {ex.Message}");
-            }
+            Commands.FileSystem.TailCommand.TailFile(fileSystem, args, ShowError);
         }
 
         public void WordCount(string args)
         {
-            if (string.IsNullOrEmpty(args))
-            {
-                ShowError("Please specify a file name");
-                return;
-            }
-            
-            try
-            {
-                string content = fileSystem.ReadFile(args);
-                if (string.IsNullOrEmpty(content))
-                {
-                    Console.WriteLine("File is empty");
-                    return;
-                }
-                
-                string[] lines = content.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
-                int lineCount = lines.Length;
-                int wordCount = 0;
-                int charCount = content.Length;
-                
-                foreach (string line in lines)
-                {
-                    if (!string.IsNullOrWhiteSpace(line))
-                    {
-                        string[] words = line.Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
-                        wordCount += words.Length;
-                    }
-                }
-                
-                Console.WriteLine($"Word count for {args}:");
-                Console.WriteLine("--------------------------------");
-                Console.WriteLine($"Lines: {lineCount}");
-                Console.WriteLine($"Words: {wordCount}");
-                Console.WriteLine($"Characters: {charCount}");
-            }
-            catch (Exception ex)
-            {
-                ShowError($"Error reading file: {ex.Message}");
-            }
+            Commands.FileSystem.WordCountCommand.WordCount(fileSystem, args, ShowError);
         }
 
         public void CopyFile(string args)
         {
-            if (string.IsNullOrEmpty(args))
-            {
-                ShowError("Please specify source and destination files");
-                ShowError("cp <source> <destination>");
-                return;
-            }
-            
-            try
-            {
-                string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                if (parts.Length < 2)
-                {
-                    ShowError("Please specify both source and destination");
-                    ShowError("cp <source> <destination>");
-                    return;
-                }
-                
-                string sourceFile = parts[0];
-                string destFile = parts[1];
-                
-                string content = fileSystem.ReadFile(sourceFile);
-                if (content == null)
-                {
-                    ShowError($"Source file '{sourceFile}' does not exist");
-                    return;
-                }
-                
-                fileSystem.WriteFile(destFile, content);
-                ShowSuccess($"File copied successfully from '{sourceFile}' to '{destFile}'");
-            }
-            catch (Exception ex)
-            {
-                ShowError($"Error copying file: {ex.Message}");
-            }
+            Commands.FileSystem.CopyCommand.CopyFile(fileSystem, args, ShowError, ShowSuccess);
         }
 
         public void MoveFile(string args)
         {
-            if (string.IsNullOrEmpty(args))
-            {
-                ShowError("Please specify source and destination files");
-                ShowError("mv <source> <destination>");
-                return;
-            }
-            
-            try
-            {
-                string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                if (parts.Length < 2)
-                {
-                    ShowError("Please specify both source and destination");
-                    ShowError("mv <source> <destination>");
-                    return;
-                }
-                
-                string sourceFile = parts[0];
-                string destFile = parts[1];
-                
-                // 使用FileSystem读取源文件内容
-                string content = fileSystem.ReadFile(sourceFile);
-                if (content == null)
-                {
-                    ShowError($"Source file '{sourceFile}' does not exist");
-                    return;
-                }
-                
-                // 使用FileSystem写入目标文件
-                fileSystem.WriteFile(destFile, content);
-                
-                // 删除源文件
-                fileSystem.DeleteFile(sourceFile);
-                
-                ShowSuccess($"File moved/renamed successfully from '{sourceFile}' to '{destFile}'");
-            }
-            catch (Exception ex)
-            {
-                ShowError($"Error moving file: {ex.Message}");
-            }
+            Commands.FileSystem.MoveCommand.MoveFile(fileSystem, args, ShowError, ShowSuccess);
         }
 
         public void RenameFile(string args)
         {
-            if (string.IsNullOrEmpty(args))
-            {
-                ShowError("Please specify source and new name");
-                ShowError("rename <source> <newname>");
-                return;
-            }
-            
-            try
-            {
-                string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                if (parts.Length < 2)
-                {
-                    ShowError("Please specify both source and new name");
-                    ShowError("rename <source> <newname>");
-                    return;
-                }
-                
-                string sourceFile = parts[0];
-                string newName = parts[1];
-                
-                string sourcePath = fileSystem.GetFullPath(sourceFile);
-                string destPath = fileSystem.GetFullPath(newName);
-                
-                if (!System.IO.File.Exists(sourcePath))
-                {
-                    ShowError($"Source file '{sourceFile}' does not exist");
-                    return;
-                }
-                
-                if (System.IO.File.Exists(destPath))
-                {
-                    ShowError($"Destination '{newName}' already exists");
-                    return;
-                }
-                
-                string content = fileSystem.ReadFile(sourcePath);
-                System.IO.File.WriteAllText(destPath, content);
-                fileSystem.DeleteFile(sourcePath);
-                
-                ShowSuccess($"File renamed successfully from '{sourceFile}' to '{newName}'");
-            }
-            catch (Exception ex)
-            {
-                ShowError($"Error renaming file: {ex.Message}");
-            }
+            Commands.FileSystem.RenameCommand.RenameFile(fileSystem, args, ShowError, ShowSuccess);
         }
 
         public void CreateEmptyFile(string args)
         {
-            if (string.IsNullOrEmpty(args))
-            {
-                ShowError("Please specify a file name");
-                ShowError("touch <filename>");
-                return;
-            }
-            
-            try
-            {
-                // 使用FileSystem创建空文件
-                fileSystem.WriteFile(args, "");
-                ShowSuccess($"Empty file '{args}' created successfully");
-            }
-            catch (Exception ex)
-            {
-                ShowError($"Error creating file: {ex.Message}");
-            }
+            Commands.FileSystem.TouchCommand.CreateEmptyFile(fileSystem, args, ShowError, ShowSuccess);
         }
 
         public void FindFile(string args)
         {
-            if (string.IsNullOrEmpty(args))
-            {
-                ShowError("Please specify a file name to search");
-                ShowError("find <filename>");
-                return;
-            }
-            
-            try
-            {
-                var files = fileSystem.GetFileList(".");
-                bool found = false;
-                
-                foreach (var file in files)
-                {
-                    if (file.ToLower().Contains(args.ToLower()))
-                    {
-                        Console.WriteLine($"Found: {file}");
-                        found = true;
-                    }
-                }
-                
-                if (!found)
-                {
-                    Console.WriteLine($"No files found matching '{args}'");
-                }
-            }
-            catch (Exception ex)
-            {
-                ShowError($"Error finding file: {ex.Message}");
-            }
+            Commands.FileSystem.FindCommand.FindFile(fileSystem, args, ShowError);
         }
 
         public void ShowTree(string args)
         {
-            string startPath = string.IsNullOrEmpty(args) ? "." : args;
-            string fullPath = fileSystem.GetFullPath(startPath);
-            
-            if (!System.IO.Directory.Exists(fullPath))
-            {
-                ShowError($"Directory not found: {startPath}");
-                return;
-            }
-            
-            try
-            {
-                Console.WriteLine(fullPath);
-                PrintDirectoryTree(fullPath, "", true);
-            }
-            catch (Exception ex)
-            {
-                ShowError($"Error displaying tree: {ex.Message}");
-            }
-        }
-
-        private void PrintDirectoryTree(string path, string prefix, bool isLast)
-        {
-            try
-            {
-                var dirs = fileSystem.GetFullPathDirectoryList(path);
-                var files = fileSystem.GetFullPathFileList(path);
-                
-                int totalItems = dirs.Count + files.Count;
-                int current = 0;
-                
-                foreach (var dir in dirs)
-                {
-                    current++;
-                    bool isLastItem = current == totalItems;
-                    string connector = isLastItem ? "+-- " : "|-- ";
-                    string newPrefix = prefix + (isLastItem ? "    " : "|   ");
-                    
-                    string dirName = System.IO.Path.GetFileName(dir);
-                    Console.WriteLine($"{prefix}{connector}{dirName}/");
-                    
-                    PrintDirectoryTree(dir, newPrefix, isLastItem);
-                }
-                
-                foreach (var file in files)
-                {
-                    current++;
-                    bool isLastItem = current == totalItems;
-                    string connector = isLastItem ? "+-- " : "|-- ";
-                    
-                    string fileName = System.IO.Path.GetFileName(file);
-                    Console.WriteLine($"{prefix}{connector}{fileName}");
-                }
-            }
-            catch (System.IO.DirectoryNotFoundException)
-            {
-                ShowError($"Directory not found: {path}");
-            }
-            // catch (System.IO.UnauthorizedAccessException)
-            // {
-            //     ShowError($"Access denied to directory: {path}");
-            // }
-            catch (Exception ex)
-            {
-                string errorMsg = ex.Message;
-                if (string.IsNullOrEmpty(errorMsg))
-                {
-                    errorMsg = $"Error type: {ex.GetType().Name}";
-                }
-                ShowError($"Error reading directory {path}: {errorMsg}");
-            }
+            Commands.FileSystem.TreeCommand.ShowTree(fileSystem, args, ShowError);
         }
 
         public void GetDiskInfo()
         {
-            Console.WriteLine("====================================");
-            Console.WriteLine("        Disk Information");
-            Console.WriteLine("====================================");
-            
-            try
-            {
-                var disks = Sys.FileSystem.VFS.VFSManager.GetDisks();
-                
-                if (disks == null || disks.Count == 0)
-                {
-                    Console.WriteLine("No disks found.");
-                    return;
-                }
-                
-                Console.WriteLine($"Total Disks: {disks.Count}");
-            }
-            catch (Exception ex)
-            {
-                ShowError($"Error getting disk info: {ex.Message}");
-            }
+            Commands.FileSystem.DiskInfoCommand.GetDiskInfo(ShowError);
         }
 
         private string FormatBytes(long bytes)
