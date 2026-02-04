@@ -110,423 +110,315 @@ namespace CMLeonOS
 
         private void ProcessCommand(string command, string args)
         {
-            switch (command)
-            {
-                case "echo":
-                    ProcessEcho(args);
-                    break;
-                case "clear":
-                case "cls":
-                    Console.Clear();
-                    break;
-                case "restart":
-                    Console.WriteLine("Restarting system...");
-                    Sys.Power.Reboot();
-                    break;
-                case "shutdown":
-                    Console.WriteLine("Shutting down system...");
-                    Sys.Power.Shutdown();
-                    break;
-                case "help":
-                    // 分页显示帮助信息
-                    string[] helpArgs = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    int pageNumber = 1;
-                    bool showAll = false;
-                    
-                    if (helpArgs.Length > 0)
-                    {
-                        if (helpArgs[0].ToLower() == "all")
-                        {
-                            showAll = true;
-                        }
-                        else if (int.TryParse(helpArgs[0], out int page))
-                        {
-                            pageNumber = page;
-                        }
-                    }
-                    
-                    string[] allCommands = {
-                        "  echo <text>      - Display text (supports \\n for newline)",
-                        "  clear/cls        - Clear the screen",
-                        "  restart          - Restart the system",
-                        "  shutdown         - Shutdown the system",
-                        "  time             - Display current time",
-                        "  date             - Display current date",
-                        "  prompt <text>    - Change command prompt",
-                        "  calc <expr>      - Simple calculator",
-                        "  history          - Show command history",
-                        "  background <hex> - Change background color",
-                        "  cuitest          - Test CUI framework",
-                        "  edit <file>      - Simple code editor",
-                        "                     Tab key inserts 4 spaces",
-                        "  ls <dir>         - List files and directories",
-                        "  cd <dir>         - Change directory",
-                        "                     cd ..              - Go to parent directory",
-                        "                     cd dir1/dir2/dir3  - Go to numbered directory",
-                        "  pwd              - Show current directory",
-                        "  mkdir <dir>      - Create directory",
-                        "  rm <file>        - Remove file",
-                        "                     Use -norisk to delete files in sys folder",
-                        "  rmdir <dir>      - Remove directory",
-                        "  cat <file>       - Display file content",
-                        "  echo <text> > <file> - Write text to file",
-                        "  head <file>      - Display first lines of file",
-                        "                     Usage: head <file> <lines>",
-                        "  tail <file>      - Display last lines of file",
-                        "                     Usage: tail <file> <lines>",
-                        "  wc <file>        - Count lines, words, characters",
-                        "  cp <src> <dst>   - Copy file",
-                        "  mv <src> <dst>   - Move/rename file",
-                        "  touch <file>     - Create empty file",
-                        "  find <name>      - Find file",
-                        "  getdisk          - Show disk information",
-                        "  user <cmd>       - User management",
-                        "                     user add admin <username> <password>    - Add admin user",
-                        "                     user add user <username> <password>     - Add regular user",
-                        "                     user delete <username>                  - Delete user",
-                        "                     user list                               - List all users",
-                        "  cpass            - Change password",
-                        "  env <cmd>       - Environment variables",
-                        "                     env see <varname>                    - Show variable value",
-                        "                     env change <varname> <value>           - Set variable value",
-                        "                     env delete <varname>                  - Delete variable",
-                        "  beep             - Play beep sound",
-                        "  uptime           - Show system uptime",
-                        "  branswe <filename> - Execute Branswe code file",
-                        "  backup <name>    - Backup system files",
-                        "  restore <name>  - Restore system files",
-                        "  grep <pattern> <file> - Search text in file",
-                        "  ping <ip>        - Ping IP address (5 times)",
-                        "  tcpserver <port> - Start TCP server on specified port",
-                        "  tcpclient <ip> <port> - Connect to TCP server",
-                        "  wget <url>       - Download file from URL",
-                        "  setdns <ip>     - Set DNS server",
-                        "  setgateway <ip>  - Set gateway",
-                        "  ipconfig         - Show network configuration",
-                        "  nslookup <domain> - DNS lookup",
-                        "  whoami          - Show current username",
-                        "  base64 encrypt <text> - Encode text to Base64",
-                        "  base64 decrypt <text> - Decode Base64 to text",
-                        "  lua <file>       - Execute Lua script",
-                        "  version          - Show OS version",
-                        "  about            - Show about information",
-                        "  help <page>      - Show help page (1-3)",
-                        "  help all          - Show all help pages",
-                        "",
-                        "Startup Script: sys\\startup.cm",
-                        "  Commands in this file will be executed on startup",
-                        "  Each line should contain one command",
-                        "  Lines starting with # are treated as comments"
-                    };
-                    
-                    int commandsPerPage = 15;
-                    int totalPages = (int)Math.Ceiling((double)allCommands.Length / commandsPerPage);
-                    
-                    if (showAll)
-                    {
-                        Console.WriteLine("====================================");
-                        Console.WriteLine("        Help - All Pages");
-                        Console.WriteLine("====================================");
-                        Console.WriteLine();
-                        
-                        foreach (var cmd in allCommands)
-                        {
-                            Console.WriteLine(cmd);
-                        }
-                        
-                        Console.WriteLine();
-                        Console.WriteLine("-- End of help --");
-                    }
-                    else
-                    {
-                        if (pageNumber > totalPages)
-                        {
-                            pageNumber = totalPages;
-                        }
-                        if (pageNumber < 1)
-                        {
-                            pageNumber = 1;
-                        }
-                        
-                        int startIndex = (pageNumber - 1) * commandsPerPage;
-                        int endIndex = Math.Min(startIndex + commandsPerPage, allCommands.Length);
-                        
-                        Console.WriteLine("====================================");
-                        Console.WriteLine($"        Help - Page {pageNumber}/{totalPages}");
-                        Console.WriteLine("====================================");
-                        Console.WriteLine();
-                        
-                        for (int i = startIndex; i < endIndex; i++)
-                        {
-                            Console.WriteLine(allCommands[i]);
-                        }
-                        
-                        if (pageNumber < totalPages)
-                        {
-                            Console.WriteLine();
-                            Console.WriteLine($"-- More -- Type 'help {pageNumber + 1}' for next page or 'help all' for all pages --");
-                        }
-                        else
-                        {
-                            Console.WriteLine();
-                            Console.WriteLine("-- End of help --");
-                        }
-                    }
-                    
-                    // Console.WriteLine("Startup Script: sys\\startup.cm");
-                    // Console.WriteLine("  Commands in this file will be executed on startup");
-                    // Console.WriteLine("  Each line should contain one command");
-                    // Console.WriteLine("  Lines starting with # are treated as comments");
-                    break;
-                case "time":
-                    Console.WriteLine(DateTime.Now.ToString());
-                    break;
-                case "date":
-                    Console.WriteLine(DateTime.Now.ToShortDateString());
-                    break;
-                case "prompt":
-                    ChangePrompt(args);
-                    break;
-                case "calc":
-                    Calculate(args);
-                    break;
-                case "history":
-                    ShowHistory();
-                    break;
-                case "background":
-                    ChangeBackground(args);
-                    break;
-                case "cuitest":
-                    TestCUI();
-                    break;
-                case "edit":
-                    EditFile(args);
-                    break;
-                case "nano":
-                    NanoFile(args);
-                    break;
-                case "diff":
-                    DiffFiles(args);
-                    break;
-                case "cal":
-                    ShowCalendar(args);
-                    break;
-                case "sleep":
-                    SleepCommand(args);
-                    break;
-                case "com":
-                    ExecuteCommandFile(args);
-                    break;
-                case "ls":
-                    fileSystem.ListFiles(args);
-                    break;
-                case "cd":
-                    fileSystem.ChangeDirectory(args);
-                    break;
-                case "pwd":
-                    Console.WriteLine(fileSystem.CurrentDirectory);
-                    break;
-                case "mkdir":
-                    if (string.IsNullOrEmpty(args))
-                    {
-                        ShowError("Please specify a directory name");
-                    }
-                    else
-                    {
-                        fileSystem.MakeDirectory(args);
-                    }
-                    break;
-                case "rm":
-                    if (string.IsNullOrEmpty(args))
-                    {
-                        ShowError("Please specify a file name");
-                    }
-                    else
-                    {
-                        // 检查是否在sys文件夹中（修复模式下绕过检测）
-                        bool isInSysFolder = (args.Contains(@"\system\") || args.Contains(@"/sys/")) && !fixMode;
-                        
-                        if (isInSysFolder)
-                        {
-                            // 检查是否有-norisk参数
-                            string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                            bool hasNorisk = false;
-                            string filePath = args;
-                            
-                            if (parts.Length > 1)
-                            {
-                                hasNorisk = Array.IndexOf(parts, "-norisk") >= 0;
-                                filePath = parts[0];
-                            }
-                            
-                            if (!hasNorisk)
-                            {
-                                ShowError("Cannot delete files in sys folder without -norisk parameter");
-                                ShowError("Usage: rm <file> -norisk");
-                            }
-                            else
-                            {
-                                fileSystem.DeleteFile(filePath);
-                            }
-                        }
-                        else
-                        {
-                            fileSystem.DeleteFile(args);
-                        }
-                    }
-                    break;
-                case "rmdir":
-                    if (string.IsNullOrEmpty(args))
-                    {
-                        ShowError("Please specify a directory name");
-                    }
-                    else
-                    {
-                        // 检查是否在sys文件夹中（修复模式下绕过检测）
-                        bool isInSysFolder = (args.Contains(@"\system\") || args.Contains(@"/sys/")) && !fixMode;
-                        
-                        if (isInSysFolder)
-                        {
-                            ShowError("Cannot delete directories in sys folder");
-                            ShowError("Use fix mode to bypass this restriction");
-                        }
-                        else
-                        {
-                            fileSystem.DeleteDirectory(args);
-                        }
-                    }
-                    break;
-                case "cat":
-                    if (string.IsNullOrEmpty(args))
-                    {
-                        ShowError("Please specify a file name");
-                    }
-                    else
-                    {
-                        Console.WriteLine(fileSystem.ReadFile(args));
-                    }
-                    break;
-                case "version":
-                    Console.WriteLine(Version.DisplayVersion);
-                    Console.WriteLine($"Major: {Version.Major}");
-                    Console.WriteLine($"Minor: {Version.Minor}");
-                    Console.WriteLine($"Patch: {Version.Patch}");
-                    Console.WriteLine($"Full Version: {Version.FullVersion}");
-                    break;
-                case "about":
-                    Console.WriteLine("CMLeonOS Project");
-                    Console.WriteLine("By LeonOS 2 Developement Team");
-                    break;
-                case "head":
-                    HeadFile(args);
-                    break;
-                case "tail":
-                    TailFile(args);
-                    break;
-                case "wc":
-                    WordCount(args);
-                    break;
-                case "cp":
-                    CopyFile(args);
-                    break;
-                case "mv":
-                    MoveFile(args);
-                    break;
-                case "rename":
-                    RenameFile(args);
-                    break;
-                case "touch":
-                    CreateEmptyFile(args);
-                    break;
-                case "find":
-                    FindFile(args);
-                    break;
-                case "tree":
-                    ShowTree(args);
-                    break;
-                case "getdisk":
-                    GetDiskInfo();
-                    break;
-                case "user":
-                    ProcessUserCommand(args);
-                    break;
-                case "hostname":
-                    ProcessHostnameCommand(args);
-                    break;
-                case "setdns":
-                    SetDnsServer(args);
-                    break;
-                case "setgateway":
-                    SetGateway(args);
-                    break;
-                case "ipconfig":
-                    ShowNetworkConfig();
-                    break;
-                case "nslookup":
-                    NsLookup(args);
-                    break;
-                case "cpass":
-                    userSystem.ChangePassword();
-                    break;
-                case "beep":
-                    Console.Beep();
-                    break;
-                case "env":
-                    ProcessEnvCommand(args);
-                    break;
-                case "branswe":
-                    ProcessBransweCommand(args);
-                    break;
-                case "uptime":
-                    ShowUptime();
-                    break;
-                case "grep":
-                    GrepFile(args);
-                    break;
-                case "backup":
-                    BackupSystem(args);
-                    break;
-                case "restore":
-                    RestoreSystem(args);
-                    break;
-                case "ftp":
-                    CreateFTP();
-                    break;
-                case "ping":
-                    PingIP(args);
-                    break;
-                case "tcpserver":
-                    StartTcpServer(args);
-                    break;
-                case "tcpclient":
-                    ConnectTcpClient(args);
-                    break;
-                case "wget":
-                    DownloadFile(args);
-                    break;
-                case "whoami":
-                    ShowCurrentUsername();
-                    break;
-                case "base64":
-                    ProcessBase64Command(args);
-                    break;
-                case "lua":
-                    ExecuteLuaScript(args);
-                    break;
-                default:
-                    ShowError($"Unknown command: {command}");
-                    break;
-            }
+            CommandList.ProcessCommand(this, command, args);
         }
 
-        private void ProcessEcho(string args)
+        public void ProcessEcho(string args)
         {
-            // 支持基本的转义字符
             var processedArgs = args.Replace("\\n", "\n");
             Console.WriteLine(processedArgs);
         }
 
-        private void ChangePrompt(string args)
+        public void ProcessClear()
+        {
+            Console.Clear();
+        }
+
+        public void ProcessRestart()
+        {
+            Console.WriteLine("Restarting system...");
+            Sys.Power.Reboot();
+        }
+
+        public void ProcessShutdown()
+        {
+            Console.WriteLine("Shutting down system...");
+            Sys.Power.Shutdown();
+        }
+
+        public void ProcessHelp(string args)
+        {
+            string[] helpArgs = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            int pageNumber = 1;
+            bool showAll = false;
+            
+            if (helpArgs.Length > 0)
+            {
+                if (helpArgs[0].ToLower() == "all")
+                {
+                    showAll = true;
+                }
+                else if (int.TryParse(helpArgs[0], out int page))
+                {
+                    pageNumber = page;
+                }
+            }
+            
+            string[] allCommands = {
+                "  echo <text>      - Display text (supports \\n for newline)",
+                "  clear/cls        - Clear the screen",
+                "  restart          - Restart the system",
+                "  shutdown         - Shutdown the system",
+                "  time             - Display current time",
+                "  date             - Display current date",
+                "  prompt <text>    - Change command prompt",
+                "  calc <expr>      - Simple calculator",
+                "  history          - Show command history",
+                "  background <hex> - Change background color",
+                "  cuitest          - Test CUI framework",
+                "  edit <file>      - Simple code editor",
+                "                     Tab key inserts 4 spaces",
+                "  ls <dir>         - List files and directories",
+                "  cd <dir>         - Change directory",
+                "                     cd ..              - Go to parent directory",
+                "                     cd dir1/dir2/dir3  - Go to numbered directory",
+                "  pwd              - Show current directory",
+                "  mkdir <dir>      - Create directory",
+                "  rm <file>        - Remove file",
+                "                     Use -norisk to delete files in sys folder",
+                "  rmdir <dir>      - Remove directory",
+                "  cat <file>       - Display file content",
+                "  echo <text> > <file> - Write text to file",
+                "  head <file>      - Display first lines of file",
+                "                     Usage: head <file> <lines>",
+                "  tail <file>      - Display last lines of file",
+                "                     Usage: tail <file> <lines>",
+                "  wc <file>        - Count lines, words, characters",
+                "  cp <src> <dst>   - Copy file",
+                "  mv <src> <dst>   - Move/rename file",
+                "  touch <file>     - Create empty file",
+                "  find <name>      - Find file",
+                "  getdisk          - Show disk information",
+                "  user <cmd>       - User management",
+                "                     user add admin <username> <password>    - Add admin user",
+                "                     user add user <username> <password>     - Add regular user",
+                "                     user delete <username>                  - Delete user",
+                "                     user list                               - List all users",
+                "  cpass            - Change password",
+                "  env <cmd>       - Environment variables",
+                "                     env see <varname>                    - Show variable value",
+                "                     env change <varname> <value>           - Set variable value",
+                "                     env delete <varname>                  - Delete variable",
+                "  beep             - Play beep sound",
+                "  uptime           - Show system uptime",
+                "  branswe <filename> - Execute Branswe code file",
+                "  backup <name>    - Backup system files",
+                "  restore <name>  - Restore system files",
+                "  grep <pattern> <file> - Search text in file",
+                "  ping <ip>        - Ping IP address (5 times)",
+                "  tcpserver <port> - Start TCP server on specified port",
+                "  tcpclient <ip> <port> - Connect to TCP server",
+                "  wget <url>       - Download file from URL",
+                "  setdns <ip>     - Set DNS server",
+                "  setgateway <ip>  - Set gateway",
+                "  ipconfig         - Show network configuration",
+                "  nslookup <domain> - DNS lookup",
+                "  whoami          - Show current username",
+                "  base64 encrypt <text> - Encode text to Base64",
+                "  base64 decrypt <text> - Decode Base64 to text",
+                "  lua <file>       - Execute Lua script",
+                "  version          - Show OS version",
+                "  about            - Show about information",
+                "  help <page>      - Show help page (1-3)",
+                "  help all          - Show all help pages",
+                "",
+                "Startup Script: sys\\startup.cm",
+                "  Commands in this file will be executed on startup",
+                "  Each line should contain one command",
+                "  Lines starting with # are treated as comments"
+            };
+            
+            int commandsPerPage = 15;
+            int totalPages = (int)Math.Ceiling((double)allCommands.Length / commandsPerPage);
+            
+            if (showAll)
+            {
+                Console.WriteLine("====================================");
+                Console.WriteLine("        Help - All Pages");
+                Console.WriteLine("====================================");
+                Console.WriteLine();
+                
+                foreach (var cmd in allCommands)
+                {
+                    Console.WriteLine(cmd);
+                }
+                
+                Console.WriteLine();
+                Console.WriteLine("-- End of help --");
+            }
+            else
+            {
+                if (pageNumber > totalPages)
+                {
+                    pageNumber = totalPages;
+                }
+                if (pageNumber < 1)
+                {
+                    pageNumber = 1;
+                }
+                
+                int startIndex = (pageNumber - 1) * commandsPerPage;
+                int endIndex = Math.Min(startIndex + commandsPerPage, allCommands.Length);
+                
+                Console.WriteLine("====================================");
+                Console.WriteLine($"        Help - Page {pageNumber}/{totalPages}");
+                Console.WriteLine("====================================");
+                Console.WriteLine();
+                
+                for (int i = startIndex; i < endIndex; i++)
+                {
+                    Console.WriteLine(allCommands[i]);
+                }
+                
+                if (pageNumber < totalPages)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine($"-- More -- Type 'help {pageNumber + 1}' for next page or 'help all' for all pages --");
+                }
+                else
+                {
+                    Console.WriteLine();
+                    Console.WriteLine("-- End of help --");
+                }
+            }
+        }
+
+        public void ProcessTime()
+        {
+            Console.WriteLine(DateTime.Now.ToString());
+        }
+
+        public void ProcessDate()
+        {
+            Console.WriteLine(DateTime.Now.ToShortDateString());
+        }
+
+        public void ProcessLs(string args)
+        {
+            fileSystem.ListFiles(args);
+        }
+
+        public void ProcessCd(string args)
+        {
+            fileSystem.ChangeDirectory(args);
+        }
+
+        public void ProcessPwd()
+        {
+            Console.WriteLine(fileSystem.CurrentDirectory);
+        }
+
+        public void ProcessMkdir(string args)
+        {
+            if (string.IsNullOrEmpty(args))
+            {
+                ShowError("Please specify a directory name");
+            }
+            else
+            {
+                fileSystem.MakeDirectory(args);
+            }
+        }
+
+        public void ProcessRm(string args)
+        {
+            if (string.IsNullOrEmpty(args))
+            {
+                ShowError("Please specify a file name");
+            }
+            else
+            {
+                bool isInSysFolder = (args.Contains(@"\system\") || args.Contains(@"/sys/")) && !fixMode;
+                
+                if (isInSysFolder)
+                {
+                    string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    bool hasNorisk = false;
+                    string filePath = args;
+                    
+                    if (parts.Length > 1)
+                    {
+                        hasNorisk = Array.IndexOf(parts, "-norisk") >= 0;
+                        filePath = parts[0];
+                    }
+                    
+                    if (!hasNorisk)
+                    {
+                        ShowError("Cannot delete files in sys folder without -norisk parameter");
+                        ShowError("Usage: rm <file> -norisk");
+                    }
+                    else
+                    {
+                        fileSystem.DeleteFile(filePath);
+                    }
+                }
+                else
+                {
+                    fileSystem.DeleteFile(args);
+                }
+            }
+        }
+
+        public void ProcessRmdir(string args)
+        {
+            if (string.IsNullOrEmpty(args))
+            {
+                ShowError("Please specify a directory name");
+            }
+            else
+            {
+                bool isInSysFolder = (args.Contains(@"\system\") || args.Contains(@"/sys/")) && !fixMode;
+                
+                if (isInSysFolder)
+                {
+                    ShowError("Cannot delete directories in sys folder");
+                    ShowError("Use fix mode to bypass this restriction");
+                }
+                else
+                {
+                    fileSystem.DeleteDirectory(args);
+                }
+            }
+        }
+
+        public void ProcessCat(string args)
+        {
+            if (string.IsNullOrEmpty(args))
+            {
+                ShowError("Please specify a file name");
+            }
+            else
+            {
+                Console.WriteLine(fileSystem.ReadFile(args));
+            }
+        }
+
+        public void ProcessVersion()
+        {
+            Console.WriteLine(Version.DisplayVersion);
+            Console.WriteLine($"Major: {Version.Major}");
+            Console.WriteLine($"Minor: {Version.Minor}");
+            Console.WriteLine($"Patch: {Version.Patch}");
+            Console.WriteLine($"Full Version: {Version.FullVersion}");
+        }
+
+        public void ProcessAbout()
+        {
+            Console.WriteLine("CMLeonOS Project");
+            Console.WriteLine("By LeonOS 2 Developement Team");
+        }
+
+        public void ProcessCpass()
+        {
+            userSystem.ChangePassword();
+        }
+
+        public void ProcessBeep()
+        {
+            Console.Beep();
+        }
+
+        public void ChangePrompt(string args)
         {
             if (!string.IsNullOrEmpty(args))
             {
@@ -538,7 +430,7 @@ namespace CMLeonOS
             }
         }
 
-        private void Calculate(string expression)
+        public void Calculate(string expression)
         {
             try
             {
@@ -591,7 +483,7 @@ namespace CMLeonOS
             }
         }
 
-        private void ShowHistory()
+        public void ShowHistory()
         {
             for (int i = 0; i < commandHistory.Count; i++)
             {
@@ -599,7 +491,7 @@ namespace CMLeonOS
             }
         }
 
-        private void ChangeBackground(string hexColor)
+        public void ChangeBackground(string hexColor)
         {
             try
             {
@@ -717,25 +609,20 @@ namespace CMLeonOS
             }
         }
 
-        private void TestCUI()
+        public void TestCUI()
         {
-            // 创建CUI实例
             var cui = new CUI("CMLeonOS CUI Test");
             
-            // 设置状态
             cui.SetStatus("Testing CUI...");
             
-            // 渲染CUI界面（只渲染顶栏）
             cui.Render();
             
-            // 显示测试消息
             Console.WriteLine();
             Console.WriteLine("CUI Framework Test");
             Console.WriteLine("-------------------");
             Console.WriteLine("Testing CUI functionality...");
             Console.WriteLine();
             
-            // 测试不同类型的消息
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Success: Success message test");
             Console.ResetColor();
@@ -747,26 +634,22 @@ namespace CMLeonOS
             Console.WriteLine("Normal message test");
             Console.WriteLine();
             
-            // 测试用户输入
             Console.Write("Enter your name: ");
             var input = Console.ReadLine();
             Console.WriteLine();
             Console.WriteLine($"Hello, {input}!");
             Console.WriteLine();
             
-            // 渲染底栏
             cui.RenderBottomBar();
             
-            // 等待用户按任意键返回
             Console.WriteLine();
             Console.WriteLine("Press any key to return to shell...");
             Console.ReadKey(true);
             
-            // 重置控制台
             Console.Clear();
         }
 
-        private void EditFile(string fileName)
+        public void EditFile(string fileName)
         {
             if (string.IsNullOrEmpty(fileName))
             {
@@ -785,7 +668,7 @@ namespace CMLeonOS
             }
         }
 
-        private void NanoFile(string fileName)
+        public void NanoFile(string fileName)
         {
             if (string.IsNullOrEmpty(fileName))
             {
@@ -804,7 +687,7 @@ namespace CMLeonOS
             }
         }
 
-        private void DiffFiles(string args)
+        public void DiffFiles(string args)
         {
             if (string.IsNullOrEmpty(args))
             {
@@ -893,7 +776,7 @@ namespace CMLeonOS
             }
         }
 
-        private void ShowCalendar(string args)
+        public void ShowCalendar(string args)
         {
             int year = DateTime.Now.Year;
             int month = DateTime.Now.Month;
@@ -955,7 +838,7 @@ namespace CMLeonOS
             Console.WriteLine();
         }
 
-        private void SleepCommand(string args)
+        public void SleepCommand(string args)
         {
             if (string.IsNullOrEmpty(args))
             {
@@ -975,7 +858,7 @@ namespace CMLeonOS
             }
         }
 
-        private void ExecuteCommandFile(string args)
+        public void ExecuteCommandFile(string args)
         {
             if (string.IsNullOrEmpty(args))
             {
@@ -1001,9 +884,6 @@ namespace CMLeonOS
                     return;
                 }
                 
-                // Console.WriteLine($"Executing command file: {args}");
-                // Console.WriteLine("--------------------------------");
-                
                 foreach (string line in lines)
                 {
                     if (string.IsNullOrWhiteSpace(line) || line.Trim().StartsWith("#"))
@@ -1013,9 +893,6 @@ namespace CMLeonOS
                     
                     ExecuteCommand(line);
                 }
-                
-                // Console.WriteLine("--------------------------------");
-                // ShowSuccess("Command file execution completed");
             }
             catch (Exception ex)
             {
@@ -1023,7 +900,7 @@ namespace CMLeonOS
             }
         }
 
-        private void HeadFile(string args)
+        public void HeadFile(string args)
         {
             if (string.IsNullOrEmpty(args))
             {
@@ -1069,7 +946,7 @@ namespace CMLeonOS
             }
         }
 
-        private void TailFile(string args)
+        public void TailFile(string args)
         {
             if (string.IsNullOrEmpty(args))
             {
@@ -1081,7 +958,7 @@ namespace CMLeonOS
             {
                 string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 string fileName = parts[0];
-                int lineCount = 10; // 默认显示10行
+                int lineCount = 10;
                 
                 if (parts.Length > 1)
                 {
@@ -1116,7 +993,7 @@ namespace CMLeonOS
             }
         }
 
-        private void WordCount(string args)
+        public void WordCount(string args)
         {
             if (string.IsNullOrEmpty(args))
             {
@@ -1159,7 +1036,7 @@ namespace CMLeonOS
             }
         }
 
-        private void CopyFile(string args)
+        public void CopyFile(string args)
         {
             if (string.IsNullOrEmpty(args))
             {
@@ -1181,7 +1058,6 @@ namespace CMLeonOS
                 string sourceFile = parts[0];
                 string destFile = parts[1];
                 
-                // 使用FileSystem读取源文件内容
                 string content = fileSystem.ReadFile(sourceFile);
                 if (content == null)
                 {
@@ -1189,7 +1065,6 @@ namespace CMLeonOS
                     return;
                 }
                 
-                // 使用FileSystem写入目标文件
                 fileSystem.WriteFile(destFile, content);
                 ShowSuccess($"File copied successfully from '{sourceFile}' to '{destFile}'");
             }
@@ -1199,7 +1074,7 @@ namespace CMLeonOS
             }
         }
 
-        private void MoveFile(string args)
+        public void MoveFile(string args)
         {
             if (string.IsNullOrEmpty(args))
             {
@@ -1243,7 +1118,7 @@ namespace CMLeonOS
             }
         }
 
-        private void RenameFile(string args)
+        public void RenameFile(string args)
         {
             if (string.IsNullOrEmpty(args))
             {
@@ -1292,7 +1167,7 @@ namespace CMLeonOS
             }
         }
 
-        private void CreateEmptyFile(string args)
+        public void CreateEmptyFile(string args)
         {
             if (string.IsNullOrEmpty(args))
             {
@@ -1313,7 +1188,7 @@ namespace CMLeonOS
             }
         }
 
-        private void FindFile(string args)
+        public void FindFile(string args)
         {
             if (string.IsNullOrEmpty(args))
             {
@@ -1324,13 +1199,11 @@ namespace CMLeonOS
             
             try
             {
-                // 使用FileSystem获取当前目录的文件列表
                 var files = fileSystem.GetFileList(".");
                 bool found = false;
                 
                 foreach (var file in files)
                 {
-                    // 检查文件名是否包含搜索字符串
                     if (file.ToLower().Contains(args.ToLower()))
                     {
                         Console.WriteLine($"Found: {file}");
@@ -1349,7 +1222,7 @@ namespace CMLeonOS
             }
         }
 
-        private void ShowTree(string args)
+        public void ShowTree(string args)
         {
             string startPath = string.IsNullOrEmpty(args) ? "." : args;
             string fullPath = fileSystem.GetFullPath(startPath);
@@ -1423,7 +1296,7 @@ namespace CMLeonOS
             }
         }
 
-        private void GetDiskInfo()
+        public void GetDiskInfo()
         {
             Console.WriteLine("====================================");
             Console.WriteLine("        Disk Information");
@@ -1431,7 +1304,6 @@ namespace CMLeonOS
             
             try
             {
-                // 使用VFSManager获取所有磁盘
                 var disks = Sys.FileSystem.VFS.VFSManager.GetDisks();
                 
                 if (disks == null || disks.Count == 0)
@@ -1463,7 +1335,7 @@ namespace CMLeonOS
             return $"{size:F2} {units[unitIndex]}";
         }
 
-        private void ProcessHostnameCommand(string args)
+        public void ProcessHostnameCommand(string args)
         {
             if (string.IsNullOrEmpty(args))
             {
@@ -1474,7 +1346,7 @@ namespace CMLeonOS
             userSystem.ProcessHostnameCommand(args);
         }
 
-        private void ProcessUserCommand(string args)
+        public void ProcessUserCommand(string args)
         {
             if (string.IsNullOrEmpty(args))
             {
@@ -1538,7 +1410,7 @@ namespace CMLeonOS
             }
         }
 
-        private void ProcessBransweCommand(string args)
+        public void ProcessBransweCommand(string args)
         {
             if (string.IsNullOrEmpty(args))
             {
@@ -1568,7 +1440,7 @@ namespace CMLeonOS
             }
         }
 
-        private void GrepFile(string args)
+        public void GrepFile(string args)
         {
             if (string.IsNullOrEmpty(args))
             {
@@ -1624,7 +1496,7 @@ namespace CMLeonOS
             }
         }
 
-        private void ProcessEnvCommand(string args)
+        public void ProcessEnvCommand(string args)
         {
             string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             
@@ -1730,7 +1602,7 @@ namespace CMLeonOS
             }
         }
 
-        private void BackupSystem(string args)
+        public void BackupSystem(string args)
         {
             string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             
@@ -1802,7 +1674,7 @@ namespace CMLeonOS
             }
         }
 
-        private void RestoreSystem(string args)
+        public void RestoreSystem(string args)
         {
             string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             
@@ -1909,7 +1781,7 @@ namespace CMLeonOS
             }
         }
 
-        private void ShowUptime()
+        public void ShowUptime()
         {
             try
             {
@@ -1918,7 +1790,6 @@ namespace CMLeonOS
                 Console.WriteLine("====================================");
                 Console.WriteLine();
                 
-                // 计算系统运行时间
                 if (Kernel.SystemStartTime != DateTime.MinValue)
                 {
                     TimeSpan uptime = DateTime.Now - Kernel.SystemStartTime;
@@ -1927,7 +1798,6 @@ namespace CMLeonOS
                     Console.WriteLine("Current time: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
                     Console.WriteLine();
                     
-                    // 格式化运行时间
                     int days = uptime.Days;
                     int hours = uptime.Hours;
                     int minutes = uptime.Minutes;
@@ -1949,7 +1819,7 @@ namespace CMLeonOS
             }
         }
 
-        private void CreateFTP()
+        public void CreateFTP()
         {
             Console.WriteLine("====================================");
             Console.WriteLine("        FTP Server");
@@ -2025,7 +1895,7 @@ namespace CMLeonOS
             // Console.WriteLine($"Server stopped at: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
         }
 
-        private void PingIP(string args)
+        public void PingIP(string args)
         {
             string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             
@@ -2151,7 +2021,7 @@ namespace CMLeonOS
             return true;
         }
 
-        private void StartTcpServer(string args)
+        public void StartTcpServer(string args)
         {
             string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             
@@ -2243,7 +2113,7 @@ namespace CMLeonOS
             }
         }
 
-        private void ConnectTcpClient(string args)
+        public void ConnectTcpClient(string args)
         {
             string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             
@@ -2323,7 +2193,7 @@ namespace CMLeonOS
             }
         }
 
-        private void DownloadFile(string args)
+        public void DownloadFile(string args)
         {
             string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             
@@ -2433,7 +2303,7 @@ namespace CMLeonOS
             }
         }
 
-        private void ShowCurrentUsername()
+        public void ShowCurrentUsername()
         {
             Console.WriteLine("====================================");
             Console.WriteLine("        Current User");
@@ -2443,7 +2313,7 @@ namespace CMLeonOS
             Console.WriteLine();
         }
 
-        private void ProcessBase64Command(string args)
+        public void ProcessBase64Command(string args)
         {
             string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             
@@ -2503,7 +2373,7 @@ namespace CMLeonOS
             }
         }
 
-        private void ExecuteLuaScript(string args)
+        public void ExecuteLuaScript(string args)
         {
             string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             
@@ -2680,7 +2550,7 @@ namespace CMLeonOS
             }
         }
 
-        private void SetDnsServer(string args)
+        public void SetDnsServer(string args)
         {
             if (string.IsNullOrWhiteSpace(args))
             {
@@ -2702,7 +2572,7 @@ namespace CMLeonOS
             }
         }
 
-        private void SetGateway(string args)
+        public void SetGateway(string args)
         {
             if (string.IsNullOrWhiteSpace(args))
             {
@@ -2724,7 +2594,7 @@ namespace CMLeonOS
             }
         }
 
-        private void ShowNetworkConfig()
+        public void ShowNetworkConfig()
         {
             Console.WriteLine("====================================");
             Console.WriteLine("        Network Configuration");
@@ -2743,7 +2613,7 @@ namespace CMLeonOS
             Console.WriteLine();
         }
 
-        private void NsLookup(string args)
+        public void NsLookup(string args)
         {
             if (string.IsNullOrWhiteSpace(args))
             {
