@@ -437,40 +437,12 @@ namespace CMLeonOS
 
         public void EditFile(string fileName)
         {
-            if (string.IsNullOrEmpty(fileName))
-            {
-                ShowError("Please specify a file name");
-                return;
-            }
-            
-            try
-            {
-                var editor = new Editor(fileName, fileSystem);
-                editor.Run();
-            }
-            catch (Exception ex)
-            {
-                ShowError($"Error starting editor: {ex.Message}");
-            }
+            Commands.Editor.EditCommand.EditFile(fileName, fileSystem, ShowError);
         }
 
         public void NanoFile(string fileName)
         {
-            if (string.IsNullOrEmpty(fileName))
-            {
-                ShowError("Please specify a file name");
-                return;
-            }
-            
-            try
-            {
-                var nano = new Nano(fileName, true, fileSystem, userSystem, this);
-                nano.Start();
-            }
-            catch (Exception ex)
-            {
-                ShowError($"Error starting nano: {ex.Message}");
-            }
+            Commands.Editor.NanoCommand.NanoFile(fileName, fileSystem, userSystem, this, ShowError);
         }
 
         public void DiffFiles(string args)
