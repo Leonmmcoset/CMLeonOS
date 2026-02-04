@@ -110,7 +110,7 @@ namespace CMLeonOS
 
         private void ProcessCommand(string command, string args)
         {
-            CommandList.ProcessCommand(this, command, args);
+            shell.CommandList.ProcessCommand(this, command, args);
         }
 
         public void ProcessEcho(string args)

@@ -1,4 +1,4 @@
-namespace CMLeonOS
+namespace CMLeonOS.shell
 {
     public static class CommandList
     {
