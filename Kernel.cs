@@ -12,13 +12,17 @@ using System.IO;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using Sys = Cosmos.System;
+using CMLeonOS.Logger;
 
 namespace CMLeonOS
 {
     public class Kernel : Sys.Kernel
     {
+        private static CMLeonOS.Logger.Logger _logger = CMLeonOS.Logger.Logger.Instance;
+
         public void ShowError(string error)
         {
+            _logger.Error("Kernel", error);
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"{error}");
             Console.ResetColor();
@@ -26,6 +30,7 @@ namespace CMLeonOS
 
         public void ShowSuccess(string success)
         {
+            _logger.Success("Kernel", success);
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"{success}");
             Console.ResetColor();
@@ -44,7 +49,6 @@ namespace CMLeonOS
         
         protected override void BeforeRun()
         {
-            // Console.Clear();
             Console.WriteLine("Kernel load done!");
             Console.WriteLine(@"-------------------------------------------------");
             Console.WriteLine(@"   ____ __  __ _                      ___  ____  ");
@@ -58,10 +62,10 @@ namespace CMLeonOS
             
             // 记录系统启动时间（用于uptime命令）
             SystemStartTime = DateTime.Now;
-            Console.WriteLine($"System started at: {SystemStartTime.ToString("yyyy-MM-dd HH:mm:ss")}");
+            _logger.Info("Kernel", $"System started at: {SystemStartTime.ToString("yyyy-MM-dd HH:mm:ss")}");
 
             // 初始化网络
-            Console.WriteLine("Starting network...");
+            _logger.Info("Kernel", "Starting network initialization");
             try
             {
                 if (Cosmos.HAL.NetworkDevice.Devices.Count == 0)
@@ -69,64 +73,70 @@ namespace CMLeonOS
                     throw new Exception("No network devices are available.");
                 }
                 NetworkDevice = NetworkDevice.Devices[0];
+                _logger.Info("Kernel", $"Network device found: {NetworkDevice.Name}");
+                
                 using var dhcp = new DHCPClient();
                 if (NetworkDevice.Ready == true) {
-                    ShowSuccess("Network device ready.");
+                    _logger.Success("Kernel", "Network device ready.");
                 }
                 else
                 {
-                    ShowError("Network device is not ready");
+                    _logger.Error("Kernel", "Network device is not ready");
                 }
                 dhcp.SendDiscoverPacket();
                 
                 IPAddress = NetworkConfiguration.CurrentAddress.ToString();
-                Console.WriteLine($"Local IP: {IPAddress}");
+                _logger.Info("Kernel", $"Local IP: {IPAddress}");
                 
                 string gateway = NetworkConfigManager.Instance.GetGateway();
-                Console.WriteLine($"Gateway: {gateway}");
+                _logger.Info("Kernel", $"Gateway: {gateway}");
                 
                 string dns = NetworkConfigManager.Instance.GetDNS();
-                Console.WriteLine($"DNS Server: {dns}");
+                _logger.Info("Kernel", $"DNS Server: {dns}");
                 
-                ShowSuccess("Network started");
+                _logger.Success("Kernel", "Network started successfully");
             }
             catch (Exception ex)
             {
-                ShowError($"Could not start network: {ex.ToString()}");
+                _logger.Error("Kernel", $"Network initialization failed: {ex.Message}");
+                // ShowError($"Could not start network: {ex.ToString()}");
             }
 
             // 注册VFS
+            _logger.Info("Kernel", "Starting VFS initialization");
             try
             {
                 Sys.FileSystem.VFS.VFSManager.RegisterVFS(fs);
-                ShowSuccess("VFS initialized successfully");
+                _logger.Success("Kernel", "VFS initialized successfully");
                 
                 // 显示可用空间（动态单位）
                 var available_space = fs.GetAvailableFreeSpace(@"0:\");
                 string spaceWithUnit = FormatBytes(available_space);
-                Console.WriteLine("Available Free Space: " + spaceWithUnit);
+                _logger.Info("Kernel", $"Available Free Space: {spaceWithUnit}");
                 
                 // 显示文件系统类型
                 var fs_type = fs.GetFileSystemType(@"0:\");
-                Console.WriteLine("File System Type: " + fs_type);
+                _logger.Info("Kernel", $"File System Type: {fs_type}");
                 
                 // 检查并创建system文件夹
                 string systemFolderPath = @"0:\system";
                 if (!System.IO.Directory.Exists(systemFolderPath))
                 {
                     System.IO.Directory.CreateDirectory(systemFolderPath);
-                    Console.WriteLine("Created system folder.");
+                    _logger.Info("Kernel", "Created system folder at 0:\\system");
                 }
                 
                 // 初始化用户系统
+                _logger.Info("Kernel", "Initializing user system");
                 userSystem = new UserSystem();
+                _logger.Success("Kernel", "User system initialized");
                 
                 // 检查env.dat文件是否存在，如果不存在则创建并设置Test环境变量
                 string envFilePath = @"0:\system\env.dat";
                 if (!System.IO.File.Exists(envFilePath))
                 {
                     System.IO.File.WriteAllText(envFilePath, "Test=123");
-                    ShowSuccess("Created env.dat with Test=123");
+                    _logger.Info("Kernel", "Created env.dat with Test=123");
                 }
 
                 // 输出系统启动-初始化完成后的时间
@@ -142,7 +152,8 @@ namespace CMLeonOS
                 int minutes = uptime.Minutes;
                 int seconds = uptime.Seconds;
                 
-                Console.WriteLine($"System uptime: {days} days, {hours} hours, {minutes} minutes, {seconds} seconds");
+                // Console.WriteLine($"System uptime: {days} days, {hours} hours, {minutes} minutes, {seconds} seconds");
+                _logger.Info("Kernel", $"System initialization completed in {days} days, {hours} hours, {minutes} minutes, {seconds} seconds");
                 // Console.WriteLine($"Total uptime: {uptime.TotalHours:F2} hours");
                 
                 // 循环直到登录成功或退出
@@ -151,7 +162,9 @@ namespace CMLeonOS
                     // 第一次启动，设置管理员账户
                     if (!userSystem.HasUsers)
                     {
+                        _logger.Info("Kernel", "First time setup - creating admin account");
                         userSystem.FirstTimeSetup();
+                        _logger.Success("Kernel", "Admin account created successfully");
                     }
                     // 后续启动，需要登录
                     else
@@ -162,6 +175,8 @@ namespace CMLeonOS
                             // 登录失败，继续尝试
                         }
                         
+                        _logger.Info("Kernel", $"User '{userSystem.CurrentUsername}' logged in successfully");
+                        
                         // 登录成功后，初始化Shell
                         shell = new Shell(userSystem);
                         
@@ -169,7 +184,9 @@ namespace CMLeonOS
                         ExecuteStartupScript();
                         
                         // 运行Shell（用户可以输入exit退出）
+                        _logger.Info("Kernel", "Starting Shell");
                         shell.Run();
+                        _logger.Info("Kernel", "Shell exited");
                         
                         // 如果用户输入了exit，Shell.Run()会返回，继续循环
                     }
@@ -177,8 +194,8 @@ namespace CMLeonOS
             }
             catch (Exception ex)
             {
-                ShowError($"Error initializing system: {ex.Message}");
-                ShowError("Please contact the developers, Email: leonmmcoset@outlook.com");
+                _logger.Error("Kernel", $"System initialization error: {ex.Message}");
+                _logger.Error("Kernel", $"Please contact the developers, Email: leonmmcoset@outlook.com");
                 // 这条横线居然和上一条信息的字符数是一样的
                 Console.WriteLine("-------------------------------------------------------------");
                 Console.WriteLine($"Maybe your disk isn't formatted, please format your disk using like PE or something else.");
@@ -198,6 +215,8 @@ namespace CMLeonOS
                 // 检查启动脚本文件是否存在
                 if (System.IO.File.Exists(startupFilePath))
                 {
+                    _logger.Info("Kernel", "Startup script found, executing...");
+                    
                     // 读取启动脚本内容
                     string[] lines = System.IO.File.ReadAllLines(startupFilePath);
                     
@@ -205,6 +224,7 @@ namespace CMLeonOS
                     if (lines.Length == 0 || (lines.Length == 1 && string.IsNullOrWhiteSpace(lines[0])))
                     {
                         Console.WriteLine("Startup script is empty, skipping...");
+                        _logger.Warning("Kernel", "Startup script is empty, skipping");
                         return;
                     }
                     
@@ -227,6 +247,7 @@ namespace CMLeonOS
                     
                     Console.WriteLine("--------------------------------");
                     Console.WriteLine("Startup script execution completed.");
+                    _logger.Success("Kernel", "Startup script execution completed");
                 }
                 else
                 {
@@ -234,10 +255,12 @@ namespace CMLeonOS
                     Console.WriteLine("Startup script not found, creating empty file...");
                     System.IO.File.WriteAllText(startupFilePath, "");
                     Console.WriteLine("Created empty startup script at: " + startupFilePath);
+                    _logger.Info("Kernel", "Created empty startup script at 0:\\system\\startup.cm");
                 }
             }
             catch (Exception ex)
             {
+                _logger.Error("Kernel", $"Error executing startup script: {ex.Message}");
                 ShowError($"Error executing startup script: {ex.Message}");
             }
         }
