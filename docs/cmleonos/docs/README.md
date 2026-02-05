@@ -9,6 +9,9 @@ actions:
   - text: Lua 文档
     link: /lua.html
     type: secondary
+  - text: 命令列表
+    link: /commands.html
+    type: secondary
 
   # - text: Introduction
   #   link: https://vuejs.press/guide/introduction.html
@@ -27,5 +30,7 @@ features:
     details: CMLeonOS支持内置编辑器，用户可以直接在CMLeonOS中编辑文件。
   - title: 硬盘存储
     details: CMLeonOS支持硬盘存储，用户可以将文件持久存储在硬盘中。
+  - title: 命令别名
+    details: CMLeonOS支持命令别名功能，用户可以创建自定义命令快捷方式。
 
 # footer: MIT Licensed | Copyright © 2018-present VuePress Community
