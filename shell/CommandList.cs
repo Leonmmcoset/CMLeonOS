@@ -184,6 +184,9 @@ namespace CMLeonOS.shell
                 case "lua":
                     shell.ExecuteLuaScript(args);
                     break;
+                case "testgui":
+                    shell.ProcessTestGui();
+                    break;
                 default:
                     shell.ShowError($"Unknown command: {command}");
                     break;

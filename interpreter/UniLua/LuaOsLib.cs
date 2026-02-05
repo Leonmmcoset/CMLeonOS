@@ -11,12 +11,14 @@ namespace UniLua
 	{
 		public const string LIB_NAME = "os";
 
+		private static DateTime? _timerStartTime;
+
 		public static int OpenLib( ILuaState lua )
 		{
 			NameFuncPair[] define = new NameFuncPair[]
 			{
 #if !UNITY_WEBPLAYER
-				new NameFuncPair("clock", 	OS_Clock),
+				new NameFuncPair("clock",	OS_Clock),
 				new NameFuncPair("gethostname", OS_Gethostname),
 				new NameFuncPair("getenv", OS_Getenv),
 				new NameFuncPair("setenv", OS_Setenv),
@@ -34,6 +36,8 @@ namespace UniLua
 				new NameFuncPair("sha256", OS_Sha256),
 				new NameFuncPair("base64encrypt", OS_Base64Encrypt),
 				new NameFuncPair("base64decrypt", OS_Base64Decrypt),
+				new NameFuncPair("timerstart", OS_TimerStart),
+				new NameFuncPair("timerstop", OS_TimerStop),
 #endif
 			};
 
@@ -202,6 +206,29 @@ namespace UniLua
 			string input = lua.L_CheckString(1);
 			string decoded = CMLeonOS.Base64Helper.Decode(input);
 			lua.PushString(decoded);
+			return 1;
+		}
+
+		private static int OS_TimerStart( ILuaState lua )
+		{
+			_timerStartTime = DateTime.Now;
+			lua.PushBoolean(true);
+			return 1;
+		}
+
+		private static int OS_TimerStop( ILuaState lua )
+		{
+			if (!_timerStartTime.HasValue)
+			{
+				lua.PushNil();
+				return 1;
+			}
+			
+			TimeSpan elapsed = DateTime.Now - _timerStartTime.Value;
+			double elapsedSeconds = elapsed.TotalSeconds;
+			
+			lua.PushNumber(elapsedSeconds);
+			_timerStartTime = null;
 			return 1;
 		}
 #endif

@@ -1216,6 +1216,11 @@ namespace CMLeonOS
             Commands.Script.LuaCommand.ExecuteLuaScript(args, fileSystem, this, ShowError, ShowWarning);
         }
 
+        public void ProcessTestGui()
+        {
+            Commands.TestGuiCommand.RunTestGui();
+        }
+
         public void SetDnsServer(string args)
         {
             if (string.IsNullOrWhiteSpace(args))

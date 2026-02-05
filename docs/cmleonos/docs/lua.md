@@ -697,6 +697,30 @@ local decoded = os.base64decrypt("SGVsbG8gV29ybGxcmVvcmxvYg==")
 print(decoded)
 ```
 
+### os.timerstart()
+启动计时器，记录当前时间。
+
+```lua
+os.timerstart()
+```
+
+### os.timerstop()
+停止计时器并返回从 timerstart 到 timerstop 之间的时间（秒）。
+
+```lua
+os.timerstart()
+for i = 1, 1000000 do
+    local x = i * 2
+end
+local elapsed = os.timerstop()
+print("Elapsed time:", elapsed, "seconds")
+```
+
+**注意**：
+- 如果在未调用 `timerstart` 的情况下调用 `timerstop`，将返回 `nil`
+- 每次调用 `timerstop` 后，计时器会被重置
+- 返回的时间单位为秒（浮点数）
+
 ---
 
 ## 输入输出库 (io)
