@@ -144,6 +144,7 @@ namespace CMLeonOS
             int cursorPos = 0;
             int startLine = Console.CursorTop;
             int startCol = Console.CursorLeft;
+            int historyIndex = -1;
             
             while (true)
             {
@@ -164,6 +165,42 @@ namespace CMLeonOS
                         cursorPos = input.Length;
                     }
                 }
+                else if (key.Key == ConsoleKey.UpArrow)
+                {
+                    if (commandHistory.Count > 0)
+                    {
+                        if (historyIndex < commandHistory.Count - 1)
+                        {
+                            historyIndex++;
+                            string historyCommand = commandHistory[commandHistory.Count - 1 - historyIndex];
+                            
+                            ClearCurrentInput(startCol, startLine, input.Length);
+                            Console.Write(historyCommand);
+                            input = historyCommand;
+                            cursorPos = input.Length;
+                        }
+                    }
+                }
+                else if (key.Key == ConsoleKey.DownArrow)
+                {
+                    if (historyIndex > 0)
+                    {
+                        historyIndex--;
+                        string historyCommand = commandHistory[commandHistory.Count - 1 - historyIndex];
+                        
+                        ClearCurrentInput(startCol, startLine, input.Length);
+                        Console.Write(historyCommand);
+                        input = historyCommand;
+                        cursorPos = input.Length;
+                    }
+                    else if (historyIndex == 0)
+                    {
+                        historyIndex = -1;
+                        ClearCurrentInput(startCol, startLine, input.Length);
+                        input = "";
+                        cursorPos = 0;
+                    }
+                }
                 else if (key.Key == ConsoleKey.Backspace)
                 {
                     if (cursorPos > 0)
@@ -182,6 +219,7 @@ namespace CMLeonOS
                 {
                     input = "";
                     cursorPos = 0;
+                    historyIndex = -1;
                     Console.SetCursorPosition(startCol, startLine);
                     Console.Write(new string(' ', Console.WindowWidth - startCol));
                     Console.SetCursorPosition(startCol, startLine);
@@ -192,8 +230,31 @@ namespace CMLeonOS
                     input = input.Substring(0, cursorPos) + key.KeyChar + input.Substring(cursorPos);
                     cursorPos++;
                     Console.Write(key.KeyChar);
+                    historyIndex = -1;
                 }
             }
+        }
+
+        private void ClearCurrentInput(int startCol, int startLine, int length)
+        {
+            int currentLine = startLine;
+            int currentCol = startCol;
+            int remaining = length;
+            
+            while (remaining > 0)
+            {
+                int spaceInLine = Console.WindowWidth - currentCol;
+                int toClear = Math.Min(remaining, spaceInLine);
+                
+                Console.SetCursorPosition(currentCol, currentLine);
+                Console.Write(new string(' ', toClear));
+                
+                remaining -= toClear;
+                currentLine++;
+                currentCol = 0;
+            }
+            
+            Console.SetCursorPosition(startCol, startLine);
         }
 
         private string AutoComplete(string input)
