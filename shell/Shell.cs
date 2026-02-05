@@ -100,7 +100,7 @@ namespace CMLeonOS
                 Console.Write($"{prompt}");
                 
                 Console.ForegroundColor = originalColor;
-                var input = Console.ReadLine();
+                var input = ReadLineWithTabCompletion();
                 
                 // 检查是否为退出命令
                 if (input != null && input.ToLower().Trim() == "exit")
@@ -136,6 +136,207 @@ namespace CMLeonOS
                 var args = parts.Length > 1 ? string.Join(" ", parts, 1, parts.Length - 1) : "";
                 ProcessCommand(command, args);
             }
+        }
+
+        private string ReadLineWithTabCompletion()
+        {
+            string input = "";
+            int cursorPos = 0;
+            int startLine = Console.CursorTop;
+            int startCol = Console.CursorLeft;
+            
+            while (true)
+            {
+                var key = Console.ReadKey(true);
+                
+                if (key.Key == ConsoleKey.Enter)
+                {
+                    Console.WriteLine();
+                    return input;
+                }
+                else if (key.Key == ConsoleKey.Tab)
+                {
+                    string completed = AutoComplete(input);
+                    if (completed != null && completed != input)
+                    {
+                        Console.Write(completed.Substring(input.Length));
+                        input = completed;
+                        cursorPos = input.Length;
+                    }
+                }
+                else if (key.Key == ConsoleKey.Backspace)
+                {
+                    if (cursorPos > 0)
+                    {
+                        input = input.Substring(0, cursorPos - 1) + input.Substring(cursorPos);
+                        cursorPos--;
+                        
+                        int currentLine = startLine + (startCol + cursorPos) / Console.WindowWidth;
+                        int currentCol = (startCol + cursorPos) % Console.WindowWidth;
+                        Console.SetCursorPosition(currentCol, currentLine);
+                        Console.Write(" ");
+                        Console.SetCursorPosition(currentCol, currentLine);
+                    }
+                }
+                else if (key.Key == ConsoleKey.Escape)
+                {
+                    input = "";
+                    cursorPos = 0;
+                    Console.SetCursorPosition(startCol, startLine);
+                    Console.Write(new string(' ', Console.WindowWidth - startCol));
+                    Console.SetCursorPosition(startCol, startLine);
+                    return "";
+                }
+                else if (key.KeyChar >= 32)
+                {
+                    input = input.Substring(0, cursorPos) + key.KeyChar + input.Substring(cursorPos);
+                    cursorPos++;
+                    Console.Write(key.KeyChar);
+                }
+            }
+        }
+
+        private string AutoComplete(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return null;
+            }
+            
+            var parts = input.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            
+            if (parts.Length == 1)
+            {
+                return CompleteCommand(parts[0]);
+            }
+            else
+            {
+                string lastPart = parts[parts.Length - 1];
+                string completedPath = CompletePath(lastPart);
+                if (completedPath != null)
+                {
+                    string prefix = string.Join(" ", parts, 0, parts.Length - 1) + " ";
+                    return prefix + completedPath;
+                }
+                return null;
+            }
+        }
+
+        private string CompleteCommand(string partialCommand)
+        {
+            if (string.IsNullOrWhiteSpace(partialCommand))
+            {
+                return null;
+            }
+            
+            string[] availableCommands = GetAvailableCommands();
+            string lowerPartial = partialCommand.ToLower();
+            
+            string match = null;
+            foreach (string cmd in availableCommands)
+            {
+                if (cmd.ToLower().StartsWith(lowerPartial))
+                {
+                    if (match == null)
+                    {
+                        match = cmd;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
+            
+            return match;
+        }
+
+        private string CompletePath(string partialPath)
+        {
+            if (string.IsNullOrWhiteSpace(partialPath))
+            {
+                return null;
+            }
+            
+            string fullPath = fileSystem.GetFullPath(partialPath);
+            string directory = "";
+            string fileName = "";
+            
+            if (fullPath.Contains(@"\") || fullPath.Contains("/"))
+            {
+                int lastSeparator = Math.Max(fullPath.LastIndexOf(@"\"), fullPath.LastIndexOf("/"));
+                directory = fullPath.Substring(0, lastSeparator + 1);
+                fileName = fullPath.Substring(lastSeparator + 1);
+            }
+            else
+            {
+                directory = fileSystem.CurrentDirectory;
+                fileName = fullPath;
+            }
+            
+            if (!Directory.Exists(directory))
+            {
+                return null;
+            }
+            
+            string[] files = Directory.GetFiles(directory);
+            string[] directories = Directory.GetDirectories(directory);
+            
+            string match = null;
+            string lowerFileName = fileName.ToLower();
+            
+            foreach (string dir in directories)
+            {
+                string dirName = Path.GetFileName(dir);
+                if (dirName.ToLower().StartsWith(lowerFileName))
+                {
+                    if (match == null)
+                    {
+                        match = dirName + @"\";
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
+            
+            if (match == null)
+            {
+                foreach (string file in files)
+                {
+                    string fileNameOnly = Path.GetFileName(file);
+                    if (fileNameOnly.ToLower().StartsWith(lowerFileName))
+                    {
+                        if (match == null)
+                        {
+                            match = fileNameOnly;
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                }
+            }
+            
+            return match;
+        }
+
+        private string[] GetAvailableCommands()
+        {
+            return new string[]
+            {
+                "echo", "clear", "cls", "restart", "shutdown", "help", "time", "date",
+                "prompt", "calc", "history", "background", "cuitest", "edit", "nano",
+                "diff", "cal", "sleep", "com", "ls", "cd", "pwd", "mkdir", "rm",
+                "rmdir", "cat", "version", "about", "head", "tail", "wc", "cp",
+                "mv", "rename", "touch", "find", "tree", "grep", "getdisk", "user",
+                "cpass", "hostname", "ipconfig", "setdns", "setgateway", "nslookup",
+                "ping", "wget", "ftp", "tcpserver", "tcpclient", "lua", "branswe",
+                "beep", "backup", "restore", "env", "whoami", "uptime", "alias",
+                "unalias", "base64", "testgui"
+            };
         }
 
         private void ProcessCommand(string command, string args)
