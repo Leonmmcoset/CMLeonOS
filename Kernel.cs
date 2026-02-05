@@ -246,22 +246,19 @@ namespace CMLeonOS
                     }
                     
                     Console.WriteLine("--------------------------------");
-                    Console.WriteLine("Startup script execution completed.");
                     _logger.Success("Kernel", "Startup script execution completed");
                 }
                 else
                 {
                     // 启动脚本不存在，创建空文件
-                    Console.WriteLine("Startup script not found, creating empty file...");
+                    _logger.Info("Kernel", "Startup script not found, creating empty file...");
                     System.IO.File.WriteAllText(startupFilePath, "");
-                    Console.WriteLine("Created empty startup script at: " + startupFilePath);
                     _logger.Info("Kernel", "Created empty startup script at 0:\\system\\startup.cm");
                 }
             }
             catch (Exception ex)
             {
                 _logger.Error("Kernel", $"Error executing startup script: {ex.Message}");
-                ShowError($"Error executing startup script: {ex.Message}");
             }
         }
 

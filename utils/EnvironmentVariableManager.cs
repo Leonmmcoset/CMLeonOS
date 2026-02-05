@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using CMLeonOS.Logger;
 
 namespace CMLeonOS
 {
@@ -10,7 +9,6 @@ namespace CMLeonOS
         private static EnvironmentVariableManager instance;
         private string envFilePath = @"0:\system\env.dat";
         private Dictionary<string, string> environmentVariables;
-        private static CMLeonOS.Logger.Logger _logger = CMLeonOS.Logger.Logger.Instance;
 
         private EnvironmentVariableManager()
         {
@@ -47,12 +45,11 @@ namespace CMLeonOS
                             environmentVariables[varName] = varValue;
                         }
                     }
-                    _logger.Info("EnvManager", $"Loaded {environmentVariables.Count} environment variables from file");
                 }
             }
             catch (Exception ex)
             {
-                _logger.Error("EnvManager", $"Error loading environment variables: {ex.Message}");
+                Console.WriteLine($"Error loading environment variables: {ex.Message}");
             }
         }
 
@@ -60,7 +57,8 @@ namespace CMLeonOS
         {
             try
             {
-                _logger.Info("EnvManager", $"Saving {environmentVariables.Count} environment variables to file");
+                Console.WriteLine($"Saving environment variables to: {envFilePath}");
+                Console.WriteLine($"Variables to save: {environmentVariables.Count}");
                 
                 // 构建文件内容
                 string content = "";
@@ -68,6 +66,9 @@ namespace CMLeonOS
                 {
                     content += $"{kvp.Key}={kvp.Value}\n";
                 }
+                
+                Console.WriteLine("Environment variables content:");
+                Console.WriteLine(content);
                 
                 // 使用FileSystem的WriteFile方法来确保在Cosmos中正常工作
                 // 注意：这里需要访问FileSystem实例，但EnvironmentVariableManager是独立的
@@ -82,23 +83,25 @@ namespace CMLeonOS
                     {
                         File.WriteAllText(envFilePath, content);
                         success = true;
-                        _logger.Info("EnvManager", "Environment variables saved successfully");
+                        Console.WriteLine("Environment variables saved successfully.");
                     }
                     catch (Exception ex)
                     {
                         retryCount++;
-                        _logger.Warning("EnvManager", $"Save attempt {retryCount} failed: {ex.Message}");
+                        Console.WriteLine($"Save attempt {retryCount} failed: {ex.Message}");
+                        // Thread.Sleep(1000); // 等待1秒后重试
                     }
                 }
                 
                 if (!success)
                 {
-                    _logger.Error("EnvManager", "Failed to save environment variables after 3 attempts");
+                    Console.WriteLine("Failed to save environment variables after 3 attempts.");
                 }
             }
             catch (Exception ex)
             {
-                _logger.Error("EnvManager", $"Error saving environment variables: {ex.Message}");
+                Console.WriteLine($"Error saving environment variables: {ex.Message}");
+                Console.WriteLine($"Exception type: {ex.GetType().Name}");
             }
         }
 
@@ -106,13 +109,13 @@ namespace CMLeonOS
         {
             if (string.IsNullOrWhiteSpace(varName))
             {
-                _logger.Warning("EnvManager", "Variable name cannot be empty");
                 Console.WriteLine("Error: Variable name cannot be empty");
                 return false;
             }
-            
+
             environmentVariables[varName] = varValue;
             SaveEnvironmentVariables();
+            Console.WriteLine($"Environment variable '{varName}' set to '{varValue}'");
             return true;
         }
 
@@ -133,15 +136,20 @@ namespace CMLeonOS
         {
             if (environmentVariables.Count == 0)
             {
-                _logger.Info("EnvManager", "No environment variables set");
+                Console.WriteLine("No environment variables set.");
             }
             else
             {
-                _logger.Info("EnvManager", $"Listing {environmentVariables.Count} environment variables");
+                Console.WriteLine("====================================");
+                Console.WriteLine("        Environment Variables");
+                Console.WriteLine("====================================");
+                Console.WriteLine();
                 foreach (var kvp in environmentVariables)
                 {
-                    _logger.Info("EnvManager", $"  {kvp.Key}={kvp.Value}");
+                    Console.WriteLine($"  {kvp.Key}={kvp.Value}");
                 }
+                Console.WriteLine();
+                Console.WriteLine($"Total: {environmentVariables.Count} variables");
             }
         }
 
@@ -151,12 +159,12 @@ namespace CMLeonOS
             {
                 environmentVariables.Remove(varName);
                 SaveEnvironmentVariables();
-                _logger.Info("EnvManager", $"Environment variable '{varName}' deleted");
+                Console.WriteLine($"Environment variable '{varName}' deleted");
                 return true;
             }
             else
             {
-                _logger.Warning("EnvManager", $"Environment variable '{varName}' not found");
+                Console.WriteLine($"Error: Environment variable '{varName}' not found");
                 return false;
             }
         }

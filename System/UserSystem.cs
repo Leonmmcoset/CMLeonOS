@@ -5,7 +5,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using Sys = Cosmos.System;
-using CMLeonOS.Logger;
 
 namespace CMLeonOS
 {
@@ -24,16 +23,19 @@ namespace CMLeonOS
         private List<User> users;
         public bool fixmode = Kernel.FixMode;
         private User currentLoggedInUser;
-        private static CMLeonOS.Logger.Logger _logger = CMLeonOS.Logger.Logger.Instance;
 
         public void ShowError(string error)
         {
-            _logger.Error("UserSystem", error);
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"{error}");
+            Console.ResetColor();
         }
 
         public void ShowSuccess(string message)
         {
-            _logger.Success("UserSystem", message);
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"{message}");
+            Console.ResetColor();
         }
 
         public static string HashPasswordSha256(string password)
@@ -57,7 +59,6 @@ namespace CMLeonOS
             LoadUsers();
             
             LoadHostname();
-            _logger.Success("UserSystem", "User system initialized successfully");
         }
 
         private void EnsureSysDirectoryExists()
@@ -266,7 +267,6 @@ namespace CMLeonOS
 
         public void FirstTimeSetup()
         {
-            _logger.Info("UserSystem", "Starting first time setup");
             Console.WriteLine("====================================");
             Console.WriteLine("        First Time Setup");
             Console.WriteLine("====================================");
@@ -320,7 +320,6 @@ namespace CMLeonOS
                 users.Add(adminUser);
                 SaveUsers();
                 ShowSuccess("Admin user created successfully!");
-                _logger.Info("UserSystem", $"Admin user '{username}' created");
                 
                 Console.WriteLine();
                 Console.WriteLine("Please set system hostname:");
@@ -339,7 +338,6 @@ namespace CMLeonOS
                     users[0].Hostname = hostname;
                     SaveHostname();
                     ShowSuccess($"Hostname set to: {hostname}");
-                    _logger.Info("UserSystem", $"Hostname set to: {hostname}");
                 }
                 
                 Console.WriteLine();
@@ -358,7 +356,6 @@ namespace CMLeonOS
             }
             catch (Exception ex)
             {
-                _logger.Error("UserSystem", $"Error creating admin user: {ex.Message}");
                 ShowError($"Error creating admin user: {ex.Message}");
             }
         }
@@ -391,7 +388,6 @@ namespace CMLeonOS
 
         public bool Login()
         {
-            _logger.Info("UserSystem", "Starting login process");
             Console.WriteLine("====================================");
             Console.WriteLine("          System Login");
             Console.WriteLine("====================================");
@@ -410,7 +406,6 @@ namespace CMLeonOS
                         useFixMode = true;
                         Console.WriteLine();
                         Console.WriteLine("Fix Mode Activated");
-                        _logger.Warning("UserSystem", "Fix mode activated");
                         Console.Write("Enter fix code: ");
                         
                         string fixCode = "";
@@ -439,12 +434,10 @@ namespace CMLeonOS
                         if (fixCode == "FixMyComputer")
                         {
                             Console.WriteLine("Fix mode enabled!");
-                            _logger.Info("UserSystem", "Fix mode enabled with correct code");
                         }
                         else
                         {
                             Console.WriteLine("Invalid fix code. Exiting fix mode.");
-                            _logger.Warning("UserSystem", "Invalid fix code provided");
                             useFixMode = false;
                         }
                     }
@@ -478,7 +471,6 @@ namespace CMLeonOS
                     if (foundUser == null)
                     {
                         ShowError("User not found.");
-                        _logger.Warning("UserSystem", $"Login failed: User '{username}' not found");
                         return false;
                     }
                     
@@ -490,12 +482,10 @@ namespace CMLeonOS
                     if (foundUser.Password != hashedInputPassword)
                     {
                         ShowError("Invalid password.");
-                        _logger.Warning("UserSystem", $"Login failed: Invalid password for user '{username}'");
                         return false;
                     }
                     
                     ShowSuccess("Login successful!");
-                    _logger.Info("UserSystem", $"User '{username}' logged in successfully");
                     Console.Beep();
                     
                     // 设置当前登录用户
@@ -511,14 +501,12 @@ namespace CMLeonOS
             {
                 // 如果读取按键失败，使用普通登录
                 ShowError("Error reading key input. Using normal login.");
-                _logger.Error("UserSystem", "Error reading key input during login");
                 return false;
             }
             
             // 如果使用了修复模式，返回true
             if (useFixMode)
             {
-                _logger.Info("UserSystem", "Login bypassed via fix mode");
                 return true;
             }
             
@@ -527,7 +515,6 @@ namespace CMLeonOS
 
         public bool AddUser(string args, bool isAdmin)
         {
-            _logger.Info("UserSystem", $"Starting to add {(isAdmin ? "admin" : "user")}");
             Console.WriteLine("====================================");
             Console.WriteLine($"        Add {(isAdmin ? "Admin" : "User")}");
             Console.WriteLine("====================================");
@@ -549,7 +536,6 @@ namespace CMLeonOS
                 if (user.Username.ToLower() == username.ToLower())
                 {
                     ShowError($"Error: User '{username}' already exists.");
-                    _logger.Warning("UserSystem", $"Add user failed: User '{username}' already exists");
                     return false;
                 }
             }
@@ -570,13 +556,11 @@ namespace CMLeonOS
 
                 ShowSuccess($"{(isAdmin ? "Admin" : "User")} '{username}' created successfully!");
                 ShowSuccess("You shall restart the system to apply the changes.");
-                _logger.Info("UserSystem", $"{(isAdmin ? "Admin" : "User")} '{username}' created successfully");
                 
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.Error("UserSystem", $"Error adding user: {ex.Message}");
                 ShowError($"Error adding user: {ex.Message}");
                 return false;
             }
@@ -584,7 +568,6 @@ namespace CMLeonOS
 
         public bool DeleteUser(string username)
         {
-            _logger.Info("UserSystem", $"Starting to delete user '{username}'");
             Console.WriteLine("====================================");
             Console.WriteLine("        Delete User");
             Console.WriteLine("====================================");
@@ -610,7 +593,6 @@ namespace CMLeonOS
             if (foundUser == null)
             {
                 ShowError($"Error: User '{username}' not found.");
-                _logger.Warning("UserSystem", $"Delete user failed: User '{username}' not found");
                 return false;
             }
             
@@ -627,7 +609,6 @@ namespace CMLeonOS
             if (foundUser.IsAdmin && adminCount <= 1)
             {
                 ShowError("Error: Cannot delete the last admin user.");
-                _logger.Warning("UserSystem", "Delete user failed: Cannot delete the last admin user");
                 return false;
             }
             
@@ -636,12 +617,10 @@ namespace CMLeonOS
                 users.Remove(foundUser);
                 SaveUsers();
                 ShowSuccess($"User '{username}' deleted successfully!");
-                _logger.Info("UserSystem", $"User '{username}' deleted successfully");
                 return true;
             }
             catch (Exception ex)
             {
-                _logger.Error("UserSystem", $"Error deleting user: {ex.Message}");
                 ShowError($"Error deleting user: {ex.Message}");
                 return false;
             }
