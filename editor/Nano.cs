@@ -471,6 +471,65 @@ namespace CMLeonOS
             }
         }
 
+        private void RunFile()
+        {
+            if (path == null)
+            {
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Clear();
+                Console.SetCursorPosition(0, 0);
+                Console.WriteLine("Error: No file is currently open. Please save the file first.");
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey(true);
+                
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Clear();
+                RenderUI();
+                updatedLinesStart = 0;
+                updatedLinesEnd = lines.Count - 1;
+                Render();
+                return;
+            }
+
+            string extension = System.IO.Path.GetExtension(path)?.ToLower();
+
+            if (extension == ".lua")
+            {
+                RunLua();
+            }
+            else if (extension == ".brs")
+            {
+                RunBranswe();
+            }
+            else if (extension == ".cm")
+            {
+                RunCom();
+            }
+            else
+            {
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.Clear();
+                Console.SetCursorPosition(0, 0);
+                Console.WriteLine($"Error: File extension '{extension}' is not supported for running.");
+                Console.WriteLine("Supported file types: .lua, .brs, .cm");
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey(true);
+                
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Clear();
+                RenderUI();
+                updatedLinesStart = 0;
+                updatedLinesEnd = lines.Count - 1;
+                Render();
+            }
+        }
+
         private void RunLua()
         {
             Console.BackgroundColor = ConsoleColor.Black;
@@ -510,7 +569,76 @@ namespace CMLeonOS
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"Error occurred while running script: {e.Message}");
             }
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey(true);
 
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Clear();
+            RenderUI();
+            updatedLinesStart = 0;
+            updatedLinesEnd = lines.Count - 1;
+            Render();
+        }
+
+        private void RunBranswe()
+        {
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Clear();
+            Console.SetCursorPosition(0, 0);
+
+            try
+            {
+                string source = GetAllText();
+                
+                Branswe.Run(source);
+            }
+            catch (Exception e)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Error occurred while running Branswe: {e.Message}");
+            }
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey(true);
+
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Clear();
+            RenderUI();
+            updatedLinesStart = 0;
+            updatedLinesEnd = lines.Count - 1;
+            Render();
+        }
+
+        private void RunCom()
+        {
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Clear();
+            Console.SetCursorPosition(0, 0);
+
+            try
+            {
+                string source = GetAllText();
+                
+                if (shell != null)
+                {
+                    shell.ExecuteCommand(source);
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Error: Shell is not available.");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Error occurred while running command: {e.Message}");
+            }
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("Press any key to continue...");
             Console.ReadKey(true);
@@ -548,7 +676,7 @@ namespace CMLeonOS
                             Paste();
                             break;
                         case ConsoleKey.R:
-                            RunLua();
+                            RunFile();
                             break;
                         case ConsoleKey.LeftArrow:
                             JumpToPreviousWord();
