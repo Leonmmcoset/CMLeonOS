@@ -1,43 +1,84 @@
 using System;
+using System.Collections.Generic;
+using System.Text;
 using Sys = Cosmos.System;
+using System.Drawing;
 using Cosmos.System.Graphics;
+using Microsoft.VisualBasic;
+using Cosmos.System.Graphics.Fonts;
+using Cosmos.System;
+using Cosmos.HAL;
+using Cosmos.System.FileSystem.VFS;
+using Cosmos.System.FileSystem;
+using System.IO;
 
 namespace CMLeonOS.Commands
 {
     public static class TestGuiCommand
     {
+        public static Canvas Screen;
+        public static Bitmap Wallpaper;
+        public static Mode display;
+
+        public static void DrawCursor()
+        {
+            if ((int)MouseManager.X >= 0 && (int)MouseManager.Y >= 0 && (int)MouseManager.X < Screen.Mode.Width && (int)MouseManager.Y < Screen.Mode.Height)
+            {
+                MouseManager.ScreenWidth = Screen.Mode.Width;
+                MouseManager.ScreenHeight = Screen.Mode.Height;
+                Screen.DrawFilledCircle(Color.FromArgb(75, 255, 255, 255), (int)MouseManager.X, (int)MouseManager.Y, 10);
+            }
+        }
+
+        public static void DrawBackground()
+        {
+            Screen.Clear(Color.Indigo);
+        }
+
         public static void RunTestGui()
         {
-            Canvas canvas;
-
-            Console.WriteLine("Cosmos booted successfully. Let's go in Graphical Mode");
-
-            canvas = FullScreenCanvas.GetFullScreenCanvas(new Mode(640, 480, ColorDepth.ColorDepth32));
-
-            canvas.Clear(global::System.Drawing.Color.FromArgb(0, 0, 255));
-
             try
             {
-                canvas.DrawPoint(global::System.Drawing.Color.FromArgb(255, 0, 0), 69, 69);
+                display = new Mode(1024, 768, ColorDepth.ColorDepth24);
+                Screen = FullScreenCanvas.GetFullScreenCanvas(display);
 
-                canvas.DrawLine(global::System.Drawing.Color.FromArgb(173, 255, 47), 250, 100, 400, 100);
+                try
+                {
+                    if (File.Exists(@"0:\system\wallpaper.bmp"))
+                    {
+                        Wallpaper = new Bitmap(File.ReadAllBytes(@"0:\system\wallpaper.bmp"));
+                    }
+                    else
+                    {
+                        Wallpaper = null;
+                    }
+                }
+                catch
+                {
+                    Wallpaper = null;
+                }
 
-                canvas.DrawLine(global::System.Drawing.Color.FromArgb(205, 92, 92), 350, 150, 350, 250);
+                global::System.Console.WriteLine("Starting graphical mode...");
+                global::System.Console.WriteLine("Press ESC to return to shell.");
 
-                canvas.DrawLine(global::System.Drawing.Color.FromArgb(245, 245, 220), 250, 150, 400, 250);
+                while (true)
+                {
+                    Screen.Clear();
+                    DrawBackground();
+                    Screen.DrawString(DateTime.Now.ToString("H:mm") + ", Screen:" + Screen.Mode.Width + "x" + Screen.Mode.Height, PCScreenFont.Default, Color.White, 15, 10);
+                    DrawCursor();
+                    Screen.Display();
 
-                canvas.DrawRectangle(global::System.Drawing.Color.FromArgb(219, 112, 147), 350, 350, 80, 60);
-
-                canvas.DrawRectangle(global::System.Drawing.Color.FromArgb(50, 205, 50), 450, 450, 80, 60);
-
-                canvas.Display();
-
-                Console.WriteLine("Press any key to return to shell...");
-                Console.ReadKey(true);
+                    var key = global::System.Console.ReadKey(true);
+                    if (key.Key == ConsoleKey.Escape)
+                    {
+                        break;
+                    }
+                }
             }
             catch (Exception e)
             {
-                Console.WriteLine("Exception occurred: " + e.Message);
+                global::System.Console.WriteLine("Exception occurred: " + e.Message);
             }
         }
     }

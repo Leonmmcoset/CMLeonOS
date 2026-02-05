@@ -27,7 +27,12 @@
 		<CosmosDisableDebugger>true</CosmosDisableDebugger>
 		<CosmosDebugLevel>None</CosmosDebugLevel>
 		<OptimizationLevel>1</OptimizationLevel>
+		<VBEResolution>800x600x32</VBEResolution>
     </PropertyGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="Wallpapers\wallpaper.bmp" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Cosmos.Build" Version="0.1.0-localbuild20260201071808" NoWarn="NU1604">

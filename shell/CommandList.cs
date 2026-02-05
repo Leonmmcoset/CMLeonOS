@@ -187,6 +187,12 @@ namespace CMLeonOS.shell
                 case "testgui":
                     shell.ProcessTestGui();
                     break;
+                case "alias":
+                    shell.ProcessAlias(args);
+                    break;
+                case "unalias":
+                    shell.ProcessUnalias(args);
+                    break;
                 default:
                     shell.ShowError($"Unknown command: {command}");
                     break;

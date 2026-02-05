@@ -57,6 +57,8 @@ namespace CMLeonOS
             fileSystem = new FileSystem();
             fixMode = Kernel.FixMode;
             envManager = EnvironmentVariableManager.Instance;
+            
+            Commands.AliasCommand.LoadAliases();
         }
 
         public void Run()
@@ -110,7 +112,28 @@ namespace CMLeonOS
 
         private void ProcessCommand(string command, string args)
         {
-            shell.CommandList.ProcessCommand(this, command, args);
+            string expandedCommand = command;
+            string expandedArgs = args;
+            
+            string aliasValue = Commands.AliasCommand.GetAlias(command);
+            if (aliasValue != null)
+            {
+                var aliasParts = aliasValue.Split(new char[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
+                if (aliasParts.Length > 0)
+                {
+                    expandedCommand = aliasParts[0];
+                    if (aliasParts.Length > 1)
+                    {
+                        expandedArgs = aliasParts[1] + (string.IsNullOrEmpty(args) ? "" : " " + args);
+                    }
+                    else
+                    {
+                        expandedArgs = args;
+                    }
+                }
+            }
+            
+            shell.CommandList.ProcessCommand(this, expandedCommand, expandedArgs);
         }
 
         public void ProcessEcho(string args)
@@ -1219,6 +1242,84 @@ namespace CMLeonOS
         public void ProcessTestGui()
         {
             Commands.TestGuiCommand.RunTestGui();
+        }
+
+        public void ProcessAlias(string args)
+        {
+            if (string.IsNullOrWhiteSpace(args))
+            {
+                Commands.AliasCommand.ListAliases();
+            }
+            else
+            {
+                string name = "";
+                string command = "";
+                
+                int i = 0;
+                while (i < args.Length && char.IsWhiteSpace(args[i]))
+                {
+                    i++;
+                }
+                
+                int nameStart = i;
+                while (i < args.Length && !char.IsWhiteSpace(args[i]))
+                {
+                    i++;
+                }
+                name = args.Substring(nameStart, i - nameStart).Trim();
+                
+                while (i < args.Length && char.IsWhiteSpace(args[i]))
+                {
+                    i++;
+                }
+                
+                if (i < args.Length && (args[i] == '\'' || args[i] == '"'))
+                {
+                    char quoteChar = args[i];
+                    i++;
+                    int commandStart = i;
+                    while (i < args.Length && args[i] != quoteChar)
+                    {
+                        i++;
+                    }
+                    if (i < args.Length)
+                    {
+                        command = args.Substring(commandStart, i - commandStart);
+                    }
+                    else
+                    {
+                        command = args.Substring(commandStart);
+                    }
+                }
+                else
+                {
+                    command = args.Substring(i).Trim();
+                }
+                
+                if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(command))
+                {
+                    ShowError("Usage: alias <name> <command>");
+                    ShowError("Example: alias ll 'ls -l'");
+                    ShowError("Example: alias home \"cd /home\"");
+                    ShowError("Example: alias cls clear");
+                    return;
+                }
+                
+                Commands.AliasCommand.AddAlias(name, command);
+            }
+        }
+
+        public void ProcessUnalias(string args)
+        {
+            if (string.IsNullOrWhiteSpace(args))
+            {
+                ShowError("Usage: unalias <name>");
+                ShowError("Example: unalias ll");
+                return;
+            }
+            
+            string name = args.Trim();
+            Commands.AliasCommand.RemoveAlias(name);
         }
 
         public void SetDnsServer(string args)
