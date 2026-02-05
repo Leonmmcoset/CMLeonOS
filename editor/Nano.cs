@@ -147,6 +147,11 @@ namespace CMLeonOS
             modified = true;
         }
 
+        private void InsertTab()
+        {
+            Insert("    ");
+        }
+
         // Backspace at the cursor.
         private void Backspace()
         {
@@ -697,6 +702,9 @@ namespace CMLeonOS
             }
             switch (key.Key)
             {
+                case ConsoleKey.Tab:
+                    InsertTab();
+                    break;
                 case ConsoleKey.Backspace:
                     Backspace();
                     break;
