@@ -10,6 +10,7 @@ namespace CMLeonOS.Commands
             Console.WriteLine($"Major: {Version.Major}");
             Console.WriteLine($"Minor: {Version.Minor}");
             Console.WriteLine($"Patch: {Version.Patch}");
+            Console.WriteLine($"Type: {Version.VersionType}");
             Console.WriteLine($"Full Version: {Version.FullVersion}");
         }
     }

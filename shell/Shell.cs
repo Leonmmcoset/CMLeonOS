@@ -23,7 +23,7 @@ namespace CMLeonOS
 {
     public class Shell
     {
-        private string prompt = "/";
+        private string prompt = "#";
         private List<string> commandHistory = new List<string>();
         private FileSystem fileSystem;
         private UserSystem userSystem;
@@ -90,8 +90,15 @@ namespace CMLeonOS
                 // 显示当前文件夹路径作为提示符（彩色）
                 string currentPath = fileSystem.CurrentDirectory;
                 ConsoleColor originalColor = Console.ForegroundColor;
+                // Console.ForegroundColor = ConsoleColor.Cyan;
+                // Console.Write($"{currentPath} | {prompt}");
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.Write($"{currentPath}");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write($" | ");
                 Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.Write($"{currentPath} | /");
+                Console.Write($"{prompt}");
+                
                 Console.ForegroundColor = originalColor;
                 var input = Console.ReadLine();
                 

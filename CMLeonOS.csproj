@@ -26,7 +26,7 @@
         <RemoveBootDebugOutput>False</RemoveBootDebugOutput>
 		<CosmosDisableDebugger>true</CosmosDisableDebugger>
 		<CosmosDebugLevel>None</CosmosDebugLevel>
-		<OptimizationLevel>1</OptimizationLevel>
+		<OptimizationLevel>2</OptimizationLevel>
 		<VBEResolution>800x600x32</VBEResolution>
     </PropertyGroup>
 
