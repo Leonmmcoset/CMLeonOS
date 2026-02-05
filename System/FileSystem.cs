@@ -14,6 +14,18 @@ namespace CMLeonOS
             currentDirectory = @"0:\";
         }
 
+        public FileSystem(string initialPath)
+        {
+            if (string.IsNullOrEmpty(initialPath))
+            {
+                currentDirectory = @"0:\";
+            }
+            else
+            {
+                currentDirectory = initialPath;
+            }
+        }
+
         public string CurrentDirectory
         {
             get { return currentDirectory; }

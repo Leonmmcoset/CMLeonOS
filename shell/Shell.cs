@@ -54,11 +54,32 @@ namespace CMLeonOS
         public Shell(UserSystem userSystem)
         {
             this.userSystem = userSystem;
-            fileSystem = new FileSystem();
             fixMode = Kernel.FixMode;
             envManager = EnvironmentVariableManager.Instance;
             
             Commands.AliasCommand.LoadAliases();
+            
+            User currentUser = userSystem.CurrentLoggedInUser;
+            if (currentUser != null && !string.IsNullOrWhiteSpace(currentUser.Username))
+            {
+                string userHomePath = $@"0:\user\{currentUser.Username}";
+                try
+                {
+                    if (!Directory.Exists(userHomePath))
+                    {
+                        Directory.CreateDirectory(userHomePath);
+                    }
+                    fileSystem = new FileSystem(userHomePath);
+                }
+                catch (Exception)
+                {
+                    fileSystem = new FileSystem();
+                }
+            }
+            else
+            {
+                fileSystem = new FileSystem();
+            }
         }
 
         public void Run()

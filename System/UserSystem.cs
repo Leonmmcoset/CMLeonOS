@@ -24,6 +24,11 @@ namespace CMLeonOS
         public bool fixmode = Kernel.FixMode;
         private User currentLoggedInUser;
 
+        public User CurrentLoggedInUser
+        {
+            get { return currentLoggedInUser; }
+        }
+
         public void ShowError(string error)
         {
             Console.ForegroundColor = ConsoleColor.Red;
