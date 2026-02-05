@@ -20,22 +20,6 @@ namespace CMLeonOS
     {
         private static CMLeonOS.Logger.Logger _logger = CMLeonOS.Logger.Logger.Instance;
 
-        public void ShowError(string error)
-        {
-            _logger.Error("Kernel", error);
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"{error}");
-            Console.ResetColor();
-        }
-
-        public void ShowSuccess(string success)
-        {
-            _logger.Success("Kernel", success);
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"{success}");
-            Console.ResetColor();
-        }
-
         // 创建全局CosmosVFS实例
         public static Sys.FileSystem.CosmosVFS fs = new Sys.FileSystem.CosmosVFS();
         public static Shell shell;
@@ -183,6 +167,32 @@ namespace CMLeonOS
                         
                         // 检查并执行启动脚本
                         ExecuteStartupScript();
+
+                        if (System.IO.File.Exists("0:\\system\\zen"))
+                        {
+                            Console.WriteLine("=====================================");
+                            Console.WriteLine("        The Zen of CMLeonOS         ");
+                            Console.WriteLine("(For the dreamer at 0x100000)");
+                            Console.WriteLine("=====================================");
+                            Console.WriteLine();
+                            Console.WriteLine("Memory has bounds, but thought breaks all frame,");
+                            Console.WriteLine("Bare metal no layers, code bears its name.");
+                            Console.WriteLine("A boot's brief spark, all systems ignite,");
+                            Console.WriteLine("Errors in registers, roots in code's flight.");
+                            Console.WriteLine();
+                            Console.WriteLine("Simplicity beats the redundant's vain race,");
+                            Console.WriteLine("Stability outshines the radical's chase.");
+                            Console.WriteLine("Hardware ne'er lies, code holds the wise key,");
+                            Console.WriteLine("Interrupts not chaos, scheduling sets free.");
+                            Console.WriteLine();
+                            Console.WriteLine("Binary's cold shell, no breath, no soul,");
+                            Console.WriteLine("Kernel's warm core, makes the machine whole.");
+                            Console.WriteLine("From zero to one, the boot path we tread,");
+                            Console.WriteLine("From one to forever, guard every thread.");
+                            Console.WriteLine();
+                            Console.WriteLine("Build the kernel in zen, step by step, line by line,");
+                            Console.WriteLine("A bug brings new wake, a line brings new shine.");
+                        }
                         
                         // 运行Shell（用户可以输入exit退出）
                         _logger.Info("Kernel", "Starting Shell");
