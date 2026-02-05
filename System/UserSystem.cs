@@ -550,7 +550,7 @@ namespace CMLeonOS
                 User newUser = new User
                 {
                     Username = username,
-                    Password = HashPasswordSha256(password),
+                    Password = password,
                     IsAdmin = isAdmin
                 };
                 users.Add(newUser);
