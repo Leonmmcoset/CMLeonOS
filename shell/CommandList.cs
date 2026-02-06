@@ -85,6 +85,9 @@ namespace CMLeonOS.shell
                 case "version":
                     shell.ProcessVersion();
                     break;
+                case "settings":
+                    shell.ProcessSettings(args);
+                    break;
                 case "about":
                     shell.ProcessAbout();
                     break;

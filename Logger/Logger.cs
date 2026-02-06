@@ -81,29 +81,31 @@ namespace CMLeonOS.Logger
 
         private void WriteToConsole(LogEntry entry)
         {
-            ConsoleColor originalColor = Console.ForegroundColor;
-            
-            switch (entry.Level)
-            {
-                case LogLevel.Debug:
-                    Console.ForegroundColor = ConsoleColor.Gray;
-                    break;
-                case LogLevel.Info:
-                    Console.ForegroundColor = ConsoleColor.DarkCyan;
-                    break;
-                case LogLevel.Warning:
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    break;
-                case LogLevel.Error:
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    break;
-                case LogLevel.Success:
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    break;
-            }
+            if (Settings.SettingsManager.LoggerEnabled) {
+                ConsoleColor originalColor = Console.ForegroundColor;
+                
+                switch (entry.Level)
+                {
+                    case LogLevel.Debug:
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                        break;
+                    case LogLevel.Info:
+                        Console.ForegroundColor = ConsoleColor.DarkCyan;
+                        break;
+                    case LogLevel.Warning:
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        break;
+                    case LogLevel.Error:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        break;
+                    case LogLevel.Success:
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        break;
+                }
 
-            Console.WriteLine(entry.ToString());
-            Console.ForegroundColor = originalColor;
+                Console.WriteLine(entry.ToString());
+                Console.ForegroundColor = originalColor;
+            }
         }
     }
 }

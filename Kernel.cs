@@ -13,6 +13,7 @@ using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using Sys = Cosmos.System;
 using CMLeonOS.Logger;
+using CMLeonOS.Settings;
 
 namespace CMLeonOS
 {
@@ -45,54 +46,15 @@ namespace CMLeonOS
             Console.WriteLine("By LeonOS 2 Developement Team");
             Console.WriteLine(@"-------------------------------------------------");
 
-            // 记录系统启动时间（用于uptime命令）
-            SystemStartTime = DateTime.Now;
-            _logger.Info("Kernel", $"System started at: {SystemStartTime.ToString("yyyy-MM-dd HH:mm:ss")}");
-
-            // 初始化网络
-            _logger.Info("Kernel", "Starting network initialization");
-            try
-            {
-                if (Cosmos.HAL.NetworkDevice.Devices.Count == 0)
-                {
-                    throw new Exception("No network devices are available.");
-                }
-                NetworkDevice = NetworkDevice.Devices[0];
-                _logger.Info("Kernel", $"Network device found: {NetworkDevice.Name}");
-                
-                using var dhcp = new DHCPClient();
-                if (NetworkDevice.Ready == true) {
-                    _logger.Success("Kernel", "Network device ready.");
-                }
-                else
-                {
-                    _logger.Error("Kernel", "Network device is not ready");
-                }
-                dhcp.SendDiscoverPacket();
-                
-                IPAddress = NetworkConfiguration.CurrentAddress.ToString();
-                _logger.Info("Kernel", $"Local IP: {IPAddress}");
-                
-                string gateway = NetworkConfigManager.Instance.GetGateway();
-                _logger.Info("Kernel", $"Gateway: {gateway}");
-                
-                string dns = NetworkConfigManager.Instance.GetDNS();
-                _logger.Info("Kernel", $"DNS Server: {dns}");
-                
-                _logger.Success("Kernel", "Network started successfully");
-            }
-            catch (Exception ex)
-            {
-                _logger.Error("Kernel", $"Network initialization failed: {ex.Message}");
-                // ShowError($"Could not start network: {ex.ToString()}");
-            }
-
             // 注册VFS
             _logger.Info("Kernel", "Starting VFS initialization");
             try
             {
                 Sys.FileSystem.VFS.VFSManager.RegisterVFS(fs);
                 _logger.Success("Kernel", "VFS initialized successfully");
+                
+                Settings.SettingsManager.LoadSettings();
+                _logger.Info("Kernel", "Settings loaded successfully");
                 
                 // 显示可用空间（动态单位）
                 var available_space = fs.GetAvailableFreeSpace(@"0:\");
@@ -122,6 +84,47 @@ namespace CMLeonOS
                 {
                     System.IO.File.WriteAllText(envFilePath, "Test=123");
                     _logger.Info("Kernel", "Created env.dat with Test=123");
+                }
+
+                // 记录系统启动时间（用于uptime命令）
+                SystemStartTime = DateTime.Now;
+                _logger.Info("Kernel", $"System started at: {SystemStartTime.ToString("yyyy-MM-dd HH:mm:ss")}");
+                
+                // 初始化网络
+                _logger.Info("Kernel", "Starting network initialization");
+                try
+                {
+                    if (Cosmos.HAL.NetworkDevice.Devices.Count == 0)
+                    {
+                        throw new Exception("No network devices are available.");
+                    }
+                    NetworkDevice = NetworkDevice.Devices[0];
+                    _logger.Info("Kernel", $"Network device found: {NetworkDevice.Name}");
+                    
+                    using var dhcp = new DHCPClient();
+                    if (NetworkDevice.Ready == true) {
+                        _logger.Success("Kernel", "Network device ready.");
+                    }
+                    else
+                    {
+                        _logger.Error("Kernel", "Network device is not ready");
+                    }
+                    dhcp.SendDiscoverPacket();
+                    
+                    IPAddress = NetworkConfiguration.CurrentAddress.ToString();
+                    _logger.Info("Kernel", $"Local IP: {IPAddress}");
+                    
+                    string gateway = NetworkConfigManager.Instance.GetGateway();
+                    _logger.Info("Kernel", $"Gateway: {gateway}");
+                    
+                    string dns = NetworkConfigManager.Instance.GetDNS();
+                    _logger.Info("Kernel", $"DNS Server: {dns}");
+                    
+                    _logger.Success("Kernel", "Network started successfully");
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error("Kernel", $"Network initialization failed: {ex.Message}");
                 }
 
                 // 输出系统启动-初始化完成后的时间
@@ -205,13 +208,15 @@ namespace CMLeonOS
             }
             catch (Exception ex)
             {
-                _logger.Error("Kernel", $"System initialization error: {ex.Message}");
-                _logger.Error("Kernel", $"Please contact the developers, Email: leonmmcoset@outlook.com");
-                // 这条横线居然和上一条信息的字符数是一样的
-                Console.WriteLine("-------------------------------------------------------------");
-                Console.WriteLine($"Maybe your disk isn't formatted, please format your disk using like PE or something else.");
-                Console.WriteLine("(CMLeonOS need more than 512 MB disk space and FAT32 file system.)");
-                Console.WriteLine("Press any key to restart...");
+                Console.Clear();
+                Console.BackgroundColor = ConsoleColor.Red;
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Clear();
+                Console.WriteLine(":(");
+                Console.WriteLine("A problem has been detected and CMLeonOS has been shutdown to prevent damage to your computer.");
+                Console.WriteLine($"Error information: {ex.Message}");
+                Console.WriteLine("If this is the first time you've seen this stop error screen, restart your computer and email to leonmmcoset@outlook.com WITH THE ERROR INFORMATION for technical support.");
+                Console.WriteLine("Press any keys to restart.");
                 Console.ReadKey();
                 Sys.Power.Reboot();
             }

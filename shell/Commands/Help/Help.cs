@@ -72,6 +72,8 @@ namespace CMLeonOS.Commands
             "  lua <file>       - Execute Lua script",
             "  version          - Show OS version",
             "  about            - Show about information",
+            "  settings <key> [value] - View or modify system settings",
+            "                        settings              - List all settings",
             "  help <page>      - Show help page (1-3)",
             "  help all          - Show all help pages",
             "",

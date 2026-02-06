@@ -501,6 +501,11 @@ namespace CMLeonOS
             Commands.VersionCommand.ProcessVersion();
         }
 
+        public void ProcessSettings(string args)
+        {
+            Commands.SettingsCommand.ProcessSettings(args);
+        }
+
         public void ProcessAbout()
         {
             Commands.AboutCommand.ProcessAbout();

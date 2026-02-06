@@ -213,9 +213,18 @@ namespace CMLeonOS
                 List<string> lines = new List<string>();
                 foreach (User user in users)
                 {
-                    // 使用SHA256加密密码
-                    string hashedPassword = HashPasswordSha256(user.Password);
-                    string line = $"{user.Username}|{hashedPassword}|{(user.IsAdmin ? "admin" : "user")}|{user.Hostname}";
+                    string passwordToSave;
+                    
+                    if (IsPasswordAlreadyHashed(user.Password))
+                    {
+                        passwordToSave = user.Password;
+                    }
+                    else
+                    {
+                        passwordToSave = HashPasswordSha256(user.Password);
+                    }
+                    
+                    string line = $"{user.Username}|{passwordToSave}|{(user.IsAdmin ? "admin" : "user")}|{user.Hostname}";
                     lines.Add(line);
                 }
                 File.WriteAllLines(userFilePath, lines.ToArray());
@@ -224,6 +233,31 @@ namespace CMLeonOS
             {
                 ShowError($"Error saving users: {ex.Message}");
             }
+        }
+
+        private bool IsPasswordAlreadyHashed(string password)
+        {
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                return false;
+            }
+            
+            string trimmedPassword = password.Trim();
+            
+            if (trimmedPassword.Length < 32)
+            {
+                return false;
+            }
+            
+            foreach (char c in trimmedPassword)
+            {
+                if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') || c == '+' || c == '/' || c == '='))
+                {
+                    return false;
+                }
+            }
+            
+            return true;
         }
 
         public bool HasUsers
