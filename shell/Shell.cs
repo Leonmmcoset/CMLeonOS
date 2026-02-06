@@ -1542,6 +1542,11 @@ namespace CMLeonOS
             Commands.TestGuiCommand.RunTestGui();
         }
 
+        public void ProcessTestTUI()
+        {
+            Commands.TestTUICommand.RunTestTUI();
+        }
+
         public void ProcessLabyrinth()
         {
             Commands.LabyrinthCommand.ProcessLabyrinth();

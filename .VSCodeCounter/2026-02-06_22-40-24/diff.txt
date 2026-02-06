@@ -1,0 +1,64 @@
+Date : 2026-02-06 22:40:24
+Directory : c:\Users\leon\source\repos\CMLeonOS\CMLeonOS
+Total : 21 files,  692 codes, 0 comments, 53 blanks, all 745 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| C#         |          7 |        643 |          0 |         46 |        689 |
+| Markdown   |          1 |         33 |          0 |          7 |         40 |
+| HTML       |          1 |          8 |          0 |          0 |          8 |
+| JavaScript |         12 |          8 |          0 |          0 |          8 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                               | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                                  |         21 |        692 |          0 |         53 |        745 |
+| Shell                                                                                                              |          6 |        605 |          0 |         42 |        647 |
+| Shell (Files)                                                                                                      |          2 |         10 |          0 |          1 |         11 |
+| Shell\Commands                                                                                                     |          4 |        595 |          0 |         41 |        636 |
+| Shell\Commands (Files)                                                                                             |          1 |        224 |          0 |         24 |        248 |
+| Shell\Commands\Help                                                                                                |          1 |        351 |          0 |         11 |        362 |
+| Shell\Commands\System                                                                                              |          1 |         10 |          0 |          3 |         13 |
+| Shell\Commands\User                                                                                                |          1 |         10 |          0 |          3 |         13 |
+| System                                                                                                             |          1 |         38 |          0 |          4 |         42 |
+| docs                                                                                                               |         14 |         49 |          0 |          7 |         56 |
+| docs\cmleonos                                                                                                      |         14 |         49 |          0 |          7 |         56 |
+| docs\cmleonos\docs                                                                                                 |         14 |         49 |          0 |          7 |         56 |
+| docs\cmleonos\docs (Files)                                                                                         |          1 |         33 |          0 |          7 |         40 |
+| docs\cmleonos\docs\.vuepress                                                                                       |         13 |         16 |          0 |          0 |         16 |
+| docs\cmleonos\docs\.vuepress\dist                                                                                  |         13 |         16 |          0 |          0 |         16 |
+| docs\cmleonos\docs\.vuepress\dist (Files)                                                                          |          1 |          8 |          0 |          0 |          8 |
+| docs\cmleonos\docs\.vuepress\dist\assets                                                                           |         12 |          8 |          0 |          0 |          8 |
++--------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                                                           | language   | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\CommandList.cs                                                  | C#         |          3 |          0 |          0 |          3 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Commands\Help\Help.cs                                           | C#         |        351 |          0 |         11 |        362 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Commands\LabyrinthCommand.cs                                    | C#         |        224 |          0 |         24 |        248 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Commands\System\SettingsCommand.cs                              | C#         |         10 |          0 |          3 |         13 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Commands\User\UserCommand.cs                                    | C#         |         10 |          0 |          3 |         13 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Shell.cs                                                        | C#         |          7 |          0 |          1 |          8 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\System\UserSystem.cs                                                  | C#         |         38 |          0 |          4 |         42 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\assets\404.html-B-2P5V78.js         | JavaScript |          1 |          0 |          1 |          2 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\assets\404.html-xATCGIq8.js         | JavaScript |         -1 |          0 |         -1 |         -2 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\assets\app-BITa06va.js              | JavaScript |         28 |          4 |          1 |         33 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\assets\app-DOooOitT.js              | JavaScript |        -28 |         -4 |         -1 |        -33 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\assets\commands.html-2c_EJOV_.js    | JavaScript |       -135 |          0 |         -1 |       -136 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\assets\commands.html-CJdMGWM7.js    | JavaScript |        143 |          0 |          1 |        144 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\assets\get-started.html-D7YgC_d3.js | JavaScript |         -1 |          0 |         -1 |         -2 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\assets\get-started.html-D_vM18Nz.js | JavaScript |          1 |          0 |          1 |          2 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\assets\index.html-DOUHF5Iy.js       | JavaScript |         -1 |          0 |         -1 |         -2 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\assets\index.html-DS7rXIvH.js       | JavaScript |          1 |          0 |          1 |          2 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\assets\lua.html-D4WURWuq.js         | JavaScript |       -297 |          0 |         -1 |       -298 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\assets\lua.html-DxDsLuB0.js         | JavaScript |        297 |          0 |          1 |        298 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\commands.html                       | HTML       |          8 |          0 |          0 |          8 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\commands.md                                        | Markdown   |         33 |          0 |          7 |         40 |
+| Total                                                                                                              |            |        692 |          0 |         53 |        745 |
++--------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
