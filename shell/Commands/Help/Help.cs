@@ -10,7 +10,13 @@ namespace CMLeonOS.Commands
             public string Command { get; set; }
             public string Parameters { get; set; }
             public string Description { get; set; }
-            public string[] SubCommands { get; set; }
+            public SubCommandInfo[] SubCommands { get; set; }
+        }
+
+        private class SubCommandInfo
+        {
+            public string Command { get; set; }
+            public string Description { get; set; }
         }
 
         private static readonly List<CommandInfo> allCommands = new List<CommandInfo>
@@ -92,7 +98,7 @@ namespace CMLeonOS.Commands
                 Command = "edit",
                 Parameters = "<file>",
                 Description = "Simple code editor",
-                SubCommands = new[] { "Tab key inserts 4 spaces" }
+                SubCommands = new[] { new SubCommandInfo { Command = "", Description = "Tab key inserts 4 spaces" } }
             },
             new CommandInfo
             {
@@ -107,8 +113,8 @@ namespace CMLeonOS.Commands
                 Description = "Change directory",
                 SubCommands = new[] 
                 { 
-                    "cd ..              - Go to parent directory",
-                    "cd dir1/dir2/dir3  - Go to numbered directory"
+                    new SubCommandInfo { Command = "cd ..", Description = "Go to parent directory" },
+                    new SubCommandInfo { Command = "cd dir1/dir2/dir3", Description = "Go to numbered directory" }
                 }
             },
             new CommandInfo
@@ -128,7 +134,7 @@ namespace CMLeonOS.Commands
                 Command = "rm",
                 Parameters = "<file>",
                 Description = "Remove file",
-                SubCommands = new[] { "Use -norisk to delete files in sys folder" }
+                SubCommands = new[] { new SubCommandInfo { Command = "", Description = "Use -norisk to delete files in sys folder" } }
             },
             new CommandInfo
             {
@@ -153,14 +159,14 @@ namespace CMLeonOS.Commands
                 Command = "head",
                 Parameters = "<file>",
                 Description = "Display first lines of file",
-                SubCommands = new[] { "Usage: head <file> <lines>" }
+                SubCommands = new[] { new SubCommandInfo { Command = "head <file> <lines>", Description = "Usage" } }
             },
             new CommandInfo
             {
                 Command = "tail",
                 Parameters = "<file>",
                 Description = "Display last lines of file",
-                SubCommands = new[] { "Usage: tail <file> <lines>" }
+                SubCommands = new[] { new SubCommandInfo { Command = "tail <file> <lines>", Description = "Usage" } }
             },
             new CommandInfo
             {
@@ -205,10 +211,10 @@ namespace CMLeonOS.Commands
                 Description = "User management",
                 SubCommands = new[]
                 {
-                    "user add admin <username> <password>    - Add admin user",
-                    "user add user <username> <password>     - Add regular user",
-                    "user delete <username>                  - Delete user",
-                    "user list                               - List all users"
+                    new SubCommandInfo { Command = "user add admin <username> <password>", Description = "Add admin user" },
+                    new SubCommandInfo { Command = "user add user <username> <password>", Description = "Add regular user" },
+                    new SubCommandInfo { Command = "user delete <username>", Description = "Delete user" },
+                    new SubCommandInfo { Command = "user list", Description = "List all users" }
                 }
             },
             new CommandInfo
@@ -224,9 +230,9 @@ namespace CMLeonOS.Commands
                 Description = "Environment variables",
                 SubCommands = new[]
                 {
-                    "env see <varname>                    - Show variable value",
-                    "env change <varname> <value>           - Set variable value",
-                    "env delete <varname>                  - Delete variable"
+                    new SubCommandInfo { Command = "env see <varname>", Description = "Show variable value" },
+                    new SubCommandInfo { Command = "env change <varname> <value>", Description = "Set variable value" },
+                    new SubCommandInfo { Command = "env delete <varname>", Description = "Delete variable" }
                 }
             },
             new CommandInfo
@@ -336,7 +342,7 @@ namespace CMLeonOS.Commands
                 Command = "alias",
                 Parameters = "<name> <cmd>",
                 Description = "Create command alias",
-                SubCommands = new[] { "alias                  - List all aliases" }
+                SubCommands = new[] { new SubCommandInfo { Command = "alias", Description = "List all aliases" } }
             },
             new CommandInfo
             {
@@ -367,18 +373,28 @@ namespace CMLeonOS.Commands
                 Command = "settings",
                 Parameters = "<key> [value]",
                 Description = "View or modify system settings",
-                SubCommands = new[] { "settings              - List all settings" }
+                SubCommands = new[] { new SubCommandInfo { Command = "settings", Description = "List all settings" } }
             },
             new CommandInfo
             {
                 Command = "help",
                 Parameters = "<page>",
                 Description = "Show help page (1-3)",
-                SubCommands = new[] { "help all          - Show all help pages" }
+                SubCommands = new[] { new SubCommandInfo { Command = "help all", Description = "Show all help pages" } }
             }
         };
 
         private const int CommandsPerPage = 15;
+
+        private static int GetCommandLinesCount(CommandInfo cmd)
+        {
+            int lines = 1;
+            if (cmd.SubCommands != null && cmd.SubCommands.Length > 0)
+            {
+                lines += cmd.SubCommands.Length;
+            }
+            return lines;
+        }
 
         public static void ProcessHelp(string args)
         {
@@ -398,7 +414,13 @@ namespace CMLeonOS.Commands
                 }
             }
             
-            int totalPages = (int)Math.Ceiling((double)allCommands.Count / CommandsPerPage);
+            int totalLines = 0;
+            foreach (var cmd in allCommands)
+            {
+                totalLines += GetCommandLinesCount(cmd);
+            }
+            
+            int totalPages = (int)Math.Ceiling((double)totalLines / CommandsPerPage);
             
             if (showAll)
             {
@@ -445,9 +467,16 @@ namespace CMLeonOS.Commands
             Console.WriteLine("====================================");
             Console.WriteLine();
             
+            int linesOnPage = 0;
             for (int i = startIndex; i < endIndex; i++)
             {
+                int cmdLines = GetCommandLinesCount(allCommands[i]);
+                if (linesOnPage + cmdLines > CommandsPerPage)
+                {
+                    break;
+                }
                 DisplayCommand(allCommands[i]);
+                linesOnPage += cmdLines;
             }
             
             if (pageNumber < totalPages)
@@ -466,17 +495,21 @@ namespace CMLeonOS.Commands
         {
             int maxCommandWidth = 18;
             int maxParamWidth = 18;
+            int subCommandIndent = 21;
+            int maxSubCommandWidth = 17;
             
             string commandPart = PadRight(cmd.Command, maxCommandWidth);
             string paramPart = PadRight(cmd.Parameters, maxParamWidth);
             
             Console.WriteLine($"  {commandPart} {paramPart} - {cmd.Description}");
             
-            if (cmd.SubCommands != null)
+            if (cmd.SubCommands != null && cmd.SubCommands.Length > 0)
             {
+                string indent = new string(' ', subCommandIndent);
                 foreach (var subCmd in cmd.SubCommands)
                 {
-                    Console.WriteLine($"                     {subCmd}");
+                    string subCmdPart = PadRight(subCmd.Command, maxSubCommandWidth);
+                    Console.WriteLine($"{indent}{subCmdPart} - {subCmd.Description}");
                 }
             }
         }
