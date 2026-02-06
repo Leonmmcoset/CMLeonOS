@@ -59,6 +59,7 @@ namespace CMLeonOS
             envManager = EnvironmentVariableManager.Instance;
             
             Commands.AliasCommand.LoadAliases();
+            Commands.SettingsCommand.SetUserSystem(userSystem);
             
             User currentUser = userSystem.CurrentLoggedInUser;
             if (currentUser != null && !string.IsNullOrWhiteSpace(currentUser.Username))

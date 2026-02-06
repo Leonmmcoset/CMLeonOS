@@ -309,6 +309,48 @@ namespace CMLeonOS
             Console.WriteLine("====================================");
             Console.WriteLine("        First Time Setup");
             Console.WriteLine("====================================");
+            Console.WriteLine();
+            
+            Console.WriteLine("User Terms and Conditions:");
+            Console.WriteLine("====================================");
+            Console.WriteLine("1. This operating system is provided as-is without warranty");
+            Console.WriteLine("2. You are responsible for your data and backups");
+            Console.WriteLine("3. Unauthorized access attempts may be logged");
+            Console.WriteLine("4. System administrators have full access to all data");
+            Console.WriteLine("5. By using this system, you agree to these terms");
+            Console.WriteLine("6. Data privacy: Your personal data is stored locally");
+            Console.WriteLine("7. System updates may be installed automatically");
+            Console.WriteLine("8. No liability for data loss or corruption");
+            Console.WriteLine("9. Support available at: leonmmcoset@outlook.com");
+            Console.WriteLine("10. This license is for personal use only");
+            Console.WriteLine("====================================");
+            Console.WriteLine();
+            
+            bool termsAccepted = false;
+            while (!termsAccepted)
+            {
+                Console.Write("Do you accept the User Terms? (yes/no): ");
+                string response = Console.ReadLine()?.ToLower();
+                
+                if (response == "yes" || response == "y")
+                {
+                    termsAccepted = true;
+                    Console.WriteLine("Terms accepted.");
+                    Console.WriteLine();
+                }
+                else if (response == "no" || response == "n")
+                {
+                    Console.WriteLine("You must accept the User Terms to continue.");
+                    Console.WriteLine("Please restart the setup process.");
+                    Thread.Sleep(2000);
+                    Sys.Power.Reboot();
+                }
+                else
+                {
+                    Console.WriteLine("Invalid response. Please enter 'yes' or 'no'.");
+                }
+            }
+            
             Console.WriteLine("Please set admin username and password:");
             
             Console.Write("Username: ");

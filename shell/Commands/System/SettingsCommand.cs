@@ -5,11 +5,24 @@ namespace CMLeonOS.Commands
 {
     public static class SettingsCommand
     {
+        private static UserSystem userSystem;
+
+        public static void SetUserSystem(UserSystem system)
+        {
+            userSystem = system;
+        }
+
         public static void ProcessSettings(string args)
         {
             if (string.IsNullOrWhiteSpace(args))
             {
                 SettingsManager.ListSettings();
+                return;
+            }
+
+            if (userSystem == null || userSystem.CurrentLoggedInUser == null || !userSystem.CurrentLoggedInUser.IsAdmin)
+            {
+                Console.WriteLine("Error: Only administrators can change settings.");
                 return;
             }
 
