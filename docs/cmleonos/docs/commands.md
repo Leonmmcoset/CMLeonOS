@@ -652,6 +652,30 @@ unalias ll
 version
 ```
 
+### settings
+查看或修改系统设置。
+
+**用法：**
+```bash
+settings                          # 列出所有设置
+settings <key>                     # 显示指定设置的值
+settings <key> <value>           # 设置指定设置的值
+```
+
+**示例：**
+```bash
+settings
+settings LoggerEnabled
+settings LoggerEnabled true
+settings LoggerEnabled false
+```
+
+**说明：**
+- 设置存储在 `0:\system\settings.dat` 文件中
+- 支持的设置项：LoggerEnabled（控制是否输出 Logger 日志）
+- 首次启动时自动创建配置文件并填入默认值
+- 如果配置文件存在但缺少某些设置项，系统会自动补充
+
 ### about
 显示系统关于信息。
 
