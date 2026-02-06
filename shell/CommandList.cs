@@ -190,6 +190,9 @@ namespace CMLeonOS.shell
                 case "testgui":
                     shell.ProcessTestGui();
                     break;
+                case "labyrinth":
+                    shell.ProcessLabyrinth();
+                    break;
                 case "alias":
                     shell.ProcessAlias(args);
                     break;

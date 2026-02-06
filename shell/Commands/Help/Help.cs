@@ -16,6 +16,7 @@ namespace CMLeonOS.Commands
             "  history          - Show command history",
             "  background <hex> - Change background color",
             "  cuitest          - Test CUI framework",
+            "  labyrinth        - Play maze escape game",
             "  edit <file>      - Simple code editor",
             "                     Tab key inserts 4 spaces",
             "  ls <dir>         - List files and directories",

@@ -18,6 +18,7 @@ using Cosmos.Core;
 using Cosmos.Core.Memory;
 using UniLua;
 using Cosmos.HAL;
+using CMLeonOS.Commands;
 
 namespace CMLeonOS
 {
@@ -1537,6 +1538,11 @@ namespace CMLeonOS
         public void ProcessTestGui()
         {
             Commands.TestGuiCommand.RunTestGui();
+        }
+
+        public void ProcessLabyrinth()
+        {
+            Commands.LabyrinthCommand.ProcessLabyrinth();
         }
 
         public void ProcessAlias(string args)
