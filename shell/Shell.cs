@@ -60,6 +60,7 @@ namespace CMLeonOS
             
             Commands.AliasCommand.LoadAliases();
             Commands.SettingsCommand.SetUserSystem(userSystem);
+            Commands.User.UserCommand.SetUserSystem(userSystem);
             
             User currentUser = userSystem.CurrentLoggedInUser;
             if (currentUser != null && !string.IsNullOrWhiteSpace(currentUser.Username))

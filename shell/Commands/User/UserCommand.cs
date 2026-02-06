@@ -4,8 +4,21 @@ namespace CMLeonOS.Commands.User
 {
     public static class UserCommand
     {
+        private static CMLeonOS.UserSystem userSystem;
+
+        public static void SetUserSystem(CMLeonOS.UserSystem system)
+        {
+            userSystem = system;
+        }
+
         public static void ProcessUserCommand(string args, CMLeonOS.UserSystem userSystem, Action<string> showError)
         {
+            if (userSystem == null || userSystem.CurrentLoggedInUser == null || !userSystem.CurrentLoggedInUser.IsAdmin)
+            {
+                showError("Error: Only administrators can use the user command.");
+                return;
+            }
+
             if (string.IsNullOrEmpty(args))
             {
                 showError("Error: Please specify a user command");
