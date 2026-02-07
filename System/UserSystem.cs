@@ -523,129 +523,78 @@ namespace CMLeonOS
 
         public bool Login()
         {
-            Console.WriteLine("====================================");
-            Console.WriteLine("          System Login");
-            Console.WriteLine("====================================");
-            // Console.ReadKey(true);
-            
-            // 检测ALT+Space按键
-            bool useFixMode = false;
-            ConsoleKeyInfo keyInfo;
-            try
+            CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+            global::System.Console.Clear();
+
+            var titleBar = new CMLeonOS.UI.Window(new CMLeonOS.UI.Rect(0, 0, 80, 3), "System Login", () => { }, false);
+            titleBar.Render();
+
+            var loginBox = new CMLeonOS.UI.Window(new CMLeonOS.UI.Rect(15, 8, 50, 10), "Login", () => { }, true);
+            loginBox.Render();
+
+            CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+            global::System.Console.SetCursorPosition(17, 10);
+            global::System.Console.Write("Username: ");
+            string username = global::System.Console.ReadLine();
+
+            if (string.IsNullOrWhiteSpace(username))
             {
-                if (fixmode == true) {
-                    keyInfo = Console.ReadKey(true);
-                    if (keyInfo.Key == ConsoleKey.Spacebar && (keyInfo.Modifiers & ConsoleModifiers.Alt) != 0)
-                    {
-                        // 检测到ALT+Space，进入修复模式
-                        useFixMode = true;
-                        Console.WriteLine();
-                        Console.WriteLine("Fix Mode Activated");
-                        Console.Write("Enter fix code: ");
-                        
-                        string fixCode = "";
-                        while (true)
-                        {
-                            var codeKey = Console.ReadKey(true);
-                            if (codeKey.Key == ConsoleKey.Enter)
-                            {
-                                Console.WriteLine();
-                                break;
-                            }
-                            else if (codeKey.Key == ConsoleKey.Backspace)
-                            {
-                                if (fixCode.Length > 0)
-                                {
-                                    fixCode = fixCode.Substring(0, fixCode.Length - 1);
-                                }
-                            }
-                            else
-                            {
-                                fixCode += codeKey.KeyChar;
-                                Console.Write(codeKey.KeyChar);
-                            }
-                        }
-                        
-                        if (fixCode == "FixMyComputer")
-                        {
-                            Console.WriteLine("Fix mode enabled!");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Invalid fix code. Exiting fix mode.");
-                            useFixMode = false;
-                        }
-                    }
-                }
-                else
-                {
-                    // 正常登录流程
-                    Console.Write("Username: ");
-                    string username = Console.ReadLine();
-                    
-                    if (string.IsNullOrWhiteSpace(username))
-                    {
-                        ShowError("Username cannot be empty.");
-                        return false;
-                    }
-                    
-                    Console.Write("Password: ");
-                    string password = ReadPassword();
-                    
-                    // 查找用户
-                    User foundUser = null;
-                    foreach (User user in users)
-                    {
-                        if (user.Username.ToLower() == username.ToLower())
-                        {
-                            foundUser = user;
-                            break;
-                        }
-                    }
-                    
-                    if (foundUser == null)
-                    {
-                        ShowError("User not found.");
-                        return false;
-                    }
-                    
-                    // 使用SHA256加密输入的密码后比较
-                    string hashedInputPassword = HashPasswordSha256(password);
-                    // Console.WriteLine($"Hashed Input Password: {hashedInputPassword}");
-                    // Console.WriteLine($"Stored Password: {foundUser.Password}");
-                    
-                    if (foundUser.Password != hashedInputPassword)
-                    {
-                        ShowError("Invalid password.");
-                        return false;
-                    }
-                    
-                    ShowSuccess("Login successful!");
-                    Console.Beep();
-                    
-                    // 设置当前登录用户
-                    currentLoggedInUser = foundUser;
-                    
-                    // 创建用户文件夹
-                    CreateUserFolder(foundUser.Username);
-                    
-                    return true;
-                }
-            }
-            catch
-            {
-                // 如果读取按键失败，使用普通登录
-                ShowError("Error reading key input. Using normal login.");
+                CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Red, global::System.ConsoleColor.Black);
+                global::System.Console.SetCursorPosition(17, 24);
+                global::System.Console.Write("Username cannot be empty.                   ");
+                global::System.Threading.Thread.Sleep(1000);
                 return false;
             }
-            
-            // 如果使用了修复模式，返回true
-            if (useFixMode)
+
+            CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+            global::System.Console.SetCursorPosition(17, 11);
+            global::System.Console.Write("Password: ");
+            string password = ReadPassword();
+
+            User foundUser = null;
+            foreach (User user in users)
             {
-                return true;
+                if (user.Username.ToLower() == username.ToLower())
+                {
+                    foundUser = user;
+                    break;
+                }
             }
-            
-            return false;
+
+            if (foundUser == null)
+            {
+                CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Red, global::System.ConsoleColor.Black);
+                global::System.Console.SetCursorPosition(17, 24);
+                global::System.Console.Write("User not found.                             ");
+                global::System.Threading.Thread.Sleep(1000);
+                return false;
+            }
+
+            string hashedInputPassword = HashPasswordSha256(password);
+
+            if (foundUser.Password != hashedInputPassword)
+            {
+                CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Red, global::System.ConsoleColor.Black);
+                global::System.Console.SetCursorPosition(17, 24);
+                global::System.Console.Write("Invalid password.                           ");
+                global::System.Threading.Thread.Sleep(1000);
+                return false;
+            }
+
+            CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Green, global::System.ConsoleColor.Black);
+            global::System.Console.SetCursorPosition(17, 24);
+            global::System.Console.Write("Login successful!                           ");
+            // global::System.Console.WriteLine("Please wait...                           ");
+            global::System.Threading.Thread.Sleep(1500);
+            global::System.Console.ResetColor();
+            global::System.Console.Clear();
+
+            global::System.Console.Beep();
+
+            currentLoggedInUser = foundUser;
+            CreateUserFolder(foundUser.Username);
+
+            return true;
         }
 
         public bool AddUser(string args, bool isAdmin)

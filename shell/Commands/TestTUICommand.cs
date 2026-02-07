@@ -27,6 +27,11 @@ namespace CMLeonOS.Commands
             menu.Items.Add(new MenuItem("Progress Bar Demo", () => ShowProgressBarDemo()));
             menu.Items.Add(new MenuItem("Tab Control Demo", () => ShowTabControlDemo()));
             menu.Items.Add(new MenuItem("Menu Demo", () => ShowMenuDemo()));
+            menu.Items.Add(new MenuItem("ListBox Demo", () => ShowListBoxDemo()));
+            menu.Items.Add(new MenuItem("CheckBox Demo", () => ShowCheckBoxDemo()));
+            menu.Items.Add(new MenuItem("RadioButton Demo", () => ShowRadioButtonDemo()));
+            menu.Items.Add(new MenuItem("TreeView Demo", () => ShowTreeViewDemo()));
+            menu.Items.Add(new MenuItem("ScrollBar Demo", () => ShowScrollBarDemo()));
             menu.Items.Add(new MenuItem("Exit", () => global::System.Environment.Exit(0)));
 
             menu.Render();
@@ -362,6 +367,316 @@ namespace CMLeonOS.Commands
                 else if (menu.HandleKey(key))
                 {
                     menu.Render();
+                }
+            }
+        }
+
+        private static void ShowListBoxDemo()
+        {
+            global::System.Console.Clear();
+
+            var statusBar = new StatusBar(new Rect(0, 24, 80, 1));
+            statusBar.Items.Add(new StatusBarItem("Use UP/DOWN to navigate, SPACE to select, ESC to return"));
+            statusBar.Render();
+
+            var listBox = new ListBox(new Rect(10, 5, 60, 15));
+            listBox.Items.Add("Item 1: Basic functionality");
+            listBox.Items.Add("Item 2: Advanced features");
+            listBox.Items.Add("Item 3: Settings");
+            listBox.Items.Add("Item 4: Help");
+            listBox.Items.Add("Item 5: About");
+            listBox.Items.Add("Item 6: Documentation");
+            listBox.Items.Add("Item 7: Configuration");
+            listBox.Items.Add("Item 8: System info");
+            listBox.Items.Add("Item 9: Network settings");
+            listBox.Items.Add("Item 10: User management");
+            listBox.MultiSelect = true;
+
+            listBox.Render();
+
+            bool demoRunning = true;
+            while (demoRunning)
+            {
+                var key = global::System.Console.ReadKey(true);
+
+                if (key.Key == global::System.ConsoleKey.Escape)
+                {
+                    demoRunning = false;
+                }
+                else if (listBox.HandleKey(key))
+                {
+                    listBox.Render();
+                }
+            }
+        }
+
+        private static void ShowCheckBoxDemo()
+        {
+            global::System.Console.Clear();
+
+            var statusBar = new StatusBar(new Rect(0, 24, 80, 1));
+            statusBar.Items.Add(new StatusBarItem("Use UP/DOWN to navigate, SPACE to toggle, ESC to return"));
+            statusBar.Render();
+
+            var checkBox1 = new CheckBox(new Point(10, 8), "Enable feature 1");
+            checkBox1.IsChecked = true;
+            checkBox1.IsFocused = true;
+            var checkBox2 = new CheckBox(new Point(10, 10), "Enable feature 2");
+            checkBox2.IsChecked = false;
+            var checkBox3 = new CheckBox(new Point(10, 12), "Enable feature 3");
+            checkBox3.IsChecked = false;
+            var checkBox4 = new CheckBox(new Point(10, 14), "Enable feature 4");
+            checkBox4.IsChecked = false;
+
+            checkBox1.Render();
+            checkBox2.Render();
+            checkBox3.Render();
+            checkBox4.Render();
+
+            int focusedCheckBox = 0;
+
+            bool demoRunning = true;
+            while (demoRunning)
+            {
+                var key = global::System.Console.ReadKey(true);
+
+                if (key.Key == global::System.ConsoleKey.Escape)
+                {
+                    demoRunning = false;
+                }
+                else if (key.Key == global::System.ConsoleKey.UpArrow)
+                {
+                    checkBox1.IsFocused = false;
+                    checkBox2.IsFocused = false;
+                    checkBox3.IsFocused = false;
+                    checkBox4.IsFocused = false;
+                    focusedCheckBox = (focusedCheckBox - 1 + 4) % 4;
+                    
+                    if (focusedCheckBox == 0) checkBox1.IsFocused = true;
+                    if (focusedCheckBox == 1) checkBox2.IsFocused = true;
+                    if (focusedCheckBox == 2) checkBox3.IsFocused = true;
+                    if (focusedCheckBox == 3) checkBox4.IsFocused = true;
+                }
+                else if (key.Key == global::System.ConsoleKey.DownArrow)
+                {
+                    checkBox1.IsFocused = false;
+                    checkBox2.IsFocused = false;
+                    checkBox3.IsFocused = false;
+                    checkBox4.IsFocused = false;
+                    focusedCheckBox = (focusedCheckBox + 1) % 4;
+                    
+                    if (focusedCheckBox == 0) checkBox1.IsFocused = true;
+                    if (focusedCheckBox == 1) checkBox2.IsFocused = true;
+                    if (focusedCheckBox == 2) checkBox3.IsFocused = true;
+                    if (focusedCheckBox == 3) checkBox4.IsFocused = true;
+                }
+                else if (key.Key == global::System.ConsoleKey.Enter || key.Key == global::System.ConsoleKey.Spacebar)
+                {
+                    if (focusedCheckBox == 0) checkBox1.IsChecked = !checkBox1.IsChecked;
+                    if (focusedCheckBox == 1) checkBox2.IsChecked = !checkBox2.IsChecked;
+                    if (focusedCheckBox == 2) checkBox3.IsChecked = !checkBox3.IsChecked;
+                    if (focusedCheckBox == 3) checkBox4.IsChecked = !checkBox4.IsChecked;
+                }
+
+                checkBox1.Render();
+                checkBox2.Render();
+                checkBox3.Render();
+                checkBox4.Render();
+            }
+        }
+
+        private static void ShowRadioButtonDemo()
+        {
+            global::System.Console.Clear();
+
+            var statusBar = new StatusBar(new Rect(0, 24, 80, 1));
+            statusBar.Items.Add(new StatusBarItem("Use UP/DOWN to navigate, SPACE to select, ESC to return"));
+            statusBar.Render();
+
+            var radioButton1 = new RadioButton(new Point(10, 8), "Option 1");
+            radioButton1.IsChecked = true;
+            radioButton1.IsFocused = true;
+            radioButton1.GroupName = "group1";
+            var radioButton2 = new RadioButton(new Point(10, 10), "Option 2");
+            radioButton2.IsChecked = false;
+            radioButton2.GroupName = "group1";
+            var radioButton3 = new RadioButton(new Point(10, 12), "Option 3");
+            radioButton3.IsChecked = false;
+            radioButton3.GroupName = "group1";
+            var radioButton4 = new RadioButton(new Point(10, 14), "Option 4");
+            radioButton4.IsChecked = false;
+            radioButton4.GroupName = "group1";
+
+            radioButton1.Render();
+            radioButton2.Render();
+            radioButton3.Render();
+            radioButton4.Render();
+
+            int focusedRadioButton = 0;
+
+            bool demoRunning = true;
+            while (demoRunning)
+            {
+                var key = global::System.Console.ReadKey(true);
+
+                if (key.Key == global::System.ConsoleKey.Escape)
+                {
+                    demoRunning = false;
+                }
+                else if (key.Key == global::System.ConsoleKey.UpArrow)
+                {
+                    radioButton1.IsFocused = false;
+                    radioButton2.IsFocused = false;
+                    radioButton3.IsFocused = false;
+                    radioButton4.IsFocused = false;
+                    focusedRadioButton = (focusedRadioButton - 1 + 4) % 4;
+                    
+                    if (focusedRadioButton == 0) radioButton1.IsFocused = true;
+                    if (focusedRadioButton == 1) radioButton2.IsFocused = true;
+                    if (focusedRadioButton == 2) radioButton3.IsFocused = true;
+                    if (focusedRadioButton == 3) radioButton4.IsFocused = true;
+                }
+                else if (key.Key == global::System.ConsoleKey.DownArrow)
+                {
+                    radioButton1.IsFocused = false;
+                    radioButton2.IsFocused = false;
+                    radioButton3.IsFocused = false;
+                    radioButton4.IsFocused = false;
+                    focusedRadioButton = (focusedRadioButton + 1) % 4;
+                    
+                    if (focusedRadioButton == 0) radioButton1.IsFocused = true;
+                    if (focusedRadioButton == 1) radioButton2.IsFocused = true;
+                    if (focusedRadioButton == 2) radioButton3.IsFocused = true;
+                    if (focusedRadioButton == 3) radioButton4.IsFocused = true;
+                }
+                else if (key.Key == global::System.ConsoleKey.Enter || key.Key == global::System.ConsoleKey.Spacebar)
+                {
+                    if (focusedRadioButton == 0) radioButton1.IsChecked = true;
+                    if (focusedRadioButton == 1) radioButton2.IsChecked = true;
+                    if (focusedRadioButton == 2) radioButton3.IsChecked = true;
+                    if (focusedRadioButton == 3) radioButton4.IsChecked = true;
+                }
+
+                radioButton1.Render();
+                radioButton2.Render();
+                radioButton3.Render();
+                radioButton4.Render();
+            }
+        }
+
+        private static void ShowTreeViewDemo()
+        {
+            global::System.Console.Clear();
+
+            var statusBar = new StatusBar(new Rect(0, 24, 80, 1));
+            statusBar.Items.Add(new StatusBarItem("Use UP/DOWN to navigate, ENTER/SPACE to expand/collapse, ESC to return"));
+            statusBar.Render();
+
+            var treeView = new TreeView(new Rect(5, 5, 70, 15));
+            treeView.Root = new TreeViewNode { Text = "Root" };
+            
+            var child1 = new TreeViewNode { Text = "Folder 1", Level = 1, Parent = treeView.Root };
+            var child2 = new TreeViewNode { Text = "Folder 2", Level = 1, Parent = treeView.Root };
+            var child3 = new TreeViewNode { Text = "File 1", Level = 2, Parent = child1 };
+            var child4 = new TreeViewNode { Text = "File 2", Level = 2, Parent = child1 };
+            var child5 = new TreeViewNode { Text = "File 3", Level = 2, Parent = child2 };
+            
+            child1.Children.Add(child3);
+            child1.Children.Add(child4);
+            child2.Children.Add(child5);
+            
+            treeView.Root.Children.Add(child1);
+            treeView.Root.Children.Add(child2);
+
+            treeView.Render();
+
+            bool demoRunning = true;
+            while (demoRunning)
+            {
+                var key = global::System.Console.ReadKey(true);
+
+                if (key.Key == global::System.ConsoleKey.Escape)
+                {
+                    demoRunning = false;
+                }
+                else if (treeView.HandleKey(key))
+                {
+                    treeView.Render();
+                }
+            }
+        }
+
+        private static void ShowScrollBarDemo()
+        {
+            global::System.Console.Clear();
+
+            var statusBar = new StatusBar(new Rect(0, 24, 80, 1));
+            statusBar.Items.Add(new StatusBarItem("Use UP/DOWN or LEFT/RIGHT to adjust, ESC to return"));
+            statusBar.Render();
+
+            var scrollBar1 = new ScrollBar(new Point(15, 10), 10);
+            scrollBar1.MaxValue = 100;
+            scrollBar1.Value = 50;
+            scrollBar1.IsVertical = true;
+
+            var scrollBar2 = new ScrollBar(new Point(40, 10), 30);
+            scrollBar2.MaxValue = 100;
+            scrollBar2.Value = 30;
+            scrollBar2.IsVertical = false;
+
+            var scrollBar3 = new ScrollBar(new Point(15, 15), 10);
+            scrollBar3.MaxValue = 50;
+            scrollBar3.Value = 25;
+            scrollBar3.IsVertical = true;
+
+            var scrollBar4 = new ScrollBar(new Point(40, 15), 30);
+            scrollBar4.MaxValue = 50;
+            scrollBar4.Value = 15;
+            scrollBar4.IsVertical = false;
+
+            var label1 = new Label(new Point(15, 8), "Vertical ScrollBar:");
+            var label2 = new Label(new Point(40, 8), "Horizontal ScrollBar:");
+            var label3 = new Label(new Point(15, 13), "Small Vertical:");
+            var label4 = new Label(new Point(40, 13), "Small Horizontal:");
+
+            label1.Render();
+            label2.Render();
+            label3.Render();
+            label4.Render();
+
+            scrollBar1.Render();
+            scrollBar2.Render();
+            scrollBar3.Render();
+            scrollBar4.Render();
+
+            int focusedScrollBar = 0;
+
+            bool demoRunning = true;
+            while (demoRunning)
+            {
+                var key = global::System.Console.ReadKey(true);
+
+                if (key.Key == global::System.ConsoleKey.Escape)
+                {
+                    demoRunning = false;
+                }
+                else if (key.Key == global::System.ConsoleKey.UpArrow || key.Key == global::System.ConsoleKey.DownArrow)
+                {
+                    if (focusedScrollBar == 0 && scrollBar1.HandleKey(key)) scrollBar1.Render();
+                    if (focusedScrollBar == 1 && scrollBar2.HandleKey(key)) scrollBar2.Render();
+                    if (focusedScrollBar == 2 && scrollBar3.HandleKey(key)) scrollBar3.Render();
+                    if (focusedScrollBar == 3 && scrollBar4.HandleKey(key)) scrollBar4.Render();
+                }
+                else if (key.Key == global::System.ConsoleKey.LeftArrow || key.Key == global::System.ConsoleKey.RightArrow)
+                {
+                    if (focusedScrollBar == 0 && scrollBar1.HandleKey(key)) scrollBar1.Render();
+                    if (focusedScrollBar == 1 && scrollBar2.HandleKey(key)) scrollBar2.Render();
+                    if (focusedScrollBar == 2 && scrollBar3.HandleKey(key)) scrollBar3.Render();
+                    if (focusedScrollBar == 3 && scrollBar4.HandleKey(key)) scrollBar4.Render();
+                }
+                else if (key.Key == global::System.ConsoleKey.Tab)
+                {
+                    focusedScrollBar = (focusedScrollBar + 1) % 4;
                 }
             }
         }
