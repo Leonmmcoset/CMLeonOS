@@ -721,6 +721,79 @@ print("Elapsed time:", elapsed, "seconds")
 - 每次调用 `timerstop` 后，计时器会被重置
 - 返回的时间单位为秒（浮点数）
 
+### os.tui_drawbox(x, y, width, height, title, borderColor, backgroundColor)
+绘制带边框和标题的矩形框。
+
+```lua
+os.tui_drawbox(10, 5, 40, 10, "Title", "white", "darkblue")
+```
+
+**参数**：
+- `x` - 矩形框的左上角 X 坐标
+- `y` - 矩形框的左上角 Y 坐标
+- `width` - 矩形框的宽度
+- `height` - 矩形框的高度
+- `title` - 矩形框的标题（可选）
+- `borderColor` - 边框颜色（black, blue, cyan, darkblue, darkcyan, darkgray, darkgreen, darkmagenta, darkred, darkyellow, gray, green, magenta, red, white, yellow）
+- `backgroundColor` - 背景颜色（同上）
+
+### os.tui_drawtext(x, y, text, foregroundColor, backgroundColor)
+在指定位置绘制文本。
+
+```lua
+os.tui_drawtext(15, 8, "Hello World!", "yellow", "black")
+```
+
+**参数**：
+- `x` - 文本的 X 坐标
+- `y` - 文本的 Y 坐标
+- `text` - 要绘制的文本内容
+- `foregroundColor` - 前景色（同上）
+- `backgroundColor` - 背景色（同上）
+
+### os.tui_setcolor(foregroundColor, backgroundColor)
+设置前景色和背景色。
+
+```lua
+os.tui_setcolor("white", "black")
+```
+
+**参数**：
+- `foregroundColor` - 前景色（black, blue, cyan, darkblue, darkcyan, darkgray, darkgreen, darkmagenta, darkred, darkyellow, gray, green, magenta, red, white, yellow）
+- `backgroundColor` - 背景色（同上）
+
+### os.tui_setcursor(x, y)
+设置光标位置。
+
+```lua
+os.tui_setcursor(20, 10)
+```
+
+**参数**：
+- `x` - 光标的 X 坐标
+- `y` - 光标的 Y 坐标
+
+### os.tui_clear()
+清屏。
+
+```lua
+os.tui_clear()
+```
+
+### os.tui_drawline(x, y, length, character, color)
+绘制水平线。
+
+```lua
+os.tui_drawline(10, 15, 30, "-", "green")
+```
+
+**参数**：
+- `x` - 线的起始 X 坐标
+- `y` - 线的起始 Y 坐标
+- `length` - 线的长度
+- `character` - 用于绘制线的字符
+- `color` - 线的颜色（同上）
+
 ---
 
 ## 输入输出库 (io)
