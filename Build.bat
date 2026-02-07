@@ -1,0 +1,2 @@
+"D:\Microsoft Visual Studio\18\Community\MSBuild\Current\Bin\amd64\MSBuild.exe" "CMLeonOS.csproj" /t:Build /p:Configuration=Fixed_Release /p:Platform=x64
+@REM "C:\Program Files (x86)\VMware\VMware Workstation\vmplayer.exe" "C:\Users\leon\AppData\Roaming\Cosmos User Kit\Build\VMware\Workstation\Cosmos.vmx"

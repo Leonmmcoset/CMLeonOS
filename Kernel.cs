@@ -1,19 +1,23 @@
+using CMLeonOS.Logger;
+using CMLeonOS.Settings;
 using Cosmos.HAL;
+using Cosmos.HAL.BlockDevice;
+using Cosmos.HAL.Drivers.Video;
 using Cosmos.System.FileSystem;
 using Cosmos.System.FileSystem.FAT;
 using Cosmos.System.FileSystem.VFS;
+using Cosmos.System.Graphics;
+using Cosmos.System.Graphics.Fonts;
 using Cosmos.System.Network.Config;
-using Cosmos.System.Network.IPv4.UDP.DHCP;
-using Cosmos.HAL.BlockDevice;
 using Cosmos.System.Network.IPv4;
+using Cosmos.System.Network.IPv4.UDP.DHCP;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection.Metadata.Ecma335;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Sys = Cosmos.System;
-using CMLeonOS.Logger;
-using CMLeonOS.Settings;
 
 namespace CMLeonOS
 {
@@ -31,9 +35,31 @@ namespace CMLeonOS
         
         public static Cosmos.HAL.NetworkDevice NetworkDevice = null;
         public static string IPAddress = "Unknown";
+
+        [IL2CPU.API.Attribs.ManifestResourceStream(ResourceName = "CMLeonOS.font.psf")]
+        public static readonly byte[] file;
         
         protected override void BeforeRun()
         {
+            // 我认了，我用默认字体
+            // try
+            // {
+            //     PCScreenFont screenFont = PCScreenFont.LoadFont(file);
+            //     VGAScreen.SetFont(screenFont.CreateVGAFont(), screenFont.Height);
+            //     VGAScreen.SetGraphicsMode(VGADriver.ScreenSize.Size720x480, ColorDepth.ColorDepth32);
+            // }
+            // catch (Exception ex)
+            // {
+            // 我不认，我试着转换成Base64
+                // 我认了
+                PCScreenFont defaultFont = PCScreenFont.Default;
+                VGAScreen.SetFont(defaultFont.CreateVGAFont(), defaultFont.Height);
+                // Console.WriteLine($"{defaultFont.Height}");
+                // Console.WriteLine($"{defaultFont.Width}");
+                // VGAScreen.SetGraphicsMode(VGADriver.ScreenSize.Size720x480, ColorDepth.ColorDepth32);
+            //     Console.WriteLine($"Error loading font: {ex.Message}");
+            // }
+
             Console.WriteLine("Kernel load done!");
             Console.WriteLine(@"-------------------------------------------------");
             Console.WriteLine(@"   ____ __  __ _                      ___  ____  ");

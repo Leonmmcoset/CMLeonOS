@@ -15,7 +15,7 @@
         <StartCosmosGDB>False</StartCosmosGDB>
         <VisualStudioDebugPort>Pipe: Cosmos\Serial</VisualStudioDebugPort>
         <CosmosDebugPort>Serial: COM1</CosmosDebugPort>
-        <Launch>VMware</Launch>
+        <Launch>HyperV</Launch>
         <Profile>VMware</Profile>
         <Description>Use VMware Player or Workstation to deploy and debug.</Description>
         <PxeInterface>192.168.0.8</PxeInterface>
@@ -30,7 +30,37 @@
 		<VBEResolution>800x600x32</VBEResolution>
     </PropertyGroup>
 
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+      <WarningLevel>8</WarningLevel>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      <WarningLevel>8</WarningLevel>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+      <WarningLevel>8</WarningLevel>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      <WarningLevel>8</WarningLevel>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Fixed_Release|AnyCPU'">
+      <WarningLevel>8</WarningLevel>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Fixed_Release|x64'">
+      <WarningLevel>8</WarningLevel>
+    </PropertyGroup>
+
     <ItemGroup>
+      <None Remove="font.psf" />
+      <None Remove="Solarize.12x29.psf" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="font.psf" />
         <EmbeddedResource Include="Wallpapers\wallpaper.bmp" />
     </ItemGroup>
 
