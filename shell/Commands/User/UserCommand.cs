@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using CMLeonOS;
 
 namespace CMLeonOS.Commands.User
 {
@@ -15,19 +17,41 @@ namespace CMLeonOS.Commands.User
         {
             if (userSystem == null || userSystem.CurrentLoggedInUser == null || !userSystem.CurrentLoggedInUser.IsAdmin)
             {
-                showError("Error: Only administrators can use the user command.");
+                showError("Error: Only administrators can use this command.");
                 return;
             }
 
             if (string.IsNullOrEmpty(args))
             {
-                showError("Error: Please specify a user command");
-                showError("Please specify a user command");
-                showError("user <add|delete> [args]");
-                showError("  user add admin <username> <password>  - Add admin user");
-                showError("  user add user <username> <password>      - Add regular user");
-                showError("  user delete <username>                    - Delete user");
-                showError("  user list                                    - List all users");
+                var commandInfos = new List<UsageGenerator.CommandInfo>
+                {
+                    new UsageGenerator.CommandInfo 
+                    { 
+                        Command = "add admin <username> <password>", 
+                        Description = "Add admin user",
+                        IsOptional = false 
+                    },
+                    new UsageGenerator.CommandInfo 
+                    { 
+                        Command = "add user <username> <password>", 
+                        Description = "Add regular user",
+                        IsOptional = false 
+                    },
+                    new UsageGenerator.CommandInfo 
+                    { 
+                        Command = "delete <username>", 
+                        Description = "Delete user",
+                        IsOptional = false 
+                    },
+                    new UsageGenerator.CommandInfo 
+                    { 
+                        Command = "list", 
+                        Description = "List all users",
+                        IsOptional = false 
+                    }
+                };
+
+                showError(UsageGenerator.GenerateUsage("user", commandInfos));
                 return;
             }
             
@@ -35,7 +59,7 @@ namespace CMLeonOS.Commands.User
             if (parts.Length < 1)
             {
                 showError("Error: Please specify a user command");
-                showError("Usage: user <add|delete> [args]");
+                showError(UsageGenerator.GenerateSimpleUsage("user", "<add|delete> [args]"));
                 return;
             }
             
@@ -46,8 +70,8 @@ namespace CMLeonOS.Commands.User
                 if (parts.Length < 4)
                 {
                     showError("Error: Please specify user type and username and password");
-                    showError("Usage: user add admin <username> <password>");
-                    showError("Usage: user add user <username> <password>");
+                    showError(UsageGenerator.GenerateSimpleUsage("user", "add admin <username> <password>"));
+                    showError(UsageGenerator.GenerateSimpleUsage("user", "add user <username> <password>"));
                     return;
                 }
                 
@@ -63,7 +87,7 @@ namespace CMLeonOS.Commands.User
                 if (parts.Length < 2)
                 {
                     showError("Error: Please specify username");
-                    showError("Usage: user delete <username>");
+                    showError(UsageGenerator.GenerateSimpleUsage("user", "delete <username>"));
                     return;
                 }
                 

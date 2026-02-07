@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using CMLeonOS;
 
 namespace CMLeonOS.Commands.Environment
 {
@@ -11,7 +13,41 @@ namespace CMLeonOS.Commands.Environment
             
             if (parts.Length == 0)
             {
-                envManager.ListVariables();
+                var commandInfos = new List<UsageGenerator.CommandInfo>
+                {
+                    new UsageGenerator.CommandInfo 
+                    { 
+                        Command = "list", 
+                        Description = "List all environment variables",
+                        IsOptional = false 
+                    },
+                    new UsageGenerator.CommandInfo 
+                    { 
+                        Command = "see <varname>", 
+                        Description = "View environment variable value",
+                        IsOptional = false 
+                    },
+                    new UsageGenerator.CommandInfo 
+                    { 
+                        Command = "add <varname> <value>", 
+                        Description = "Add environment variable",
+                        IsOptional = false 
+                    },
+                    new UsageGenerator.CommandInfo 
+                    { 
+                        Command = "change <varname> <value>", 
+                        Description = "Change environment variable",
+                        IsOptional = false 
+                    },
+                    new UsageGenerator.CommandInfo 
+                    { 
+                        Command = "delete <varname>", 
+                        Description = "Delete environment variable",
+                        IsOptional = false 
+                    }
+                };
+
+                showError(UsageGenerator.GenerateUsage("env", commandInfos));
                 return;
             }
             
@@ -39,7 +75,7 @@ namespace CMLeonOS.Commands.Environment
                     else
                     {
                         showError("Error: Please specify variable name");
-                        showError("Usage: env see <varname>");
+                        showError(UsageGenerator.GenerateSimpleUsage("env", "see <varname>"));
                     }
                     break;
                 case "add":
@@ -60,7 +96,7 @@ namespace CMLeonOS.Commands.Environment
                     else
                     {
                         showError("Error: Please specify variable name and value");
-                        showError("Usage: env add <varname> <value>");
+                        showError(UsageGenerator.GenerateSimpleUsage("env", "add <varname> <value>"));
                     }
                     break;
                 case "change":
@@ -81,7 +117,7 @@ namespace CMLeonOS.Commands.Environment
                     else
                     {
                         showError("Error: Please specify variable name and value");
-                        showError("Usage: env change <varname> <value>");
+                        showError(UsageGenerator.GenerateSimpleUsage("env", "change <varname> <value>"));
                     }
                     break;
                 case "delete":
@@ -101,12 +137,46 @@ namespace CMLeonOS.Commands.Environment
                     else
                     {
                         showError("Error: Please specify variable name");
-                        showError("Usage: env delete <varname>");
+                        showError(UsageGenerator.GenerateSimpleUsage("env", "delete <varname>"));
                     }
                     break;
                 default:
+                    var commandInfos = new List<UsageGenerator.CommandInfo>
+                    {
+                        new UsageGenerator.CommandInfo 
+                        { 
+                            Command = "list", 
+                            Description = "List all environment variables",
+                            IsOptional = false 
+                        },
+                        new UsageGenerator.CommandInfo 
+                        { 
+                            Command = "see <varname>", 
+                            Description = "View environment variable value",
+                            IsOptional = false 
+                        },
+                        new UsageGenerator.CommandInfo 
+                        { 
+                            Command = "add <varname> <value>", 
+                            Description = "Add environment variable",
+                            IsOptional = false 
+                        },
+                        new UsageGenerator.CommandInfo 
+                        { 
+                            Command = "change <varname> <value>", 
+                            Description = "Change environment variable",
+                            IsOptional = false 
+                        },
+                        new UsageGenerator.CommandInfo 
+                        { 
+                            Command = "delete <varname>", 
+                            Description = "Delete environment variable",
+                            IsOptional = false 
+                        }
+                    };
+
                     showError("Error: Invalid env command");
-                    showError("Usage: env [list] | env see <varname> | env add <varname> <value> | env change <varname> <value> | env delete <varname>");
+                    showError(UsageGenerator.GenerateUsage("env", commandInfos));
                     break;
             }
         }

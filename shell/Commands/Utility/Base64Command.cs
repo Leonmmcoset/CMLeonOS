@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using CMLeonOS;
 
 namespace CMLeonOS.Commands.Utility
 {
@@ -10,8 +12,23 @@ namespace CMLeonOS.Commands.Utility
             
             if (parts.Length == 0)
             {
-                showError("Error: Please specify subcommand");
-                showError("Usage: base64 encrypt <text> | base64 decrypt <text>");
+                var commandInfos = new List<UsageGenerator.CommandInfo>
+                {
+                    new UsageGenerator.CommandInfo 
+                    { 
+                        Command = "encrypt <text>", 
+                        Description = "Encode text to Base64",
+                        IsOptional = false 
+                    },
+                    new UsageGenerator.CommandInfo 
+                    { 
+                        Command = "decrypt <text>", 
+                        Description = "Decode Base64 to text",
+                        IsOptional = false 
+                    }
+                };
+
+                showError(UsageGenerator.GenerateCompactUsage("base64", commandInfos));
                 return;
             }
             
@@ -19,15 +36,31 @@ namespace CMLeonOS.Commands.Utility
             
             if (subcommand != "encrypt" && subcommand != "decrypt")
             {
+                var commandInfos = new List<UsageGenerator.CommandInfo>
+                {
+                    new UsageGenerator.CommandInfo 
+                    { 
+                        Command = "encrypt <text>", 
+                        Description = "Encode text to Base64",
+                        IsOptional = false 
+                    },
+                    new UsageGenerator.CommandInfo 
+                    { 
+                        Command = "decrypt <text>", 
+                        Description = "Decode Base64 to text",
+                        IsOptional = false 
+                    }
+                };
+
                 showError("Error: Invalid subcommand");
-                showError("Usage: base64 encrypt <text> | base64 decrypt <text>");
+                showError(UsageGenerator.GenerateCompactUsage("base64", commandInfos));
                 return;
             }
             
             if (parts.Length < 2)
             {
                 showError("Error: Please specify text to process");
-                showError($"Usage: base64 {subcommand} <text>");
+                showError(UsageGenerator.GenerateSimpleUsage("base64", $"{subcommand} <text>"));
                 return;
             }
             

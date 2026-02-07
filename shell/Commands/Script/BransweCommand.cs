@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using CMLeonOS;
 
 namespace CMLeonOS.Commands.Script
 {
@@ -9,8 +11,17 @@ namespace CMLeonOS.Commands.Script
         {
             if (string.IsNullOrEmpty(args))
             {
-                showError("Error: Please specify file name");
-                showError("Usage: branswe <filename>");
+                var commandInfos = new List<UsageGenerator.CommandInfo>
+                {
+                    new UsageGenerator.CommandInfo 
+                    { 
+                        Command = "<filename>", 
+                        Description = "Execute Branswe file",
+                        IsOptional = false 
+                    }
+                };
+
+                showError(UsageGenerator.GenerateUsage("branswe", commandInfos));
                 return;
             }
             

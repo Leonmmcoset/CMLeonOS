@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using CMLeonOS;
 
 namespace CMLeonOS.Commands.User
 {
@@ -8,7 +10,17 @@ namespace CMLeonOS.Commands.User
         {
             if (string.IsNullOrEmpty(args))
             {
-                showError("Usage: hostname <new_hostname>");
+                var commandInfos = new List<UsageGenerator.CommandInfo>
+                {
+                    new UsageGenerator.CommandInfo 
+                    { 
+                        Command = "<new_hostname>", 
+                        Description = "Set new hostname",
+                        IsOptional = false 
+                    }
+                };
+
+                showError(UsageGenerator.GenerateUsage("hostname", commandInfos));
                 return;
             }
             

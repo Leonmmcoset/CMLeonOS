@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using CMLeonOS;
 
 namespace CMLeonOS.Commands.Script
 {
@@ -9,7 +11,17 @@ namespace CMLeonOS.Commands.Script
         {
             if (string.IsNullOrEmpty(args))
             {
-                showError("Usage: com <filename.cm>");
+                var commandInfos = new List<UsageGenerator.CommandInfo>
+                {
+                    new UsageGenerator.CommandInfo 
+                    { 
+                        Command = "<filename.cm>", 
+                        Description = "Execute command file",
+                        IsOptional = false 
+                    }
+                };
+
+                showError(UsageGenerator.GenerateUsage("com", commandInfos));
                 return;
             }
             

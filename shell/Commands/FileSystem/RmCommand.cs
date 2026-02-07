@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using CMLeonOS;
 
 namespace CMLeonOS.Commands.FileSystem
 {
@@ -8,7 +10,24 @@ namespace CMLeonOS.Commands.FileSystem
         {
             if (string.IsNullOrEmpty(args))
             {
-                showError("Please specify a file name");
+                var commandInfos = new List<UsageGenerator.CommandInfo>
+                {
+                    new UsageGenerator.CommandInfo 
+                    { 
+                        Command = "<file>", 
+                        Description = "Delete file",
+                        IsOptional = false 
+                    },
+                    new UsageGenerator.CommandInfo 
+                    { 
+                        Command = "<file> -norisk", 
+                        Description = "Delete file in sys folder without confirmation",
+                        IsOptional = false 
+                    }
+                };
+
+                showError(UsageGenerator.GenerateUsage("rm", commandInfos));
+                return;
             }
             else
             {
@@ -29,7 +48,7 @@ namespace CMLeonOS.Commands.FileSystem
                     if (!hasNorisk)
                     {
                         showError("Cannot delete files in sys folder without -norisk parameter");
-                        showError("Usage: rm <file> -norisk");
+                        showError(UsageGenerator.GenerateSimpleUsage("rm", "<file> -norisk"));
                     }
                     else
                     {

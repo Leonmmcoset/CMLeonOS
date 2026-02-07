@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UniLua;
+using CMLeonOS;
 
 namespace CMLeonOS.Commands.Script
 {
@@ -12,8 +14,23 @@ namespace CMLeonOS.Commands.Script
             
             if (parts.Length == 0)
             {
-                showError("Error: Please specify Lua script file or use --shell for interactive mode");
-                showError("Usage: lua <file> or lua --shell");
+                var commandInfos = new List<UsageGenerator.CommandInfo>
+                {
+                    new UsageGenerator.CommandInfo 
+                    { 
+                        Command = "<file>", 
+                        Description = "Execute Lua script file",
+                        IsOptional = false 
+                    },
+                    new UsageGenerator.CommandInfo 
+                    { 
+                        Command = "--shell", 
+                        Description = "Enter Lua interactive shell",
+                        IsOptional = false 
+                    }
+                };
+
+                showError(UsageGenerator.GenerateUsage("lua", commandInfos));
                 return;
             }
             
