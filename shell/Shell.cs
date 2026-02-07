@@ -407,6 +407,22 @@ namespace CMLeonOS
             string expandedCommand = command;
             string expandedArgs = args;
             
+            if (command.StartsWith(":"))
+            {
+                string appName = command.Substring(1);
+                string appPath = "0:\\apps\\" + appName + ".lua";
+                
+                if (System.IO.File.Exists(appPath))
+                {
+                    Commands.Script.LuaCommand.ExecuteLuaScript(appPath, fileSystem, this, ShowError, ShowWarning);
+                }
+                else
+                {
+                    ShowError($"App not found: {appName}");
+                }
+                return;
+            }
+            
             string aliasValue = Commands.AliasCommand.GetAlias(command);
             if (aliasValue != null)
             {

@@ -99,6 +99,14 @@ namespace CMLeonOS
                     _logger.Info("Kernel", "Created system folder at 0:\\system");
                 }
                 
+                // 检查并创建apps文件夹
+                string appsFolderPath = @"0:\apps";
+                if (!System.IO.Directory.Exists(appsFolderPath))
+                {
+                    System.IO.Directory.CreateDirectory(appsFolderPath);
+                    _logger.Info("Kernel", "Created apps folder at 0:\\apps");
+                }
+                
                 // 初始化用户系统
                 _logger.Info("Kernel", "Initializing user system");
                 userSystem = new UserSystem();
