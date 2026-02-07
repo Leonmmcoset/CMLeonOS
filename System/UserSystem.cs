@@ -306,139 +306,193 @@ namespace CMLeonOS
 
         public void FirstTimeSetup()
         {
-            Console.WriteLine("====================================");
-            Console.WriteLine("        First Time Setup");
-            Console.WriteLine("====================================");
-            Console.WriteLine();
-            
-            Console.WriteLine("User Terms and Conditions:");
-            Console.WriteLine("====================================");
-            Console.WriteLine("1. This operating system is provided as-is without warranty");
-            Console.WriteLine("2. You are responsible for your data and backups");
-            Console.WriteLine("3. Unauthorized access attempts may be logged");
-            Console.WriteLine("4. System administrators have full access to all data");
-            Console.WriteLine("5. By using this system, you agree to these terms");
-            Console.WriteLine("6. Data privacy: Your personal data is stored locally");
-            Console.WriteLine("7. System updates may be installed automatically");
-            Console.WriteLine("8. No liability for data loss or corruption");
-            Console.WriteLine("9. Support available at: leonmmcoset@outlook.com");
-            Console.WriteLine("10. This license is for personal use only");
-            Console.WriteLine("====================================");
-            Console.WriteLine();
-            
-            bool termsAccepted = false;
-            while (!termsAccepted)
-            {
-                Console.Write("Do you accept the User Terms? (yes/no): ");
-                string response = Console.ReadLine()?.ToLower();
-                
-                if (response == "yes" || response == "y")
+            CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+            global::System.Console.Clear();
+
+                var titleBar = new CMLeonOS.UI.Window(new CMLeonOS.UI.Rect(0, 0, 80, 3), "First Time Setup", () => { }, false);
+                titleBar.Render();
+
+                var termsBox = new CMLeonOS.UI.Window(new CMLeonOS.UI.Rect(5, 5, 70, 18), "User Terms and Conditions", () => { }, true);
+                termsBox.Render();
+
+                CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Gray, global::System.ConsoleColor.Black);
+                global::System.Console.SetCursorPosition(7, 7);
+                global::System.Console.WriteLine("1. This operating system is provided as-is without warranty");
+                global::System.Console.SetCursorPosition(7, 8);
+                global::System.Console.WriteLine("2. You are responsible for your data and backups");
+                global::System.Console.SetCursorPosition(7, 9);
+                global::System.Console.WriteLine("3. Unauthorized access attempts may be logged");
+                global::System.Console.SetCursorPosition(7, 10);
+                global::System.Console.WriteLine("4. System administrators have full access to all data");
+                global::System.Console.SetCursorPosition(7, 11);
+                global::System.Console.WriteLine("5. By using this system, you agree to these terms");
+                global::System.Console.SetCursorPosition(7, 12);
+                global::System.Console.WriteLine("6. Data privacy: Your personal data is stored locally");
+                global::System.Console.SetCursorPosition(7, 13);
+                global::System.Console.WriteLine("7. System updates may be installed automatically");
+                global::System.Console.SetCursorPosition(7, 14);
+                global::System.Console.WriteLine("8. No liability for data loss or corruption");
+                global::System.Console.SetCursorPosition(7, 15);
+                global::System.Console.WriteLine("9. Support available at: leonmmcoset@outlook.com");
+                global::System.Console.SetCursorPosition(7, 16);
+                global::System.Console.WriteLine("10. This license is for personal use only");
+
+                bool termsAccepted = false;
+                while (!termsAccepted)
                 {
-                    termsAccepted = true;
-                    Console.WriteLine("Terms accepted.");
-                    Console.WriteLine();
+                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+                    global::System.Console.SetCursorPosition(5, 24);
+                    global::System.Console.Write("Do you accept the User Terms? (yes/no): ");
+                    string response = global::System.Console.ReadLine()?.ToLower();
+
+                    if (response == "yes" || response == "y")
+                    {
+                        termsAccepted = true;
+                        CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Green, global::System.ConsoleColor.Black);
+                        global::System.Console.SetCursorPosition(5, 24);
+                        global::System.Console.Write("Terms accepted.                          ");
+                    }
+                    else if (response == "no" || response == "n")
+                    {
+                        CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Red, global::System.ConsoleColor.Black);
+                        global::System.Console.SetCursorPosition(5, 24);
+                        global::System.Console.Write("You must accept the User Terms to continue.");
+                        global::System.Threading.Thread.Sleep(2000);
+                        Sys.Power.Reboot();
+                    }
+                    else
+                    {
+                        CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Red, global::System.ConsoleColor.Black);
+                        global::System.Console.SetCursorPosition(5, 24);
+                        global::System.Console.Write("Invalid response. Please enter 'yes' or 'no'.");
+                    }
                 }
-                else if (response == "no" || response == "n")
-                {
-                    Console.WriteLine("You must accept the User Terms to continue.");
-                    Console.WriteLine("Please restart the setup process.");
-                    Thread.Sleep(2000);
-                    Sys.Power.Reboot();
-                }
-                else
-                {
-                    Console.WriteLine("Invalid response. Please enter 'yes' or 'no'.");
-                }
-            }
-            
-            Console.WriteLine("Please set admin username and password:");
-            
-            Console.Write("Username: ");
-            string username = Console.ReadLine();
-            
-            while (string.IsNullOrWhiteSpace(username))
-            {
-                ShowError("Username cannot be empty.");
-                Console.Write("Username: ");
-                username = Console.ReadLine();
-            }
-            
-            Console.WriteLine("Password: ");
-            string password = ReadPassword();
-            
-            Console.WriteLine("Please confirm your password:");
-            string confirmPassword = ReadPassword();
-            
-            while (password != confirmPassword)
-            {
-                ShowError("Passwords do not match. Please try again.");
-                
-                Console.Write("Username: ");
-                username = Console.ReadLine();
-                
+
+                global::System.Console.Clear();
+                titleBar.Render();
+
+                var setupBox = new CMLeonOS.UI.Window(new CMLeonOS.UI.Rect(5, 5, 70, 12), "Admin Account Setup", () => { }, true);
+                setupBox.Render();
+
+                CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+                global::System.Console.SetCursorPosition(7, 7);
+                global::System.Console.Write("Username: ");
+                string username = global::System.Console.ReadLine();
+
                 while (string.IsNullOrWhiteSpace(username))
                 {
-                    ShowError("Username cannot be empty.");
-                    Console.Write("Username: ");
-                    username = Console.ReadLine();
+                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Red, global::System.ConsoleColor.Black);
+                    global::System.Console.SetCursorPosition(7, 24);
+                    global::System.Console.Write("Username cannot be empty.                   ");
+                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+                    global::System.Console.SetCursorPosition(7, 7);
+                    global::System.Console.Write("Username: ");
+                    username = global::System.Console.ReadLine();
                 }
-                
-                Console.WriteLine("Password: ");
-                password = ReadPassword();
-                
-                Console.WriteLine("Please confirm your password:");
-                confirmPassword = ReadPassword();
-            }
-            
-            try
-            {
-                User adminUser = new User
+
+                CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+                global::System.Console.SetCursorPosition(7, 8);
+                global::System.Console.Write("Password: ");
+                string password = ReadPassword();
+
+                CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+                global::System.Console.SetCursorPosition(7, 9);
+                global::System.Console.Write("Confirm Password: ");
+                string confirmPassword = ReadPassword();
+
+                while (password != confirmPassword)
                 {
-                    Username = username,
-                    Password = password,
-                    IsAdmin = true
-                };
-                users.Add(adminUser);
-                SaveUsers();
-                ShowSuccess("Admin user created successfully!");
-                
-                Console.WriteLine();
-                Console.WriteLine("Please set system hostname:");
-                Console.Write("Hostname: ");
-                string hostname = Console.ReadLine();
-                
-                while (string.IsNullOrWhiteSpace(hostname))
-                {
-                    ShowError("Hostname cannot be empty.");
-                    Console.Write("Hostname: ");
-                    hostname = Console.ReadLine();
+                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Red, global::System.ConsoleColor.Black);
+                    global::System.Console.SetCursorPosition(7, 24);
+                    global::System.Console.Write("Passwords do not match. Please try again.      ");
+                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+                    global::System.Console.SetCursorPosition(7, 7);
+                    global::System.Console.Write("Username: ");
+                    username = global::System.Console.ReadLine();
+
+                    while (string.IsNullOrWhiteSpace(username))
+                    {
+                        CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Red, global::System.ConsoleColor.Black);
+                        global::System.Console.SetCursorPosition(7, 24);
+                        global::System.Console.Write("Username cannot be empty.                   ");
+                        CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+                        global::System.Console.SetCursorPosition(7, 7);
+                        global::System.Console.Write("Username: ");
+                        username = global::System.Console.ReadLine();
+                    }
+
+                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+                    global::System.Console.SetCursorPosition(7, 8);
+                    global::System.Console.Write("Password: ");
+                    password = ReadPassword();
+
+                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+                    global::System.Console.SetCursorPosition(7, 9);
+                    global::System.Console.Write("Confirm Password: ");
+                    confirmPassword = ReadPassword();
                 }
-                
-                if (users.Count > 0)
+
+                try
                 {
-                    users[0].Hostname = hostname;
-                    SaveHostname();
-                    ShowSuccess($"Hostname set to: {hostname}");
+                    User adminUser = new User
+                    {
+                        Username = username,
+                        Password = password,
+                        IsAdmin = true
+                    };
+                    users.Add(adminUser);
+                    SaveUsers();
+                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Green, global::System.ConsoleColor.Black);
+                    global::System.Console.SetCursorPosition(7, 24);
+                    global::System.Console.Write("Admin user created successfully!            ");
+
+                    global::System.Console.Clear();
+                    titleBar.Render();
+
+                    var hostnameBox = new CMLeonOS.UI.Window(new CMLeonOS.UI.Rect(5, 5, 70, 8), "Hostname Setup", () => { }, true);
+                    hostnameBox.Render();
+
+                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+                    global::System.Console.SetCursorPosition(7, 7);
+                    global::System.Console.Write("Hostname: ");
+                    string hostname = global::System.Console.ReadLine();
+
+                    while (string.IsNullOrWhiteSpace(hostname))
+                    {
+                        CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Red, global::System.ConsoleColor.Black);
+                        global::System.Console.SetCursorPosition(7, 24);
+                        global::System.Console.Write("Hostname cannot be empty.                   ");
+                        CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+                        global::System.Console.SetCursorPosition(7, 7);
+                        global::System.Console.Write("Hostname: ");
+                        hostname = global::System.Console.ReadLine();
+                    }
+
+                    if (users.Count > 0)
+                    {
+                        users[0].Hostname = hostname;
+                        SaveUsers();
+                    }
+
+                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Green, global::System.ConsoleColor.Black);
+                    global::System.Console.SetCursorPosition(7, 24);
+                    global::System.Console.Write("Hostname set successfully!                     ");
+                    global::System.Threading.Thread.Sleep(2000);
+
+                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+                    global::System.Console.Clear();
+                    global::System.Console.SetCursorPosition(30, 12);
+                    global::System.Console.Write("Setup completed!");
+                    global::System.Console.SetCursorPosition(20, 13);
+                    global::System.Console.Write("System will restart in 3 seconds...");
+                    global::System.Threading.Thread.Sleep(3000);
+
+                    Sys.Power.Reboot();
                 }
-                
-                Console.WriteLine();
-                Console.WriteLine("System will restart in 3 seconds...");
-                Console.WriteLine("Please wait...");
-                Console.WriteLine();
-                
-                for (int i = 3; i > 0; i--)
+                catch (Exception ex)
                 {
-                    Console.Write($"\rRestarting in {i} seconds...   ");
-                    Thread.Sleep(1000);
+                    ShowError($"Error creating admin user: {ex.Message}");
                 }
-                
-                Console.WriteLine("\rRestarting now!");
-                Sys.Power.Reboot();
-            }
-            catch (Exception ex)
-            {
-                ShowError($"Error creating admin user: {ex.Message}");
-            }
         }
 
         private void CreateUserFolder(string username)
