@@ -336,6 +336,8 @@ namespace CMLeonOS
                 global::System.Console.WriteLine("9. Support available at: leonmmcoset@outlook.com");
                 global::System.Console.SetCursorPosition(7, 16);
                 global::System.Console.WriteLine("10. This license is for personal use only");
+                global::System.Console.SetCursorPosition(7, 17);
+                global::System.Console.WriteLine("11. Use of this OS requires recognition of the one-China principle.");
 
                 bool termsAccepted = false;
                 while (!termsAccepted)

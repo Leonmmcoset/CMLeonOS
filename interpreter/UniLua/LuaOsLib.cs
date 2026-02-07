@@ -4,6 +4,7 @@ namespace UniLua
 	using System.Diagnostics;
 	using System;
 	using CMLeonOS;
+	using CMLeonOS.UI;
 	using Sys = Cosmos.System;
 	using System.Threading;
 	
@@ -38,10 +39,17 @@ namespace UniLua
 				new NameFuncPair("base64decrypt", OS_Base64Decrypt),
 				new NameFuncPair("timerstart", OS_TimerStart),
 				new NameFuncPair("timerstop", OS_TimerStop),
+				new NameFuncPair("tui_drawbox", OS_TUIDrawBox),
+				new NameFuncPair("tui_drawtext", OS_TUIDrawText),
+				new NameFuncPair("tui_setcolor", OS_TUISetColor),
+				new NameFuncPair("tui_setcursor", OS_TUISetCursor),
+				new NameFuncPair("tui_clear", OS_TUIClear),
+				new NameFuncPair("tui_drawline", OS_TUIDrawLine),
 #endif
 			};
 
 			lua.L_NewLib( define );
+ 
 			return 1;
 		}
 
@@ -230,6 +238,118 @@ namespace UniLua
 			lua.PushNumber(elapsedSeconds);
 			_timerStartTime = null;
 			return 1;
+		}
+
+		private static int OS_TUIDrawBox(ILuaState lua)
+		{
+			int x = (int)lua.L_CheckNumber(1);
+			int y = (int)lua.L_CheckNumber(2);
+			int width = (int)lua.L_CheckNumber(3);
+			int height = (int)lua.L_CheckNumber(4);
+			string title = lua.L_CheckString(5);
+			string borderColor = lua.L_CheckString(6);
+			string backgroundColor = lua.L_CheckString(7);
+
+			ConsoleColor borderColorEnum = ParseColor(borderColor);
+			ConsoleColor backgroundColorEnum = ParseColor(backgroundColor);
+
+			var rect = new Rect(x, y, width, height);
+			TUIHelper.SetColors(borderColorEnum, backgroundColorEnum);
+			TUIHelper.DrawBox(rect, title, borderColorEnum);
+			lua.PushBoolean(true);
+			return 1;
+		}
+
+		private static int OS_TUIDrawText(ILuaState lua)
+		{
+			int x = (int)lua.L_CheckNumber(1);
+			int y = (int)lua.L_CheckNumber(2);
+			string text = lua.L_CheckString(3);
+			string foregroundColor = lua.L_CheckString(4);
+			string backgroundColor = lua.L_CheckString(5);
+
+			ConsoleColor foregroundColorEnum = ParseColor(foregroundColor);
+			ConsoleColor backgroundColorEnum = ParseColor(backgroundColor);
+
+			TUIHelper.SetColors(foregroundColorEnum, backgroundColorEnum);
+			Console.SetCursorPosition(x, y);
+			Console.Write(text);
+			lua.PushBoolean(true);
+			return 1;
+		}
+
+		private static int OS_TUISetColor(ILuaState lua)
+		{
+			string foregroundColor = lua.L_CheckString(1);
+			string backgroundColor = lua.L_CheckString(2);
+
+			ConsoleColor foregroundColorEnum = ParseColor(foregroundColor);
+			ConsoleColor backgroundColorEnum = ParseColor(backgroundColor);
+
+			TUIHelper.SetColors(foregroundColorEnum, backgroundColorEnum);
+			lua.PushBoolean(true);
+			return 1;
+		}
+
+		private static int OS_TUISetCursor(ILuaState lua)
+		{
+			int x = (int)lua.L_CheckNumber(1);
+			int y = (int)lua.L_CheckNumber(2);
+
+			Console.SetCursorPosition(x, y);
+			lua.PushBoolean(true);
+			return 1;
+		}
+
+		private static int OS_TUIClear(ILuaState lua)
+		{
+			Console.Clear();
+			lua.PushBoolean(true);
+			return 1;
+		}
+
+		private static int OS_TUIDrawLine(ILuaState lua)
+		{
+			int x = (int)lua.L_CheckNumber(1);
+			int y = (int)lua.L_CheckNumber(2);
+			int length = (int)lua.L_CheckNumber(3);
+			char character = lua.L_CheckString(4)[0];
+			string color = lua.L_CheckString(5);
+
+			ConsoleColor colorEnum = ParseColor(color);
+
+			TUIHelper.SetColors(colorEnum, ConsoleColor.Black);
+			Console.SetCursorPosition(x, y);
+			for (int i = 0; i < length; i++)
+			{
+				Console.Write(character);
+			}
+			lua.PushBoolean(true);
+			return 1;
+		}
+
+		private static ConsoleColor ParseColor(string colorName)
+		{
+			switch (colorName.ToLower())
+			{
+				case "black": return ConsoleColor.Black;
+				case "blue": return ConsoleColor.Blue;
+				case "cyan": return ConsoleColor.Cyan;
+				case "darkblue": return ConsoleColor.DarkBlue;
+				case "darkcyan": return ConsoleColor.DarkCyan;
+				case "darkgray": return ConsoleColor.DarkGray;
+				case "darkgreen": return ConsoleColor.DarkGreen;
+				case "darkmagenta": return ConsoleColor.DarkMagenta;
+				case "darkred": return ConsoleColor.DarkRed;
+				case "darkyellow": return ConsoleColor.DarkYellow;
+				case "gray": return ConsoleColor.Gray;
+				case "green": return ConsoleColor.Green;
+				case "magenta": return ConsoleColor.Magenta;
+				case "red": return ConsoleColor.Red;
+				case "white": return ConsoleColor.White;
+				case "yellow": return ConsoleColor.Yellow;
+				default: return ConsoleColor.White;
+			}
 		}
 #endif
 	}
