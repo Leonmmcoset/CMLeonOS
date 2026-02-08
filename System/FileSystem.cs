@@ -28,7 +28,14 @@ namespace CMLeonOS
 
         public string CurrentDirectory
         {
-            get { return currentDirectory; }
+            get
+            {
+                if (currentDirectory == @"0:\")
+                {
+                    return ".";
+                }
+                return currentDirectory;
+            }
         }
 
         public void ChangeDirectory(string path)
@@ -89,7 +96,8 @@ namespace CMLeonOS
                 if (Directory.Exists(fullPath))
                 {
                     // 列出当前目录下的文件和子目录
-                    Console.WriteLine($"Contents of {path}:");
+                    string displayPath = path == "." ? CurrentDirectory : path;
+                    Console.WriteLine($"Contents of {displayPath}:");
                     
                     // 列出子目录
                     try
