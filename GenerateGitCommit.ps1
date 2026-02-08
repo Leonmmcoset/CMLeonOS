@@ -8,9 +8,10 @@ try {
     
     if ($LASTEXITCODE -eq 0) {
         $shortHash = $commitHash.Substring(0, 7).Trim()
-        $shortHash | Out-File -FilePath $commitFile -Encoding UTF8 -NoNewline
+        $trimmedHash = $commitHash.Trim()
+        [System.IO.File]::WriteAllText($commitFile, $shortHash, [System.Text.Encoding]::ASCII)
         Write-Host "Git Commit Hash: $shortHash" -ForegroundColor Green
-        Write-Host "Full Hash: $commitHash.Trim()" -ForegroundColor Cyan
+        Write-Host "Full Hash: $trimmedHash" -ForegroundColor Cyan
     }
     else {
         Write-Host "Warning: Not a git repository or git not found" -ForegroundColor Yellow
