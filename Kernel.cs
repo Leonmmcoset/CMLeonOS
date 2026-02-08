@@ -39,7 +39,10 @@ namespace CMLeonOS
 
         [IL2CPU.API.Attribs.ManifestResourceStream(ResourceName = "CMLeonOS.font.psf")]
         public static readonly byte[] file;
-
+        
+        [IL2CPU.API.Attribs.ManifestResourceStream(ResourceName = "CMLeonOS.GitCommit.txt")]
+        public static readonly byte[] gitCommitFile;
+        
         public static void ShowError(string message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
@@ -119,6 +122,26 @@ namespace CMLeonOS
                 _logger.Info("Kernel", "Initializing user system");
                 userSystem = new UserSystem();
                 _logger.Success("Kernel", "User system initialized");
+                
+                // 读取 Git Commit hash
+                if (gitCommitFile != null && gitCommitFile.Length > 0)
+                {
+                    try
+                    {
+                        Version.GitCommit = System.Text.Encoding.UTF8.GetString(gitCommitFile);
+                        _logger.Info("Kernel", $"Git Commit: {Version.GitCommit}");
+                    }
+                    catch
+                    {
+                        Version.GitCommit = "unknown";
+                        _logger.Warning("Kernel", "Failed to read Git Commit, using 'unknown'");
+                    }
+                }
+                else
+                {
+                    Version.GitCommit = "unknown";
+                    _logger.Warning("Kernel", "Git Commit file not found, using 'unknown'");
+                }
                 
                 // 检查env.dat文件是否存在，如果不存在则创建并设置Test环境变量
                 string envFilePath = @"0:\system\env.dat";
@@ -321,7 +344,21 @@ namespace CMLeonOS
                     Console.Beep();
                     Console.WriteLine(":(");
                     Console.WriteLine("A problem has been detected and CMLeonOS has been shut down to prevent damage to your computer.");
+                    
+                    string gitCommit = "unknown";
+                    if (gitCommitFile != null && gitCommitFile.Length > 0)
+                    {
+                        try
+                        {
+                            gitCommit = System.Text.Encoding.UTF8.GetString(gitCommitFile);
+                        }
+                        catch
+                        {
+                        }
+                    }
+                    
                     Console.WriteLine($"Error information: {ex.Message}");
+                    Console.WriteLine($"Build version: {gitCommit}");
                     Console.WriteLine("The operating system cannot recover from this exception and has halted immediately.");
                     Console.WriteLine("If this is the first time you've seen this stop error screen, restart your computer.");
                     Console.WriteLine("If this screen appears again, follow these steps:");

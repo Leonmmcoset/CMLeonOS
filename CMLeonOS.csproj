@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
@@ -28,6 +28,7 @@
 		<CosmosDebugLevel>None</CosmosDebugLevel>
 		<OptimizationLevel>2</OptimizationLevel>
 		<VBEResolution>800x600x32</VBEResolution>
+		<RunPostBuildEvent>Always</RunPostBuildEvent>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -62,6 +63,7 @@
     <ItemGroup>
         <EmbeddedResource Include="font.psf" />
         <EmbeddedResource Include="Wallpapers\wallpaper.bmp" />
+        <EmbeddedResource Include="GitCommit.txt" />
     </ItemGroup>
 
     <ItemGroup>
@@ -81,5 +83,9 @@
         <PackageReference Include="CosmosHttp" Version="1.0.4" />
         <PackageReference Include="IL2CPU.API" Version="0.1.0-localbuild20260203125852" />
     </ItemGroup>
+
+    <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+      <Exec Command="powershell -ExecutionPolicy Bypass -File GenerateGitCommit.ps1" WorkingDirectory="$(MSBuildProjectDirectory)" />
+    </Target>
 
 </Project>
