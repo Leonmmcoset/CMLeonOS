@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Sys = Cosmos.System;
@@ -253,8 +254,32 @@ namespace CMLeonOS
                 Console.WriteLine("Press any keys to restart.");
                 Console.ReadKey();
                 Sys.Power.Reboot();
+                // try {
+                //     Disk targetDisk = fs.Disks[0];
+                //     CreateMBRandPartitionTable(targetDisk);
+                // }
+                // catch (Exception exe)
+                // {
+                //     Console.WriteLine($"Error creating MBR and partition table: {exe.Message}");
+                // }
+                // Console.WriteLine("Done.");
+                
             }
         }
+
+        // 我他妈居然成功了，我在没有任何文档的情况下研究出来了
+        // private void CreateMBRandPartitionTable(Disk disk)
+        // {
+        //     disk.Clear();
+        //     ulong diskSize = (ulong)(disk.Size / 1024 / 1024);
+        //     uint partSize = (uint)(diskSize - 2);
+
+        //     disk.CreatePartition((int)partSize);
+
+        //     var part = disk.Partitions[disk.Partitions.Count - 1];
+        //     disk.FormatPartition(0, "FAT32", true);
+        //     Console.WriteLine($"Partition type: {part.GetType()}");
+        // }
 
         private void ExecuteStartupScript()
         {
