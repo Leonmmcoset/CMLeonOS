@@ -318,11 +318,20 @@ namespace CMLeonOS
                     Console.BackgroundColor = ConsoleColor.Red;
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.Clear();
+                    Console.Beep();
                     Console.WriteLine(":(");
-                    Console.WriteLine("A problem has been detected and CMLeonOS has been shutdown to prevent damage to your computer.");
+                    Console.WriteLine("A problem has been detected and CMLeonOS has been shut down to prevent damage to your computer.");
                     Console.WriteLine($"Error information: {ex.Message}");
-                    Console.WriteLine("If this is the first time you've seen this stop error screen, restart your computer and email to leonmmcoset@outlook.com WITH THE ERROR INFORMATION for technical support.");
-                    Console.WriteLine("Press any keys to restart.");
+                    Console.WriteLine("The operating system cannot recover from this exception and has halted immediately.");
+                    Console.WriteLine("If this is the first time you've seen this stop error screen, restart your computer.");
+                    Console.WriteLine("If this screen appears again, follow these steps:");
+                    Console.WriteLine("1. Check the system logs to ensure all kernel modules are loaded correctly.");
+                    Console.WriteLine("2. Record the system version and steps to reproduce the error.");
+                    Console.WriteLine("3. Send an email to the CMLeonOS developer team (the email address is below).");
+                    Console.WriteLine("Contact us via email at leonmmcoset@outlook.com, including the error information for support.");
+                    Console.WriteLine("Please include the system build version, runtime environment, and operation steps before the crash.");
+                    Console.WriteLine("Warning: Unsaved data in memory will be lost due to the emergency system shutdown.");
+                    Console.WriteLine("Press any key to restart.");
                     Console.ReadKey();
                     Sys.Power.Reboot();
                 }
