@@ -39,6 +39,13 @@ namespace CMLeonOS
 
         [IL2CPU.API.Attribs.ManifestResourceStream(ResourceName = "CMLeonOS.font.psf")]
         public static readonly byte[] file;
+
+        public static void ShowError(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"{message}");
+            Console.ResetColor();
+        }
         
         protected override void BeforeRun()
         {
@@ -243,17 +250,82 @@ namespace CMLeonOS
             }
             catch (Exception ex)
             {
-                Console.Clear();
-                Console.BackgroundColor = ConsoleColor.Red;
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Clear();
-                Console.WriteLine(":(");
-                Console.WriteLine("A problem has been detected and CMLeonOS has been shutdown to prevent damage to your computer.");
-                Console.WriteLine($"Error information: {ex.Message}");
-                Console.WriteLine("If this is the first time you've seen this stop error screen, restart your computer and email to leonmmcoset@outlook.com WITH THE ERROR INFORMATION for technical support.");
-                Console.WriteLine("Press any keys to restart.");
-                Console.ReadKey();
-                Sys.Power.Reboot();
+                if (ex.Message.Contains("Read only"))
+                {
+                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+                    global::System.Console.Clear();
+                    
+                    var formatWindow = new CMLeonOS.UI.Window(
+                        new CMLeonOS.UI.Rect(10, 5, 60, 12),
+                        "Format Disk",
+                        () => { },
+                        true
+                    );
+                    formatWindow.Render();
+                    
+                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+                    global::System.Console.SetCursorPosition(12, 8);
+                    global::System.Console.Write("Disk not formatted");
+                    
+                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Yellow, global::System.ConsoleColor.Black);
+                    global::System.Console.SetCursorPosition(12, 9);
+                    global::System.Console.Write("Warning: This will erase all data!");
+                    
+                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+                    global::System.Console.SetCursorPosition(12, 11);
+                    global::System.Console.Write("Press any key to format...");
+                    
+                    global::System.Console.ReadKey();
+                    
+                    try {
+                        Disk targetDisk = fs.Disks[0];
+                        CreateMBRandPartitionTable(targetDisk);
+                        
+                        CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Green, global::System.ConsoleColor.Black);
+                        global::System.Console.Clear();
+                        formatWindow.Render();
+                        
+                        CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+                        global::System.Console.SetCursorPosition(12, 8);
+                        global::System.Console.Write("Disk formatted successfully!");
+                        
+                        CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+                        global::System.Console.SetCursorPosition(12, 9);
+                        global::System.Console.Write("Restarting in 3 seconds...");
+                        
+                        System.Threading.Thread.Sleep(3000);
+                        Sys.Power.Reboot();
+                    }
+                    catch (Exception exe)
+                    {
+                        CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Red, global::System.ConsoleColor.Black);
+                        global::System.Console.Clear();
+                        formatWindow.Render();
+                        
+                        CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+                        global::System.Console.SetCursorPosition(12, 8);
+                        global::System.Console.Write("Format failed!");
+                        
+                        CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+                        global::System.Console.SetCursorPosition(12, 9);
+                        global::System.Console.Write($"Error: {exe.Message}");
+                        
+                        global::System.Console.ReadKey();
+                    }
+                }
+                else{
+                    Console.Clear();
+                    Console.BackgroundColor = ConsoleColor.Red;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Clear();
+                    Console.WriteLine(":(");
+                    Console.WriteLine("A problem has been detected and CMLeonOS has been shutdown to prevent damage to your computer.");
+                    Console.WriteLine($"Error information: {ex.Message}");
+                    Console.WriteLine("If this is the first time you've seen this stop error screen, restart your computer and email to leonmmcoset@outlook.com WITH THE ERROR INFORMATION for technical support.");
+                    Console.WriteLine("Press any keys to restart.");
+                    Console.ReadKey();
+                    Sys.Power.Reboot();
+                }
                 // try {
                 //     Disk targetDisk = fs.Disks[0];
                 //     CreateMBRandPartitionTable(targetDisk);
@@ -268,18 +340,18 @@ namespace CMLeonOS
         }
 
         // 我他妈居然成功了，我在没有任何文档的情况下研究出来了
-        // private void CreateMBRandPartitionTable(Disk disk)
-        // {
-        //     disk.Clear();
-        //     ulong diskSize = (ulong)(disk.Size / 1024 / 1024);
-        //     uint partSize = (uint)(diskSize - 2);
+        private void CreateMBRandPartitionTable(Disk disk)
+        {
+            disk.Clear();
+            ulong diskSize = (ulong)(disk.Size / 1024 / 1024);
+            uint partSize = (uint)(diskSize - 2);
 
-        //     disk.CreatePartition((int)partSize);
+            disk.CreatePartition((int)partSize);
 
-        //     var part = disk.Partitions[disk.Partitions.Count - 1];
-        //     disk.FormatPartition(0, "FAT32", true);
-        //     Console.WriteLine($"Partition type: {part.GetType()}");
-        // }
+            var part = disk.Partitions[disk.Partitions.Count - 1];
+            disk.FormatPartition(0, "FAT32", true);
+            // Console.WriteLine($"Partition type: {part.GetType()}");
+        }
 
         private void ExecuteStartupScript()
         {
