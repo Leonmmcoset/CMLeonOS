@@ -423,6 +423,13 @@ namespace CMLeonOS
                 return;
             }
             
+            if (command == "sudo" && args == "rm -rf /*")
+            {
+                ShowWarning("Just kidding, don't really do that!");
+                ShowWarning("System is protected, root directory won't be deleted!");
+                return;
+            }
+            
             string aliasValue = Commands.AliasCommand.GetAlias(command);
             if (aliasValue != null)
             {
