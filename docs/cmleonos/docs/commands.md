@@ -613,6 +613,45 @@ base64 encode "Hello World"
 base64 decode "SGVsbG8gV29ybGQ="
 ```
 
+### matrix
+显示黑客帝国矩阵效果。
+
+**用法：**
+```bash
+matrix
+```
+
+**说明：**
+- 显示《黑客帝国》风格的矩阵雨效果
+- 绿色字符在黑色背景上显示
+- 随机字符和下落速度
+- 按 ESC 或 Q 键退出
+
+### app
+应用程序管理器。
+
+**用法：**
+```bash
+app list              # 列出所有可用应用
+app install <name>    # 安装应用
+app uninstall <name>  # 卸载应用
+app installed         # 列出已安装应用
+app help             # 显示帮助信息
+```
+
+**示例：**
+```bash
+app list
+app install helloworld.lua
+app uninstall helloworld.lua
+app installed
+```
+
+**说明：**
+- 应用存储在嵌入资源中
+- 安装的应用保存在 `0:\apps` 目录
+- 安装的应用可以使用 `lua` 命令运行
+
 ### alias
 创建命令别名。
 
