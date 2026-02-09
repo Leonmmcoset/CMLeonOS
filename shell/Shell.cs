@@ -113,12 +113,17 @@ namespace CMLeonOS
                 }
                 
                 commandHistory.Add(input);
-                var parts = input.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                if (parts.Length > 0)
+                var commands = input.Split(new string[] { "&&" }, StringSplitOptions.RemoveEmptyEntries);
+                
+                foreach (var cmd in commands)
                 {
-                    var command = parts[0].ToLower();
-                    var args = parts.Length > 1 ? string.Join(" ", parts, 1, parts.Length - 1) : "";
-                    ProcessCommand(command, args);
+                    var parts = cmd.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length > 0)
+                    {
+                        var command = parts[0].Trim().ToLower();
+                        var args = parts.Length > 1 ? string.Join(" ", parts, 1, parts.Length - 1).Trim() : "";
+                        ProcessCommand(command, args);
+                    }
                 }
                 
                 // 如果需要退出，返回到登录页面
