@@ -55,6 +55,9 @@ namespace CMLeonOS.shell
                 case "matrix":
                     shell.ShowMatrix();
                     break;
+                case "app":
+                    shell.ProcessApp(args);
+                    break;
                 case "diff":
                     shell.DiffFiles(args);
                     break;

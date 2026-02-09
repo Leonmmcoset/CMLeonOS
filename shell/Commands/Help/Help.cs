@@ -261,6 +261,12 @@ namespace CMLeonOS.Commands
             },
             new CommandInfo
             {
+                Command = "app",
+                Parameters = "<command>",
+                Description = "Application manager"
+            },
+            new CommandInfo
+            {
                 Command = "branswe",
                 Parameters = "<filename>",
                 Description = "Execute Branswe code file"

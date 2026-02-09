@@ -571,6 +571,45 @@ namespace CMLeonOS
             Commands.Utility.MatrixCommand.ShowMatrix();
         }
 
+        public void ProcessApp(string args)
+        {
+            Commands.Utility.AppManagerCommand.InitializeApps();
+            
+            string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            
+            if (parts.Length == 0)
+            {
+                Commands.Utility.AppManagerCommand.ShowHelp();
+                return;
+            }
+            
+            string subCommand = parts[0].ToLower();
+            string subArgs = parts.Length > 1 ? parts[1] : "";
+            
+            switch (subCommand)
+            {
+                case "list":
+                    Commands.Utility.AppManagerCommand.ListApps();
+                    break;
+                case "install":
+                    Commands.Utility.AppManagerCommand.InstallApp(subArgs, fileSystem, ShowError);
+                    break;
+                case "uninstall":
+                    Commands.Utility.AppManagerCommand.UninstallApp(subArgs, fileSystem, ShowError);
+                    break;
+                case "installed":
+                    Commands.Utility.AppManagerCommand.ShowInstalledApps(fileSystem);
+                    break;
+                case "help":
+                    Commands.Utility.AppManagerCommand.ShowHelp();
+                    break;
+                default:
+                    ShowError($"Unknown app command: {subCommand}");
+                    Commands.Utility.AppManagerCommand.ShowHelp();
+                    break;
+            }
+        }
+
         public void ShowHistory()
         {
             Commands.Utility.HistoryCommand.ShowHistory(commandHistory);
