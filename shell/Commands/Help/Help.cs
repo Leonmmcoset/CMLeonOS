@@ -71,6 +71,12 @@ namespace CMLeonOS.Commands
             },
             new CommandInfo
             {
+                Command = "calcgui",
+                Parameters = "",
+                Description = "TUI calculator"
+            },
+            new CommandInfo
+            {
                 Command = "history",
                 Parameters = "",
                 Description = "Show command history"
@@ -246,6 +252,12 @@ namespace CMLeonOS.Commands
                 Command = "uptime",
                 Parameters = "",
                 Description = "Show system uptime"
+            },
+            new CommandInfo
+            {
+                Command = "matrix",
+                Parameters = "",
+                Description = "Show Matrix effect (The Matrix movie)"
             },
             new CommandInfo
             {

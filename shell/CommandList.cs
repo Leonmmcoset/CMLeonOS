@@ -52,6 +52,9 @@ namespace CMLeonOS.shell
                 case "nano":
                     shell.NanoFile(args);
                     break;
+                case "matrix":
+                    shell.ShowMatrix();
+                    break;
                 case "diff":
                     shell.DiffFiles(args);
                     break;

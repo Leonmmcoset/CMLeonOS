@@ -566,6 +566,11 @@ namespace CMLeonOS
             Commands.Utility.CalcGUICommand.ShowCalculator();
         }
 
+        public void ShowMatrix()
+        {
+            Commands.Utility.MatrixCommand.ShowMatrix();
+        }
+
         public void ShowHistory()
         {
             Commands.Utility.HistoryCommand.ShowHistory(commandHistory);

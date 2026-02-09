@@ -381,7 +381,6 @@ namespace CMLeonOS
                 //     Console.WriteLine($"Error creating MBR and partition table: {exe.Message}");
                 // }
                 // Console.WriteLine("Done.");
-                
             }
         }
 
