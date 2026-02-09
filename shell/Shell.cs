@@ -556,6 +556,11 @@ namespace CMLeonOS
             Commands.Utility.CalcCommand.Calculate(expression, ShowError);
         }
 
+        public void ShowCalculatorGUI()
+        {
+            Commands.Utility.CalcGUICommand.ShowCalculator();
+        }
+
         public void ShowHistory()
         {
             Commands.Utility.HistoryCommand.ShowHistory(commandHistory);

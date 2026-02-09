@@ -34,6 +34,9 @@ namespace CMLeonOS.shell
                 case "calc":
                     shell.Calculate(args);
                     break;
+                case "calcgui":
+                    shell.ShowCalculatorGUI();
+                    break;
                 case "history":
                     shell.ShowHistory();
                     break;

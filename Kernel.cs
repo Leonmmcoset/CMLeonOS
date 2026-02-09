@@ -364,8 +364,8 @@ namespace CMLeonOS
                     Console.WriteLine("If this screen appears again, follow these steps:");
                     Console.WriteLine("1. Check the system logs to ensure all kernel modules are loaded correctly.");
                     Console.WriteLine("2. Record the system version and steps to reproduce the error.");
-                    Console.WriteLine("3. Send an email to the CMLeonOS developer team (the email address is below).");
-                    Console.WriteLine("Contact us via email at leonmmcoset@outlook.com, including the error information for support.");
+                    Console.WriteLine("3. Send an post to the CMLeonOS official forum.");
+                    Console.WriteLine("Contact us via https://lbbs.ecuil.com/#/thread/category/10, including the error information for support.");
                     Console.WriteLine("Please include the system build version, runtime environment, and operation steps before the crash.");
                     Console.WriteLine("Warning: Unsaved data in memory will be lost due to the emergency system shutdown.");
                     Console.WriteLine("Press any key to restart.");

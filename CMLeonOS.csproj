@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
@@ -33,26 +33,32 @@
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
       <WarningLevel>8</WarningLevel>
+      <NoWarn>1603,1701;1702,8632</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
       <WarningLevel>8</WarningLevel>
+      <NoWarn>1603,1701;1702,8632</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
       <WarningLevel>8</WarningLevel>
+      <NoWarn>1603,1701;1702,8632</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       <WarningLevel>8</WarningLevel>
+      <NoWarn>1603,1701;1702,8632</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Fixed_Release|AnyCPU'">
       <WarningLevel>8</WarningLevel>
+      <NoWarn>1603,1701;1702,8632</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Fixed_Release|x64'">
       <WarningLevel>8</WarningLevel>
+      <NoWarn>1603,1701;1702,8632</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

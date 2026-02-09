@@ -30,10 +30,10 @@ namespace CMLeonOS
         {
             get
             {
-                if (currentDirectory == @"0:\")
-                {
-                    return ".";
-                }
+                // if (currentDirectory == @"0:\apps")
+                // {
+                //     return ":";
+                // }
                 return currentDirectory;
             }
         }
