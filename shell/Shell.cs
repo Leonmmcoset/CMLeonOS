@@ -86,7 +86,9 @@ namespace CMLeonOS
 
         public void Run()
         {
+            User currentUser = userSystem.CurrentLoggedInUser;
             bool shouldExit = false;
+
             while (true)
             {
                 // 显示当前文件夹路径作为提示符（彩色）
@@ -94,6 +96,10 @@ namespace CMLeonOS
                 ConsoleColor originalColor = Console.ForegroundColor;
                 // Console.ForegroundColor = ConsoleColor.Cyan;
                 // Console.Write($"{currentPath} | {prompt}");
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.Write($"{currentUser.Username}");
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write($" $ ");
                 Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.Write($"{currentPath}");
                 Console.ForegroundColor = ConsoleColor.White;
@@ -1626,6 +1632,11 @@ namespace CMLeonOS
         public void ProcessLabyrinth()
         {
             Commands.LabyrinthCommand.ProcessLabyrinth();
+        }
+
+        public void PlaySnake()
+        {
+            Commands.Utility.SnakeCommand.PlaySnake();
         }
 
         public void ProcessAlias(string args)

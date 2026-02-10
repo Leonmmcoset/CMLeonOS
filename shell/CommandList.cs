@@ -205,6 +205,9 @@ namespace CMLeonOS.shell
                 case "labyrinth":
                     shell.ProcessLabyrinth();
                     break;
+                case "snake":
+                    shell.PlaySnake();
+                    break;
                 case "alias":
                     shell.ProcessAlias(args);
                     break;

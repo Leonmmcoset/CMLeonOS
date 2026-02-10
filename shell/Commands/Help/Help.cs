@@ -101,6 +101,12 @@ namespace CMLeonOS.Commands
             },
             new CommandInfo
             {
+                Command = "snake",
+                Parameters = "",
+                Description = "Play snake game"
+            },
+            new CommandInfo
+            {
                 Command = "edit",
                 Parameters = "<file>",
                 Description = "Simple code editor",
