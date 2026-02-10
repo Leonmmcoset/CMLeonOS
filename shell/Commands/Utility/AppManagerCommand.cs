@@ -29,6 +29,11 @@ namespace CMLeonOS.Commands.Utility
                 {
                     embeddedApps["testspeed.lua"] = LuaApps.testspeed;
                 }
+                
+                if (LuaApps.calculator != null && LuaApps.calculator.Length > 0)
+                {
+                    embeddedApps["calculator.lua"] = LuaApps.calculator;
+                }
             }
             catch (Exception ex)
             {

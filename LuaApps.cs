@@ -9,5 +9,8 @@ namespace CMLeonOS
         
         [ManifestResourceStream(ResourceName = "CMLeonOS.LuaApps.testspeed.lua")]
         public static readonly byte[] testspeed;
+        
+        [ManifestResourceStream(ResourceName = "CMLeonOS.LuaApps.calculator.lua")]
+        public static readonly byte[] calculator;
     }
 }

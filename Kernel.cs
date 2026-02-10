@@ -63,8 +63,8 @@ namespace CMLeonOS
             // {
             // 我不认，我试着转换成Base64
                 // 我认了
-                PCScreenFont defaultFont = PCScreenFont.Default;
-                VGAScreen.SetFont(defaultFont.CreateVGAFont(), defaultFont.Height);
+                // PCScreenFont defaultFont = PCScreenFont.Default;
+                // VGAScreen.SetFont(defaultFont.CreateVGAFont(), defaultFont.Height);
                 // Console.WriteLine($"{defaultFont.Height}");
                 // Console.WriteLine($"{defaultFont.Width}");
                 // VGAScreen.SetGraphicsMode(VGADriver.ScreenSize.Size720x480, ColorDepth.ColorDepth32);
