@@ -57,7 +57,6 @@ namespace CMLeonOS
             // {
             //     PCScreenFont screenFont = PCScreenFont.LoadFont(file);
             //     VGAScreen.SetFont(screenFont.CreateVGAFont(), screenFont.Height);
-            //     VGAScreen.SetGraphicsMode(VGADriver.ScreenSize.Size720x480, ColorDepth.ColorDepth32);
             // }
             // catch (Exception ex)
             // {
