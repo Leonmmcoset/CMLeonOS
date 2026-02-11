@@ -358,15 +358,22 @@ namespace CMLeonOS
 
         public string GetFullPath(string path)
         {
+            if (string.IsNullOrEmpty(path))
+            {
+                return currentDirectory;
+            }
+            
             if (path.StartsWith(@"0:\"))
             {
                 return path;
             }
-            else if (path == ".")
+            
+            if (path == ".")
             {
                 return currentDirectory;
             }
-            else if (path == "..")
+            
+            if (path == "..")
             {
                 if (currentDirectory == @"0:\")
                 {
@@ -385,9 +392,15 @@ namespace CMLeonOS
                     }
                 }
             }
-            else if (path.StartsWith("../") || path.StartsWith("..\\"))
+            
+            if (path.StartsWith("../") || path.StartsWith("..\\"))
             {
-                // 支持多层..操作
+                if (currentDirectory == @"0:\")
+                {
+                    Console.WriteLine("Error: Cannot go above root directory");
+                    return currentDirectory;
+                }
+                
                 int level = 0;
                 string tempPath = path;
                 while (tempPath.StartsWith("../") || tempPath.StartsWith("..\\"))
@@ -401,9 +414,14 @@ namespace CMLeonOS
                     {
                         tempPath = tempPath.Substring(3);
                     }
+                    
+                    if (level > 10)
+                    {
+                        Console.WriteLine("Error: Too many parent directory references");
+                        return currentDirectory;
+                    }
                 }
                 
-                // 向上移动level级
                 string resultPath = currentDirectory;
                 for (int i = 0; i < level; i++)
                 {
@@ -419,12 +437,11 @@ namespace CMLeonOS
                 }
                 return resultPath;
             }
-            else if (path.StartsWith("dir") || path.StartsWith("DIR"))
+            
+            if (path.StartsWith("dir") || path.StartsWith("DIR"))
             {
-                // 支持cd dir1/dir2/dir3等格式
                 string dirName = path;
                 
-                // 提取数字部分
                 string numberPart = "";
                 for (int i = 3; i < path.Length; i++)
                 {
@@ -438,7 +455,6 @@ namespace CMLeonOS
                     }
                 }
                 
-                // 构建完整路径
                 if (currentDirectory == @"0:\")
                 {
                     return $@"0:\{dirName}";
@@ -448,16 +464,36 @@ namespace CMLeonOS
                     return $@"{currentDirectory}\{dirName}";
                 }
             }
+            
+            string normalizedPath = path;
+            
+            if (normalizedPath.StartsWith("/"))
+            {
+                normalizedPath = normalizedPath.Substring(1);
+            }
+            
+            if (normalizedPath.StartsWith("\\"))
+            {
+                normalizedPath = normalizedPath.Substring(1);
+            }
+            
+            if (normalizedPath.EndsWith("/"))
+            {
+                normalizedPath = normalizedPath.Substring(0, normalizedPath.Length - 1);
+            }
+            
+            if (normalizedPath.EndsWith("\\"))
+            {
+                normalizedPath = normalizedPath.Substring(0, normalizedPath.Length - 1);
+            }
+            
+            if (currentDirectory == @"0:\")
+            {
+                return $@"0:\{normalizedPath}";
+            }
             else
             {
-                if (currentDirectory == @"0:\")
-                {
-                    return $@"0:\{path}";
-                }
-                else
-                {
-                    return $@"{currentDirectory}\{path}";
-                }
+                return $@"{currentDirectory}\{normalizedPath}";
             }
         }
     }

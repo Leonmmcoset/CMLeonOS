@@ -7,7 +7,7 @@ namespace CMLeonOS
         public static string Major = "1";
         public static string Minor = "0";
         public static string Patch = "0";
-        public static string VersionType = "PreRelease";
+        public static string VersionType = "PreRelease 2";
         public static string GitCommit = "unknown";
         
         public static string FullVersion
