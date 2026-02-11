@@ -309,10 +309,7 @@ namespace CMLeonOS
             CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
             global::System.Console.Clear();
 
-                var titleBar = new CMLeonOS.UI.Window(new CMLeonOS.UI.Rect(0, 0, 80, 3), "First Time Setup", () => { }, false);
-                titleBar.Render();
-
-                var termsBox = new CMLeonOS.UI.Window(new CMLeonOS.UI.Rect(5, 5, 70, 18), "User Terms and Conditions", () => { }, true);
+            var termsBox = new CMLeonOS.UI.Window(new CMLeonOS.UI.Rect(5, 5, 70, 18), "User Terms and Conditions", () => { }, true);
                 termsBox.Render();
 
                 CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Gray, global::System.ConsoleColor.Black);
@@ -371,7 +368,6 @@ namespace CMLeonOS
                 }
 
                 global::System.Console.Clear();
-                titleBar.Render();
 
                 var setupBox = new CMLeonOS.UI.Window(new CMLeonOS.UI.Rect(5, 5, 70, 12), "Admin Account Setup", () => { }, true);
                 setupBox.Render();
@@ -447,9 +443,7 @@ namespace CMLeonOS
                     CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Green, global::System.ConsoleColor.Black);
                     global::System.Console.SetCursorPosition(7, 24);
                     global::System.Console.Write("Admin user created successfully!            ");
-
                     global::System.Console.Clear();
-                    titleBar.Render();
 
                     var hostnameBox = new CMLeonOS.UI.Window(new CMLeonOS.UI.Rect(5, 5, 70, 8), "Hostname Setup", () => { }, true);
                     hostnameBox.Render();
@@ -527,9 +521,6 @@ namespace CMLeonOS
         {
             CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
             global::System.Console.Clear();
-
-            var titleBar = new CMLeonOS.UI.Window(new CMLeonOS.UI.Rect(0, 0, 80, 3), "System Login", () => { }, false);
-            titleBar.Render();
 
             var loginBox = new CMLeonOS.UI.Window(new CMLeonOS.UI.Rect(15, 8, 50, 10), "Login", () => { }, true);
             loginBox.Render();

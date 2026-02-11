@@ -156,9 +156,23 @@ namespace CMLeonOS.UI
                 if (y == rect.Top)
                 {
                     Console.Write(corner);
+                    
+                    // Calculate title position
+                    int titleX = rect.Left + (rect.Width - title.Length) / 2;
+                    int titleStart = titleX;
+                    int titleEnd = titleX + title.Length;
+                    
                     for (int x = rect.Left + 1; x < rect.Right - 1; x++)
                     {
-                        Console.Write(horizontal);
+                        // Skip drawing horizontal characters where title will be
+                        if (!string.IsNullOrEmpty(title) && x >= titleStart && x < titleEnd)
+                        {
+                            Console.Write(' ');
+                        }
+                        else
+                        {
+                            Console.Write(horizontal);
+                        }
                     }
                     Console.Write(corner);
                 }
