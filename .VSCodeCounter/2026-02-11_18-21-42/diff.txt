@@ -1,0 +1,107 @@
+Date : 2026-02-11 18:21:42
+Directory : c:\Users\leon\source\repos\CMLeonOS\CMLeonOS
+Total : 50 files,  3842 codes, 27 comments, 588 blanks, all 4457 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| C#         |         27 |      3,552 |         25 |        538 |      4,115 |
+| Markdown   |          3 |        104 |          0 |         28 |        132 |
+| Lua        |          3 |         96 |          1 |         11 |        108 |
+| XML        |          1 |         35 |          0 |          8 |         43 |
+| PowerShell |          1 |         22 |          0 |          3 |         25 |
+| HTML       |          2 |         16 |          0 |          0 |         16 |
+| JavaScript |         12 |         16 |          0 |          0 |         16 |
+| Batch      |          1 |          1 |          1 |          0 |          2 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                                               | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                                  |         50 |      3,842 |         27 |        588 |      4,457 |
+| . (Files)                                                                                                          |          5 |        192 |         31 |         38 |        261 |
+| Interpreter                                                                                                        |          1 |        103 |          0 |         17 |        120 |
+| Interpreter\UniLua                                                                                                 |          1 |        103 |          0 |         17 |        120 |
+| LuaApps                                                                                                            |          3 |         96 |          1 |         11 |        108 |
+| Shell                                                                                                              |         18 |      1,799 |          0 |        254 |      2,053 |
+| Shell (Files)                                                                                                      |          3 |        305 |          0 |         44 |        349 |
+| Shell\Commands                                                                                                     |         15 |      1,494 |          0 |        210 |      1,704 |
+| Shell\Commands (Files)                                                                                             |          1 |        583 |          0 |        102 |        685 |
+| Shell\Commands\Environment                                                                                         |          1 |         68 |          0 |          2 |         70 |
+| Shell\Commands\FileSystem                                                                                          |          1 |         18 |          0 |          1 |         19 |
+| Shell\Commands\Help                                                                                                |          1 |         24 |          0 |          0 |         24 |
+| Shell\Commands\Info                                                                                                |          1 |          1 |          0 |          0 |          1 |
+| Shell\Commands\Script                                                                                              |          3 |         37 |          0 |          3 |         40 |
+| Shell\Commands\User                                                                                                |          2 |         34 |          0 |          2 |         36 |
+| Shell\Commands\Utility                                                                                             |          5 |        729 |          0 |        100 |        829 |
+| System                                                                                                             |          2 |         12 |         -7 |         -1 |          4 |
+| UI                                                                                                                 |          3 |      1,499 |          2 |        240 |      1,741 |
+| Utils                                                                                                              |          1 |          5 |          0 |          1 |          6 |
+| docs                                                                                                               |         17 |        136 |          0 |         28 |        164 |
+| docs\cmleonos                                                                                                      |         17 |        136 |          0 |         28 |        164 |
+| docs\cmleonos\docs                                                                                                 |         17 |        136 |          0 |         28 |        164 |
+| docs\cmleonos\docs (Files)                                                                                         |          3 |        104 |          0 |         28 |        132 |
+| docs\cmleonos\docs\.vuepress                                                                                       |         14 |         32 |          0 |          0 |         32 |
+| docs\cmleonos\docs\.vuepress\dist                                                                                  |         14 |         32 |          0 |          0 |         32 |
+| docs\cmleonos\docs\.vuepress\dist (Files)                                                                          |          2 |         16 |          0 |          0 |         16 |
+| docs\cmleonos\docs\.vuepress\dist\assets                                                                           |         12 |         16 |          0 |          0 |         16 |
++--------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                                                           | language   | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Build.bat                                                             | Batch      |          1 |          1 |          0 |          2 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\CMLeonOS.csproj                                                       | XML        |         35 |          0 |          8 |         43 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\GenerateGitCommit.ps1                                                 | PowerShell |         22 |          0 |          3 |         25 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Interpreter\UniLua\LuaOsLib.cs                                        | C#         |        103 |          0 |         17 |        120 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Kernel.cs                                                             | C#         |        121 |         30 |         24 |        175 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\LuaApps.cs                                                            | C#         |         13 |          0 |          3 |         16 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\LuaApps\calculator.lua                                                | Lua        |         87 |          0 |         11 |         98 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\LuaApps\helloworld.lua                                                | Lua        |          3 |          0 |          0 |          3 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\LuaApps\testspeed.lua                                                 | Lua        |          6 |          1 |          0 |          7 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\CommandList.cs                                                  | C#         |         15 |          0 |          0 |         15 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Commands\Environment\EnvCommand.cs                              | C#         |         68 |          0 |          2 |         70 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Commands\FileSystem\RmCommand.cs                                | C#         |         18 |          0 |          1 |         19 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Commands\Help\Help.cs                                           | C#         |         24 |          0 |          0 |         24 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Commands\Info\Version.cs                                        | C#         |          1 |          0 |          0 |          1 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Commands\Script\BransweCommand.cs                               | C#         |         10 |          0 |          1 |         11 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Commands\Script\ComCommand.cs                                   | C#         |         11 |          0 |          1 |         12 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Commands\Script\LuaCommand.cs                                   | C#         |         16 |          0 |          1 |         17 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Commands\TestTUICommand.cs                                      | C#         |        583 |          0 |        102 |        685 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Commands\User\HostnameCommand.cs                                | C#         |         11 |          0 |          1 |         12 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Commands\User\UserCommand.cs                                    | C#         |         23 |          0 |          1 |         24 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Commands\Utility\AppManagerCommand.cs                           | C#         |        165 |          0 |         30 |        195 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Commands\Utility\Base64Command.cs                               | C#         |         31 |          0 |          2 |         33 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Commands\Utility\CalcGuiCommand.cs                              | C#         |        307 |          0 |         28 |        335 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Commands\Utility\MatrixCommand.cs                               | C#         |         62 |          0 |         13 |         75 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Commands\Utility\SnakeCommand.cs                                | C#         |        164 |          0 |         27 |        191 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Shell.cs                                                        | C#         |         79 |          0 |         13 |         92 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\UsageGenerator.cs                                               | C#         |        211 |          0 |         31 |        242 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\System\FileSystem.cs                                                  | C#         |          4 |          4 |          0 |          8 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\System\UserSystem.cs                                                  | C#         |          8 |        -11 |         -1 |         -4 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\UI\Components.cs                                                      | C#         |        960 |          0 |        144 |      1,104 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\UI\TUI.cs                                                             | C#         |        260 |          2 |         42 |        304 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\UI\TUIDemo.cs                                                         | C#         |        279 |          0 |         54 |        333 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Utils\Version.cs                                                      | C#         |          5 |          0 |          1 |          6 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\assets\404.html-B-2P5V78.js         | JavaScript |         -1 |          0 |         -1 |         -2 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\assets\404.html-ByTdGTSm.js         | JavaScript |          1 |          0 |          1 |          2 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\assets\app-BITa06va.js              | JavaScript |        -28 |         -4 |         -1 |        -33 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\assets\app-C1vKFkGc.js              | JavaScript |         28 |          4 |          1 |         33 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\assets\commands.html-CJdMGWM7.js    | JavaScript |       -143 |          0 |         -1 |       -144 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\assets\commands.html-DsR2axk8.js    | JavaScript |        153 |          0 |          1 |        154 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\assets\get-started.html-CfHiKCXZ.js | JavaScript |          1 |          0 |          1 |          2 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\assets\get-started.html-D_vM18Nz.js | JavaScript |         -1 |          0 |         -1 |         -2 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\assets\index.html-BMbDjf_W.js       | JavaScript |          1 |          0 |          1 |          2 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\assets\index.html-DS7rXIvH.js       | JavaScript |         -1 |          0 |         -1 |         -2 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\assets\lua.html-3_L4TJjQ.js         | JavaScript |        303 |          0 |          1 |        304 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\assets\lua.html-DxDsLuB0.js         | JavaScript |       -297 |          0 |         -1 |       -298 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\commands.html                       | HTML       |         10 |          0 |          0 |         10 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\.vuepress\dist\lua.html                            | HTML       |          6 |          0 |          0 |          6 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\commands.md                                        | Markdown   |         46 |          0 |         10 |         56 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\get-started.md                                     | Markdown   |          2 |          0 |          1 |          3 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\lua.md                                             | Markdown   |         56 |          0 |         17 |         73 |
+| Total                                                                                                              |            |      3,842 |         27 |        588 |      4,457 |
++--------------------------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
