@@ -53,6 +53,19 @@ namespace CMLeonOS
             return Convert.ToBase64String(sha256.GetHash());
         }
 
+        private static bool ContainsInvalidChars(string input)
+        {
+            char[] invalidChars = { '<', '>', ':', '"', '|', '?', '*', '/', '\\' };
+            foreach (char c in invalidChars)
+            {
+                if (input.Contains(c.ToString()))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public UserSystem()
         {
             EnsureSysDirectoryExists();
@@ -382,6 +395,17 @@ namespace CMLeonOS
                     CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Red, global::System.ConsoleColor.Black);
                     global::System.Console.SetCursorPosition(7, 24);
                     global::System.Console.Write("Username cannot be empty.                   ");
+                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+                    global::System.Console.SetCursorPosition(7, 7);
+                    global::System.Console.Write("Username: ");
+                    username = global::System.Console.ReadLine();
+                }
+
+                while (ContainsInvalidChars(username))
+                {
+                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Red, global::System.ConsoleColor.Black);
+                    global::System.Console.SetCursorPosition(7, 24);
+                    global::System.Console.Write("Username contains invalid characters: < > : \" | ? / \\      ");
                     CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
                     global::System.Console.SetCursorPosition(7, 7);
                     global::System.Console.Write("Username: ");

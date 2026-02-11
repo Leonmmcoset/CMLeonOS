@@ -39,6 +39,7 @@ namespace UniLua
 				new NameFuncPair("base64decrypt", OS_Base64Decrypt),
 				new NameFuncPair("timerstart", OS_TimerStart),
 				new NameFuncPair("timerstop", OS_TimerStop),
+				new NameFuncPair("osversion", OS_Osversion),
 				new NameFuncPair("tui_drawbox", OS_TUIDrawBox),
 				new NameFuncPair("tui_drawtext", OS_TUIDrawText),
 				new NameFuncPair("tui_setcolor", OS_TUISetColor),
@@ -237,6 +238,13 @@ namespace UniLua
 			
 			lua.PushNumber(elapsedSeconds);
 			_timerStartTime = null;
+			return 1;
+		}
+
+		private static int OS_Osversion(ILuaState lua)
+		{
+			string version = CMLeonOS.Version.FullVersion;
+			lua.PushString(version);
 			return 1;
 		}
 

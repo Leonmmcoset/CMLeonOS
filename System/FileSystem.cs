@@ -14,6 +14,19 @@ namespace CMLeonOS
             currentDirectory = @"0:\";
         }
 
+        private static bool ContainsInvalidChars(string input)
+        {
+            char[] invalidChars = { '<', '>', ':', '"', '|', '?', '*' };
+            foreach (char c in invalidChars)
+            {
+                if (input.Contains(c.ToString()))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public FileSystem(string initialPath)
         {
             if (string.IsNullOrEmpty(initialPath))
@@ -67,6 +80,12 @@ namespace CMLeonOS
 
         public void MakeDirectory(string path)
         {
+            if (ContainsInvalidChars(path))
+            {
+                Console.WriteLine("Error: Directory name contains invalid characters: < > : \" | ?");
+                return;
+            }
+            
             string fullPath = GetFullPath(path);
             
             try
@@ -363,6 +382,28 @@ namespace CMLeonOS
                 return currentDirectory;
             }
             
+            if (path.Length > 255)
+            {
+                Console.WriteLine("Error: Path too long (maximum 255 characters)");
+                return currentDirectory;
+            }
+            
+            char[] invalidChars = { '<', '>', ':', '"', '|', '?', '*' };
+            foreach (char c in invalidChars)
+            {
+                if (path.Contains(c.ToString()))
+                {
+                    Console.WriteLine($"Error: Invalid character in path: '{c}'");
+                    return currentDirectory;
+                }
+            }
+            
+            if (path.Contains("//") || path.Contains("\\\\"))
+            {
+                Console.WriteLine("Error: Path contains consecutive slashes");
+                return currentDirectory;
+            }
+            
             if (path.StartsWith(@"0:\"))
             {
                 return path;
@@ -466,6 +507,16 @@ namespace CMLeonOS
             }
             
             string normalizedPath = path;
+            
+            while (normalizedPath.Contains("//"))
+            {
+                normalizedPath = normalizedPath.Replace("//", "/");
+            }
+            
+            while (normalizedPath.Contains("\\\\"))
+            {
+                normalizedPath = normalizedPath.Replace("\\\\", "\\");
+            }
             
             if (normalizedPath.StartsWith("/"))
             {

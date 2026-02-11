@@ -8,6 +8,19 @@ namespace CMLeonOS.Commands.User
     {
         private static CMLeonOS.UserSystem userSystem;
 
+        private static bool ContainsInvalidChars(string input)
+        {
+            char[] invalidChars = { '<', '>', ':', '"', '|', '?', '*', '/', '\\' };
+            foreach (char c in invalidChars)
+            {
+                if (input.Contains(c.ToString()))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public static void SetUserSystem(CMLeonOS.UserSystem system)
         {
             userSystem = system;
@@ -79,6 +92,12 @@ namespace CMLeonOS.Commands.User
                 string username = parts[2];
                 string password = parts[3];
                 bool isAdmin = userType == "admin";
+                
+                if (ContainsInvalidChars(username))
+                {
+                    showError("Error: Username contains invalid characters: < > : \" | ? / \\");
+                    return;
+                }
                 
                 userSystem.AddUser($"{username} {password}", isAdmin);
             }
