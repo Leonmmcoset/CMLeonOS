@@ -691,6 +691,18 @@ unalias ll
 version
 ```
 
+**输出：**
+```
+CMLeonOS v1.0.0 (PreRelease 2) - Git: b80c5b4
+Major: 1
+Minor: 0
+Patch: 0
+Type: PreRelease 2
+Full Version: 1.0.0-PreRelease 2
+Git Commit: b80c5b4
+Build Time: 2026-02-12 15:30:45
+```
+
 ### settings
 查看或修改系统设置。
 

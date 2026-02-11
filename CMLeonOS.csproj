@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
@@ -70,6 +70,7 @@
         <EmbeddedResource Include="font.psf" />
         <EmbeddedResource Include="Wallpapers\wallpaper.bmp" />
         <EmbeddedResource Include="GitCommit.txt" />
+        <EmbeddedResource Include="BuildTime.txt" />
         <EmbeddedResource Include="LuaApps\*.lua" />
     </ItemGroup>
 
@@ -93,6 +94,7 @@
 
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
       <Exec Command="powershell -ExecutionPolicy Bypass -File GenerateGitCommit.ps1" WorkingDirectory="$(MSBuildProjectDirectory)" />
+      <Exec Command="powershell -ExecutionPolicy Bypass -File BuildTime.ps1" WorkingDirectory="$(MSBuildProjectDirectory)" />
     </Target>
 
 </Project>

@@ -43,6 +43,9 @@ namespace CMLeonOS
         [IL2CPU.API.Attribs.ManifestResourceStream(ResourceName = "CMLeonOS.GitCommit.txt")]
         public static readonly byte[] gitCommitFile;
         
+        [IL2CPU.API.Attribs.ManifestResourceStream(ResourceName = "CMLeonOS.BuildTime.txt")]
+        public static readonly byte[] buildTimeFile;
+        
         public static void ShowError(string message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
@@ -140,6 +143,24 @@ namespace CMLeonOS
                 {
                     Version.GitCommit = "unknown";
                     _logger.Warning("Kernel", "Git Commit file not found, using 'unknown'");
+                }
+                
+                // 读取 Build Time
+                if (buildTimeFile != null && buildTimeFile.Length > 0)
+                {
+                    try
+                    {
+                        string buildTime = System.Text.Encoding.UTF8.GetString(buildTimeFile);
+                        _logger.Info("Kernel", $"Build Time: {buildTime}");
+                    }
+                    catch
+                    {
+                        _logger.Warning("Kernel", "Failed to read Build Time");
+                    }
+                }
+                else
+                {
+                    _logger.Warning("Kernel", "Build Time file not found");
                 }
                 
                 // 检查env.dat文件是否存在，如果不存在则创建并设置Test环境变量
