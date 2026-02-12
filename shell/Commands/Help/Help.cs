@@ -279,18 +279,6 @@ namespace CMLeonOS.Commands
             },
             new CommandInfo
             {
-                Command = "backup",
-                Parameters = "<name>",
-                Description = "Backup system files"
-            },
-            new CommandInfo
-            {
-                Command = "restore",
-                Parameters = "<name>",
-                Description = "Restore system files"
-            },
-            new CommandInfo
-            {
                 Command = "grep",
                 Parameters = "<pattern> <file>",
                 Description = "Search text in file"

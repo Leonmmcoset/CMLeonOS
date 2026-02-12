@@ -166,12 +166,6 @@ namespace CMLeonOS.shell
                 case "grep":
                     shell.GrepFile(args);
                     break;
-                case "backup":
-                    shell.BackupSystem(args);
-                    break;
-                case "restore":
-                    shell.RestoreSystem(args);
-                    break;
                 case "ftp":
                     shell.CreateFTP();
                     break;

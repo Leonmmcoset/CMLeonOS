@@ -408,7 +408,7 @@ namespace CMLeonOS
                 "mv", "rename", "touch", "find", "tree", "grep", "getdisk", "user",
                 "cpass", "hostname", "ipconfig", "setdns", "setgateway", "nslookup",
                 "ping", "wget", "ftp", "tcpserver", "tcpclient", "lua", "branswe",
-                "beep", "backup", "restore", "env", "whoami", "uptime", "alias",
+                "beep", "env", "whoami", "uptime", "alias",
                 "unalias", "base64", "testgui"
             };
         }
@@ -934,123 +934,6 @@ namespace CMLeonOS
         public void ProcessEnvCommand(string args)
         {
             Commands.Environment.EnvCommand.ProcessEnvCommand(args, envManager, ShowError);
-        }
-
-        public void BackupSystem(string args)
-        {
-            string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            
-            if (parts.Length == 0)
-            {
-                ShowError("Error: Please specify backup name");
-                ShowError("Usage: backup <backupname>");
-                return;
-            }
-            
-            string backupName = parts[0];
-            string backupPath = $@"0:\backup\{backupName}";
-            
-            try
-            {
-                Console.WriteLine($"BackupSystem: Creating backup '{backupName}'");
-                Console.WriteLine($"Backup path: {backupPath}");
-                
-                if (Directory.Exists(backupPath))
-                {
-                    ShowWarning($"Backup '{backupName}' already exists");
-                    ShowWarning("Returning without creating new backup");
-                    return;
-                }
-                
-                Console.WriteLine($"BackupSystem: Creating backup directory: {backupPath}");
-                Directory.CreateDirectory(backupPath);
-                ShowSuccess($"Backup directory created");
-                
-                // 备份系统文件
-                string sysPath = @"0:\system";
-                Console.WriteLine($"BackupSystem: Checking system path: {sysPath}");
-                Console.WriteLine($"BackupSystem: System path exists: {Directory.Exists(sysPath)}");
-                
-                if (Directory.Exists(sysPath))
-                {
-                    Console.WriteLine($"BackupSystem: Copying system files to backup");
-                    CopyDirectory(sysPath, backupPath);
-                    Console.WriteLine($"BackupSystem: System files copied");
-                }
-                else
-                {
-                    Console.WriteLine($"BackupSystem: System path does not exist, skipping system backup");
-                }
-                
-                // 备份用户文件
-                string userPath = @"0:\user";
-                Console.WriteLine($"BackupSystem: Checking user path: {userPath}");
-                Console.WriteLine($"BackupSystem: User path exists: {Directory.Exists(userPath)}");
-                
-                if (Directory.Exists(userPath))
-                {
-                    Console.WriteLine($"BackupSystem: Copying user files to backup");
-                    CopyDirectory(userPath, backupPath);
-                    Console.WriteLine($"BackupSystem: User files copied");
-                }
-                else
-                {
-                    Console.WriteLine($"BackupSystem: User path does not exist, skipping user backup");
-                }
-                
-                ShowSuccess($"Backup '{backupName}' created successfully");
-                ShowSuccess($"Backup location: {backupPath}");
-            }
-            catch (Exception ex)
-            {
-                ShowError($"Error creating backup: {ex.Message}");
-                ShowError($"Exception type: {ex.GetType().Name}");
-            }
-        }
-
-        public void RestoreSystem(string args)
-        {
-            string[] parts = args.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            
-            if (parts.Length == 0)
-            {
-                ShowError("Error: Please specify backup name");
-                ShowError("Usage: restore <backupname>");
-                return;
-            }
-            
-            string backupName = parts[0];
-            string backupPath = $@"0:\backup\{backupName}";
-            
-            try
-            {
-                if (!Directory.Exists(backupPath))
-                {
-                    ShowError($"Error: Backup '{backupName}' not found");
-                    return;
-                }
-                
-                // 恢复系统文件
-                string sysPath = @"0:\system";
-                if (Directory.Exists(backupPath))
-                {
-                    CopyDirectory(backupPath, sysPath, true);
-                }
-                
-                // 恢复用户文件
-                string userPath = @"0:\user";
-                if (Directory.Exists(backupPath))
-                {
-                    CopyDirectory(backupPath, userPath, true);
-                }
-                
-                ShowSuccess($"Backup '{backupName}' restored successfully");
-                ShowSuccess($"Backup location: {backupPath}");
-            }
-            catch (Exception ex)
-            {
-                ShowError($"Error restoring backup: {ex.Message}");
-            }
         }
 
         private void CopyDirectory(string sourcePath, string destPath, bool overwrite = false)

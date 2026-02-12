@@ -767,34 +767,6 @@ restart
 shutdown
 ```
 
-## 备份与恢复命令
-
-### backup
-备份系统。
-
-**用法：**
-```bash
-backup <backup_file>
-```
-
-**示例：**
-```bash
-backup mybackup.zip
-```
-
-### restore
-恢复系统备份。
-
-**用法：**
-```bash
-restore <backup_file>
-```
-
-**示例：**
-```bash
-restore mybackup.zip
-```
-
 ## 测试命令
 
 ### cuitest
