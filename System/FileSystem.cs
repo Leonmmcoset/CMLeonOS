@@ -114,50 +114,51 @@ namespace CMLeonOS
             {
                 if (Directory.Exists(fullPath))
                 {
-                    // 列出当前目录下的文件和子目录
                     string displayPath = path == "." ? CurrentDirectory : path;
                     Console.WriteLine($"Contents of {displayPath}:");
                     
-                    // 列出子目录
                     try
                     {
                         var dirs = Directory.GetDirectories(fullPath);
                         foreach (var dir in dirs)
                         {
-                            // 使用Path.GetFileName获取目录名，避免Substring可能导致的问题
                             string dirName = Path.GetFileName(dir);
+                            Console.ForegroundColor = ConsoleColor.Yellow;
                             Console.WriteLine($"[DIR]  {dirName}");
+                            Console.ResetColor();
                         }
                     }
                     catch
                     {
-                        // 可能没有权限或其他错误
                     }
                     
-                    // 列出文件
                     try
                     {
                         var files = Directory.GetFiles(fullPath);
                         foreach (var file in files)
                         {
-                            // 使用Path.GetFileName获取文件名，避免Substring可能导致的问题
                             string fileName = Path.GetFileName(file);
+                            Console.ForegroundColor = ConsoleColor.White;
                             Console.WriteLine($"[FILE] {fileName}");
+                            Console.ResetColor();
                         }
                     }
                     catch
                     {
-                        // 可能没有权限或其他错误
                     }
                 }
                 else
                 {
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine($"Directory not found: {path}");
+                    Console.ResetColor();
                 }
             }
             catch (Exception ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"Error listing files: {ex.Message}");
+                Console.ResetColor();
             }
         }
 
