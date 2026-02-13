@@ -190,6 +190,9 @@ namespace CMLeonOS.shell
                 case "lua":
                     shell.ExecuteLuaScript(args);
                     break;
+                case "scl":
+                    shell.ExecuteSCLScript(args);
+                    break;
                 case "testgui":
                     shell.ProcessTestGui();
                     break;
