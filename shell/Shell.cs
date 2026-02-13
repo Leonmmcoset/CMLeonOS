@@ -1502,6 +1502,11 @@ namespace CMLeonOS
             Commands.Script.LuaCommand.ExecuteLuaScript(args, fileSystem, this, ShowError, ShowWarning);
         }
 
+        public void ExecuteSCLScript(string args)
+        {
+            Commands.Script.SCLCommand.ExecuteSCLScript(args, fileSystem, this, ShowError, ShowWarning);
+        }
+
         public void ProcessTestGui()
         {
             Commands.TestGuiCommand.RunTestGui();
