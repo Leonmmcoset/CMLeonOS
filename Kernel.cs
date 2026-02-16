@@ -55,24 +55,22 @@ namespace CMLeonOS
         
         protected override void BeforeRun()
         {
-            // 我认了，我用默认字体
-            // try
-            // {
-            //     PCScreenFont screenFont = PCScreenFont.LoadFont(file);
-            //     VGAScreen.SetFont(screenFont.CreateVGAFont(), screenFont.Height);
-            // }
-            // catch (Exception ex)
-            // {
-            // 我不认，我试着转换成Base64
-                // 我认了
-                // PCScreenFont defaultFont = PCScreenFont.Default;
-                // VGAScreen.SetFont(defaultFont.CreateVGAFont(), defaultFont.Height);
-                // Console.WriteLine($"{defaultFont.Height}");
-                // Console.WriteLine($"{defaultFont.Width}");
-                // VGAScreen.SetGraphicsMode(VGADriver.ScreenSize.Size720x480, ColorDepth.ColorDepth32);
-            //     Console.WriteLine($"Error loading font: {ex.Message}");
-            // }
+            BootMenuAction bootAction = BootMenu.Show();
 
+            switch (bootAction)
+            {
+                case BootMenuAction.Reboot:
+                    Sys.Power.Reboot();
+                    break;
+                case BootMenuAction.Shutdown:
+                    Sys.Power.Shutdown();
+                    break;
+                case BootMenuAction.NormalBoot:
+                default:
+                    break;
+            }
+
+            Console.Clear();
             Console.WriteLine("Kernel load done!");
             Console.WriteLine(@"-------------------------------------------------");
             Console.WriteLine(@"   ____ __  __ _                      ___  ____  ");
