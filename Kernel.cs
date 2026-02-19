@@ -72,7 +72,7 @@ namespace CMLeonOS
 
             Console.Clear();
             Console.WriteLine("Kernel load done!");
-            Console.WriteLine(@"-------------------------------------------------");
+            Console.WriteLine(@"----------------------------------------------------------");
             Console.WriteLine(@"   ____ __  __ _                      ___  ____  ");
             Console.WriteLine(@"  / ___|  \/  | |    ___  ___  _ __  / _ \/ ___| ");
             Console.WriteLine(@" | |   | |\/| | |   / _ \/ _ \| '_ \| | | \___ \ ");
@@ -80,8 +80,8 @@ namespace CMLeonOS
             Console.WriteLine(@"  \____|_|  |_|_____\___|\___/|_| |_|____/|____/ ");
             Console.WriteLine();
             Console.WriteLine("The CMLeonOS Project");
-            Console.WriteLine("By LeonOS 2 Developement Team");
-            Console.WriteLine(@"-------------------------------------------------");
+            Console.WriteLine("(C) LeonOS 2 Developer Team 2025-2026. All rights reserved.");
+            Console.WriteLine(@"----------------------------------------------------------");
 
             // 注册VFS
             _logger.Info("Kernel", "Starting VFS initialization");
