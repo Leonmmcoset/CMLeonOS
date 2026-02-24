@@ -308,7 +308,11 @@ namespace CMLeonOS
             {
                 if (File.Exists(fullPath))
                 {
-                    return File.ReadAllText(fullPath);
+                    using (FileStream fs = new FileStream(fullPath, FileMode.Open, FileAccess.Read))
+                    using (StreamReader sr = new StreamReader(fs))
+                    {
+                        return sr.ReadToEnd();
+                    }
                 }
                 else
                 {
@@ -389,15 +393,15 @@ namespace CMLeonOS
                 return currentDirectory;
             }
             
-            char[] invalidChars = { '<', '>', ':', '"', '|', '?', '*' };
-            foreach (char c in invalidChars)
-            {
-                if (path.Contains(c.ToString()))
-                {
-                    Console.WriteLine($"Error: Invalid character in path: '{c}'");
-                    return currentDirectory;
-                }
-            }
+            //char[] invalidChars = { '<', '>', ':', '"', '|', '?', '*' };
+            //foreach (char c in invalidChars)
+            //{
+            //    if (path.Contains(c.ToString()))
+            //    {
+            //        Console.WriteLine($"Error: Invalid character in path: '{c}'");
+            //        return currentDirectory;
+            //    }
+            //}
             
             if (path.Contains("//") || path.Contains("\\\\"))
             {

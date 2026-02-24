@@ -47,15 +47,22 @@ namespace CMLeonOS
 
                 if (value != null && fileSystem != null)
                 {
-                    string fullPath = fileSystem.GetFullPath(value);
-                    
-                    if (System.IO.File.Exists(fullPath))
+                    try
                     {
+                        string fullPath = fileSystem.GetFullPath(value);
                         string text = fileSystem.ReadFile(fullPath);
-                        text = text.Replace("\r\n", "\n");
-                        lines.AddRange(text.Split('\n'));
+                        
+                        if (!string.IsNullOrEmpty(text))
+                        {
+                            text = text.Replace("\r\n", "\n");
+                            lines.AddRange(text.Split('\n'));
+                        }
+                        else
+                        {
+                            lines.Add(string.Empty);
+                        }
                     }
-                    else
+                    catch
                     {
                         lines.Add(string.Empty);
                     }

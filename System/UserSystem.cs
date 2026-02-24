@@ -55,7 +55,7 @@ namespace CMLeonOS
 
         private static bool ContainsInvalidChars(string input)
         {
-            char[] invalidChars = { '<', '>', ':', '"', '|', '?', '*', '/', '\\' };
+            char[] invalidChars = { '<', '>', ':', '"', '|', '?', '*', '/', '\\', ' ' };
             foreach (char c in invalidChars)
             {
                 if (input.Contains(c.ToString()))
@@ -405,7 +405,7 @@ namespace CMLeonOS
                 {
                     CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Red, global::System.ConsoleColor.Black);
                     global::System.Console.SetCursorPosition(7, 24);
-                    global::System.Console.Write("Username contains invalid characters: < > : \" | ? / \\      ");
+                    global::System.Console.Write("Username contains invalid characters: < > : \" | ? * / \\ space");
                     CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
                     global::System.Console.SetCursorPosition(7, 7);
                     global::System.Console.Write("Username: ");
