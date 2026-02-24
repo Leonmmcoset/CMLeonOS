@@ -97,7 +97,6 @@ namespace CMLeonOS
                 {
                     int y = i - scrollY + TITLEBAR_HEIGHT;
                     if (y < TITLEBAR_HEIGHT || y >= consoleHeight - SHORTCUT_BAR_HEIGHT) continue;
-
                     Console.SetCursorPosition(0, y);
 
                     if (i >= lines.Count || scrollX >= lines[i].Length)
@@ -107,7 +106,15 @@ namespace CMLeonOS
                     else
                     {
                         string line = lines[i].Substring(scrollX, Math.Min(consoleWidth, lines[i].Length - scrollX));
-                        Console.Write(line + new string(' ', Math.Max(0, consoleWidth - line.Length)));
+                        
+                        if (IsLuaFile())
+                        {
+                            RenderLuaLine(line, consoleWidth);
+                        }
+                        else
+                        {
+                            Console.Write(line + new string(' ', Math.Max(0, consoleWidth - line.Length)));
+                        }
                     }
                 }
 
@@ -116,6 +123,102 @@ namespace CMLeonOS
             }
 
             Console.SetCursorPosition(linePos - scrollX, currentLine + TITLEBAR_HEIGHT - scrollY);
+        }
+
+        private bool IsLuaFile()
+        {
+            if (path != null)
+            {
+                string extension = System.IO.Path.GetExtension(path)?.ToLower();
+                return extension == ".lua";
+            }
+            return false;
+        }
+
+        private void RenderLuaLine(string line, int consoleWidth)
+        {
+            int pos = 0;
+            bool inString = false;
+            bool inComment = false;
+
+            while (pos < line.Length && pos < consoleWidth)
+            {
+                if (inComment)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write(line[pos]);
+                    pos++;
+                }
+                else if (line.Substring(pos).StartsWith("--"))
+                {
+                    inComment = true;
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write(line.Substring(pos));
+                    break;
+                }
+                else if (inString)
+                {
+                    if (line[pos] == '"' || line[pos] == '\'')
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write(line[pos]);
+                        inString = false;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write(line[pos]);
+                    }
+                    pos++;
+                }
+                else
+                {
+                    if (line[pos] == '"' || line[pos] == '\'')
+                    {
+                        inString = true;
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.Write(line[pos]);
+                        pos++;
+                    }
+                    else if (IsLuaKeyword(line, pos))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.Write(line[pos]);
+                        pos++;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.Write(line[pos]);
+                        pos++;
+                    }
+                }
+            }
+
+            if (pos < consoleWidth)
+            {
+                Console.Write(new string(' ', consoleWidth - pos));
+            }
+
+            Console.ResetColor();
+        }
+
+        private bool IsLuaKeyword(string line, int pos)
+        {
+            string[] keywords = { "function", "end", "if", "then", "else", "elseif", "while", "do", "for", "return", "local", "true", "false", "nil", "and", "or", "not", "break", "repeat", "until" };
+            
+            foreach (string keyword in keywords)
+            {
+                if (pos + keyword.Length <= line.Length && line.Substring(pos, keyword.Length) == keyword)
+                {
+                    char nextChar = pos + keyword.Length < line.Length ? line[pos + keyword.Length] : ' ';
+                    if (!char.IsLetterOrDigit(nextChar))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         // Insert a new line at the cursor.
