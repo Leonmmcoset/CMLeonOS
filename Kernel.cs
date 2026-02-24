@@ -254,6 +254,8 @@ namespace CMLeonOS
                         // 检查并执行启动脚本
                         ExecuteStartupScript();
 
+                        ExecuteStartupTest();
+
                         if (System.IO.File.Exists("0:\\system\\zen"))
                         {
                             Console.WriteLine("=====================================");
@@ -469,6 +471,44 @@ namespace CMLeonOS
             {
                 _logger.Error("Kernel", $"Error executing startup script: {ex.Message}");
             }
+        }
+
+        private void ExecuteStartupTest()
+        {
+            Console.BackgroundColor = ConsoleColor.Red;
+            Console.Write("   ");
+            Console.BackgroundColor = ConsoleColor.Yellow;
+            Console.Write("   ");
+            Console.BackgroundColor = ConsoleColor.Green;
+            Console.Write("   ");
+            Console.BackgroundColor = ConsoleColor.Cyan;
+            Console.Write("   ");
+            Console.BackgroundColor = ConsoleColor.Blue;
+            Console.Write("   ");
+            Console.BackgroundColor = ConsoleColor.Magenta;
+            Console.Write("   ");
+            Console.BackgroundColor = ConsoleColor.White;
+            Console.Write("   ");
+            Console.BackgroundColor = ConsoleColor.DarkBlue;
+            Console.Write("   ");
+            Console.BackgroundColor = ConsoleColor.DarkCyan;
+            Console.Write("   ");
+            Console.BackgroundColor = ConsoleColor.DarkGreen;
+            Console.Write("   ");
+            Console.BackgroundColor = ConsoleColor.DarkYellow;
+            Console.Write("   ");
+            Console.BackgroundColor = ConsoleColor.DarkRed;
+            Console.Write("   ");
+            Console.BackgroundColor = ConsoleColor.Gray;
+            Console.Write("   ");
+            Console.BackgroundColor = ConsoleColor.DarkGray;
+            Console.Write("   ");
+            Console.BackgroundColor = ConsoleColor.DarkMagenta;
+            Console.Write("   ");
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.Write("   ");
+            Console.WriteLine("");
+            Console.ResetColor();
         }
 
         private string FormatBytes(long bytes)
