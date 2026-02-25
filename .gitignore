@@ -56,3 +56,5 @@ coverage/
 
 # Release files
 *.release
+
+main.map

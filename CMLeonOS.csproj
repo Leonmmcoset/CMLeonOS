@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
@@ -20,15 +20,17 @@
         <Description>Use VMware Player or Workstation to deploy and debug.</Description>
         <PxeInterface>192.168.0.8</PxeInterface>
         <CompressionType>Gzip</CompressionType>
-        <BinFormat>Elf</BinFormat>
+        <BinFormat>Bin</BinFormat>
         <DebugEnabled>False</DebugEnabled>
         <CompileVBEMultiboot>False</CompileVBEMultiboot>
-        <RemoveBootDebugOutput>False</RemoveBootDebugOutput>
+        <RemoveBootDebugOutput>True</RemoveBootDebugOutput>
 		<CosmosDisableDebugger>true</CosmosDisableDebugger>
 		<CosmosDebugLevel>None</CosmosDebugLevel>
 		<OptimizationLevel>2</OptimizationLevel>
 		<VBEResolution>800x600x32</VBEResolution>
 		<RunPostBuildEvent>Always</RunPostBuildEvent>
+		<Timeout>1</Timeout>
+		<UseUEFI>False</UseUEFI>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -89,7 +91,7 @@
         <PackageReference Include="Cosmos.System2_Plugs" Version="0.1.0-localbuild20260201071815" />
         <PackageReference Include="CosmosFtpServer" Version="1.0.9" />
         <PackageReference Include="CosmosHttp" Version="1.0.4" />
-        <PackageReference Include="IL2CPU.API" Version="0.1.0-localbuild20260203125852" />
+        <PackageReference Include="IL2CPU.API" Version="0.1.0-localbuild20260225062300" />
     </ItemGroup>
 
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
