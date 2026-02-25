@@ -71,8 +71,8 @@ namespace CMLeonOS
             }
 
             Console.Clear();
-            Console.WriteLine("Kernel load done!");
-            Console.WriteLine(@"----------------------------------------------------------");
+            // Console.WriteLine("Kernel load done!");
+            // Console.WriteLine(@"----------------------------------------------------------");
             Console.WriteLine(@"   ____ __  __ _                      ___  ____  ");
             Console.WriteLine(@"  / ___|  \/  | |    ___  ___  _ __  / _ \/ ___| ");
             Console.WriteLine(@" | |   | |\/| | |   / _ \/ _ \| '_ \| | | \___ \ ");

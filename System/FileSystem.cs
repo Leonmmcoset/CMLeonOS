@@ -16,7 +16,7 @@ namespace CMLeonOS
 
         private static bool ContainsInvalidChars(string input)
         {
-            char[] invalidChars = { '<', '>', ':', '"', '|', '?', '*' };
+            char[] invalidChars = { '<', '>', '"', '|', '?', '*' };
             foreach (char c in invalidChars)
             {
                 if (input.Contains(c.ToString()))
@@ -56,6 +56,18 @@ namespace CMLeonOS
             if (string.IsNullOrEmpty(path))
             {
                 currentDirectory = @"0:\";
+                return;
+            }
+
+            if (path == @"0:\")
+            {
+                currentDirectory = @"0:\";
+                return;
+            }
+
+            if (path == @"1:\")
+            {
+                currentDirectory = @"1:\";
                 return;
             }
 
@@ -414,6 +426,11 @@ namespace CMLeonOS
                 return path;
             }
             
+            if (path.StartsWith(@"1:\"))
+            {
+                return path;
+            }
+            
             if (path == ".")
             {
                 return currentDirectory;
@@ -421,16 +438,16 @@ namespace CMLeonOS
             
             if (path == "..")
             {
-                if (currentDirectory == @"0:\")
+                if (currentDirectory == @"0:\" || currentDirectory == @"1:\")
                 {
-                    return @"0:\";
+                    return currentDirectory;
                 }
                 else
                 {
                     int lastSlash = currentDirectory.LastIndexOf('\\');
-                    if (lastSlash == 2) // 0:\
+                    if (lastSlash == 2) // 0:\ or 1:\
                     {
-                        return @"0:\";
+                        return currentDirectory.Substring(0, 3);
                     }
                     else
                     {
@@ -441,7 +458,7 @@ namespace CMLeonOS
             
             if (path.StartsWith("../") || path.StartsWith("..\\"))
             {
-                if (currentDirectory == @"0:\")
+                if (currentDirectory == @"0:\" || currentDirectory == @"1:\")
                 {
                     Console.WriteLine("Error: Cannot go above root directory");
                     return currentDirectory;
@@ -472,9 +489,9 @@ namespace CMLeonOS
                 for (int i = 0; i < level; i++)
                 {
                     int lastSlash = resultPath.LastIndexOf('\\');
-                    if (lastSlash == 2) // 0:\
+                    if (lastSlash == 2) // 0:\ or 1:\
                     {
-                        resultPath = @"0:\";
+                        resultPath = resultPath.Substring(0, 3);
                     }
                     else
                     {
