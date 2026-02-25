@@ -14,8 +14,8 @@ namespace CMLeonOS.Commands.Editor
             
             try
             {
-                var editor = new CMLeonOS.Editor(fileName, fileSystem);
-                editor.Run();
+                var nano = new CMLeonOS.Nano(fileName, true, fileSystem);
+                nano.Start();
             }
             catch (Exception ex)
             {
