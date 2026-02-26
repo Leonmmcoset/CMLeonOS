@@ -140,6 +140,8 @@ namespace CMLeonOS
             int pos = 0;
             bool inString = false;
             bool inComment = false;
+            bool inLongComment = false;
+            char stringDelimiter = '\0';
 
             while (pos < line.Length && pos < consoleWidth)
             {
@@ -149,42 +151,130 @@ namespace CMLeonOS
                     Console.Write(line[pos]);
                     pos++;
                 }
-                else if (line.Substring(pos).StartsWith("--"))
+                else if (inLongComment)
                 {
-                    inComment = true;
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.Write(line.Substring(pos));
-                    break;
-                }
-                else if (inString)
-                {
-                    if (line[pos] == '"' || line[pos] == '\'')
+                    if (pos + 1 < line.Length && line[pos] == ']' && line[pos + 1] == ']')
                     {
-                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        inLongComment = false;
                         Console.Write(line[pos]);
-                        inString = false;
+                        pos++;
+                        Console.Write(line[pos]);
+                        pos++;
                     }
                     else
                     {
-                        Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.Write(line[pos]);
+                        pos++;
                     }
-                    pos++;
+                }
+                else if (pos + 1 < line.Length && line[pos] == '-' && line[pos + 1] == '-')
+                {
+                    if (pos + 3 < line.Length && line[pos + 2] == '[' && line[pos + 3] == '[')
+                    {
+                        inLongComment = true;
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.Write(line.Substring(pos));
+                        break;
+                    }
+                    else
+                    {
+                        inComment = true;
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.Write(line.Substring(pos));
+                        break;
+                    }
+                }
+                else if (inString)
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    if (line[pos] == stringDelimiter)
+                    {
+                        if (pos + 1 < line.Length && line[pos + 1] == stringDelimiter)
+                        {
+                            Console.Write(line[pos]);
+                            pos++;
+                            Console.Write(line[pos]);
+                            pos++;
+                        }
+                        else
+                        {
+                            Console.Write(line[pos]);
+                            inString = false;
+                            pos++;
+                        }
+                    }
+                    else if (line[pos] == '\\')
+                    {
+                        Console.Write(line[pos]);
+                        pos++;
+                        if (pos < line.Length)
+                        {
+                            Console.Write(line[pos]);
+                            pos++;
+                        }
+                    }
+                    else
+                    {
+                        Console.Write(line[pos]);
+                        pos++;
+                    }
                 }
                 else
                 {
                     if (line[pos] == '"' || line[pos] == '\'')
                     {
                         inString = true;
+                        stringDelimiter = line[pos];
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.Write(line[pos]);
                         pos++;
                     }
+                    else if (IsLuaNumber(line, pos))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Magenta;
+                        while (pos < line.Length && IsLuaNumber(line, pos))
+                        {
+                            Console.Write(line[pos]);
+                            pos++;
+                        }
+                    }
+                    else if (IsLuaOperator(line, pos))
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkYellow;
+                        if (pos + 1 < line.Length && IsLuaOperator(line, pos + 1))
+                        {
+                            Console.Write(line[pos]);
+                            pos++;
+                            Console.Write(line[pos]);
+                            pos++;
+                        }
+                        else
+                        {
+                            Console.Write(line[pos]);
+                            pos++;
+                        }
+                    }
                     else if (IsLuaKeyword(line, pos))
                     {
                         Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.Write(line[pos]);
-                        pos++;
+                        string keyword = GetLuaKeyword(line, pos);
+                        Console.Write(keyword);
+                        pos += keyword.Length;
+                    }
+                    else if (IsLuaBuiltin(line, pos))
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkCyan;
+                        string builtin = GetLuaBuiltin(line, pos);
+                        Console.Write(builtin);
+                        pos += builtin.Length;
+                    }
+                    else if (IsLuaFunctionCall(line, pos))
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                        string funcName = GetLuaFunctionName(line, pos);
+                        Console.Write(funcName);
+                        pos += funcName.Length;
                     }
                     else
                     {
@@ -203,22 +293,160 @@ namespace CMLeonOS
             Console.ResetColor();
         }
 
+        private bool IsLuaNumber(string line, int pos)
+        {
+            if (pos >= line.Length) return false;
+            
+            char c = line[pos];
+            if (!char.IsDigit(c) && c != '.') return false;
+            
+            if (c == '.')
+            {
+                if (pos + 1 >= line.Length) return false;
+                return char.IsDigit(line[pos + 1]);
+            }
+            
+            return true;
+        }
+
+        private bool IsLuaOperator(string line, int pos)
+        {
+            if (pos >= line.Length) return false;
+            
+            char c = line[pos];
+            return c == '+' || c == '-' || c == '*' || c == '/' || c == '^' || 
+                   c == '%' || c == '#' || c == '=' || c == '~' || 
+                   c == '<' || c == '>' || c == '&' || c == '|' || 
+                   c == '(' || c == ')' || c == '[' || c == ']' || 
+                   c == '{' || c == '}' || c == ',' || c == ';';
+        }
+
         private bool IsLuaKeyword(string line, int pos)
         {
-            string[] keywords = { "function", "end", "if", "then", "else", "elseif", "while", "do", "for", "return", "local", "true", "false", "nil", "and", "or", "not", "break", "repeat", "until" };
+            string[] keywords = { 
+                "function", "end", "if", "then", "else", "elseif", "while", "do", 
+                "for", "return", "local", "true", "false", "nil", "and", "or", 
+                "not", "break", "repeat", "until", "in", "goto", "self"
+            };
             
             foreach (string keyword in keywords)
             {
                 if (pos + keyword.Length <= line.Length && line.Substring(pos, keyword.Length) == keyword)
                 {
+                    char prevChar = pos > 0 ? line[pos - 1] : ' ';
                     char nextChar = pos + keyword.Length < line.Length ? line[pos + keyword.Length] : ' ';
-                    if (!char.IsLetterOrDigit(nextChar))
+                    
+                    if (!char.IsLetterOrDigit(prevChar) && !char.IsLetterOrDigit(nextChar) && prevChar != '_' && nextChar != '_')
                     {
                         return true;
                     }
                 }
             }
             return false;
+        }
+
+        private string GetLuaKeyword(string line, int pos)
+        {
+            string[] keywords = { 
+                "function", "end", "if", "then", "else", "elseif", "while", "do", 
+                "for", "return", "local", "true", "false", "nil", "and", "or", 
+                "not", "break", "repeat", "until", "in", "goto", "self"
+            };
+            
+            foreach (string keyword in keywords)
+            {
+                if (pos + keyword.Length <= line.Length && line.Substring(pos, keyword.Length) == keyword)
+                {
+                    char prevChar = pos > 0 ? line[pos - 1] : ' ';
+                    char nextChar = pos + keyword.Length < line.Length ? line[pos + keyword.Length] : ' ';
+                    
+                    if (!char.IsLetterOrDigit(prevChar) && !char.IsLetterOrDigit(nextChar) && prevChar != '_' && nextChar != '_')
+                    {
+                        return keyword;
+                    }
+                }
+            }
+            return "";
+        }
+
+        private bool IsLuaBuiltin(string line, int pos)
+        {
+            string[] builtins = { 
+                "print", "type", "tonumber", "tostring", "pairs", "ipairs", 
+                "next", "select", "unpack", "assert", "error", "pcall", 
+                "xpcall", "load", "loadstring", "loadfile", "dofile", 
+                "require", "setmetatable", "getmetatable", "rawget", "rawset", 
+                "rawequal", "rawlen", "gcinfo", "collectgarbage", "newproxy"
+            };
+            
+            foreach (string builtin in builtins)
+            {
+                if (pos + builtin.Length <= line.Length && line.Substring(pos, builtin.Length) == builtin)
+                {
+                    char prevChar = pos > 0 ? line[pos - 1] : ' ';
+                    char nextChar = pos + builtin.Length < line.Length ? line[pos + builtin.Length] : ' ';
+                    
+                    if (!char.IsLetterOrDigit(prevChar) && !char.IsLetterOrDigit(nextChar) && prevChar != '_' && nextChar != '_')
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private string GetLuaBuiltin(string line, int pos)
+        {
+            string[] builtins = { 
+                "print", "type", "tonumber", "tostring", "pairs", "ipairs", 
+                "next", "select", "unpack", "assert", "error", "pcall", 
+                "xpcall", "load", "loadstring", "loadfile", "dofile", 
+                "require", "setmetatable", "getmetatable", "rawget", "rawset", 
+                "rawequal", "rawlen", "gcinfo", "collectgarbage", "newproxy"
+            };
+            
+            foreach (string builtin in builtins)
+            {
+                if (pos + builtin.Length <= line.Length && line.Substring(pos, builtin.Length) == builtin)
+                {
+                    char prevChar = pos > 0 ? line[pos - 1] : ' ';
+                    char nextChar = pos + builtin.Length < line.Length ? line[pos + builtin.Length] : ' ';
+                    
+                    if (!char.IsLetterOrDigit(prevChar) && !char.IsLetterOrDigit(nextChar) && prevChar != '_' && nextChar != '_')
+                    {
+                        return builtin;
+                    }
+                }
+            }
+            return "";
+        }
+
+        private bool IsLuaFunctionCall(string line, int pos)
+        {
+            if (pos >= line.Length || !char.IsLetter(line[pos]) && line[pos] != '_') return false;
+            
+            int endPos = pos;
+            while (endPos < line.Length && (char.IsLetterOrDigit(line[endPos]) || line[endPos] == '_'))
+            {
+                endPos++;
+            }
+            
+            if (endPos < line.Length && line[endPos] == '(')
+            {
+                return true;
+            }
+            
+            return false;
+        }
+
+        private string GetLuaFunctionName(string line, int pos)
+        {
+            int endPos = pos;
+            while (endPos < line.Length && (char.IsLetterOrDigit(line[endPos]) || line[endPos] == '_'))
+            {
+                endPos++;
+            }
+            return line.Substring(pos, endPos - pos);
         }
 
         // Insert a new line at the cursor.
