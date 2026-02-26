@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using Sys = Cosmos.System;
+using CMLeonOS.Logger;
 
 namespace CMLeonOS
 {
@@ -23,6 +24,7 @@ namespace CMLeonOS
         private List<User> users;
         public bool fixmode = Kernel.FixMode;
         private User currentLoggedInUser;
+        private static CMLeonOS.Logger.Logger _logger = CMLeonOS.Logger.Logger.Instance;
 
         public User CurrentLoggedInUser
         {
@@ -519,7 +521,7 @@ namespace CMLeonOS
         {
             try
             {
-                Console.WriteLine($"Creating user folder for {username}...");
+                _logger.Info("UserSystem", $"Creating user folder for {username}...");
 
                 // 在user文件夹下创建用户文件夹
                 string userFolderPath = Path.Combine(@"0:\user", username);
@@ -528,16 +530,16 @@ namespace CMLeonOS
                 if (!Directory.Exists(userFolderPath))
                 {
                     Directory.CreateDirectory(userFolderPath);
-                    Console.WriteLine($"Created user folder for {username}.");
+                    _logger.Info("UserSystem", $"Created user folder for {username}.");
                 }
                 else 
                 {
-                    Console.WriteLine($"User folder for {username} already exists.");
+                    _logger.Info("UserSystem", $"User folder for {username} already exists.");
                 }
             }
             catch (Exception ex)
             {
-                ShowError($"Error creating user folder: {ex.Message}");
+                _logger.Error("UserSystem", $"Error creating user folder for {username}: {ex.Message}");
             }
         }
 

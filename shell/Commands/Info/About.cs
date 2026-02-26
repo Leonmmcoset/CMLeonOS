@@ -7,7 +7,7 @@ namespace CMLeonOS.Commands
         public static void ProcessAbout()
         {
             Console.WriteLine("CMLeonOS Project");
-            Console.WriteLine("By LeonOS 2 Developement Team");
+            Console.WriteLine("By LeonOS 2 Developer Team");
         }
     }
 }

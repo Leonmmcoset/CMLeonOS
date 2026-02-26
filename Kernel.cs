@@ -440,7 +440,7 @@ namespace CMLeonOS
                     }
                     
                     Console.WriteLine("Executing startup script...");
-                    Console.WriteLine("--------------------------------");
+                    // Console.WriteLine("--------------------------------");
                     
                     // 逐行执行命令
                     foreach (string line in lines)
@@ -456,7 +456,7 @@ namespace CMLeonOS
                         shell.ExecuteCommand(line);
                     }
                     
-                    Console.WriteLine("--------------------------------");
+                    // Console.WriteLine("--------------------------------");
                     _logger.Success("Kernel", "Startup script execution completed");
                 }
                 else
@@ -475,6 +475,12 @@ namespace CMLeonOS
 
         private void ExecuteStartupTest()
         {
+            Console.WriteLine("------------------------------------------------------");
+            Console.WriteLine($"Welcome to {Version.DisplayVersion}");
+            Console.WriteLine("* Documentation: https://cmleonos.jjmm.ink/");
+            Console.WriteLine("* Fourm: https://lbbs.ecuil.com/#/category/10");
+            Console.WriteLine("");
+
             Console.BackgroundColor = ConsoleColor.Red;
             Console.Write("   ");
             Console.BackgroundColor = ConsoleColor.Yellow;
@@ -509,6 +515,7 @@ namespace CMLeonOS
             Console.Write("   ");
             Console.WriteLine("");
             Console.ResetColor();
+            Console.WriteLine("------------------------------------------------------");
         }
 
         private string FormatBytes(long bytes)
