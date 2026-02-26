@@ -1,9 +1,73 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UniLua;
 
 namespace CMLeonOS
 {
+    public class NanoSettings
+    {
+        public bool EnableSmartIndent { get; set; } = true;
+        public bool EnableAutoCompleteBrackets { get; set; } = true;
+        public bool EnableAutoCompleteQuotes { get; set; } = true;
+        public bool EnableSmartDelete { get; set; } = true;
+        public bool EnableSyntaxHighlight { get; set; } = true;
+
+        public void Save(string filePath)
+        {
+            try
+            {
+                bool smartIndent = EnableSmartIndent;
+                bool autoBrackets = EnableAutoCompleteBrackets;
+                bool autoQuotes = EnableAutoCompleteQuotes;
+                bool smartDelete = EnableSmartDelete;
+                bool syntaxHighlight = EnableSyntaxHighlight;
+                
+                string content = $"{smartIndent},{autoBrackets},{autoQuotes},{smartDelete},{syntaxHighlight}";
+                using (StreamWriter sw = new StreamWriter(filePath))
+                {
+                    sw.Write(content);
+                }
+            }
+            catch
+            {
+            }
+        }
+
+        public void Load(string filePath)
+        {
+            try
+            {
+                if (File.Exists(filePath))
+                {
+                    using (StreamReader sr = new StreamReader(filePath))
+                    {
+                        string content = sr.ReadToEnd();
+                        string[] parts = content.Split(',');
+                        if (parts.Length >= 5)
+                        {
+                            bool smartIndent, autoBrackets, autoQuotes, smartDelete, syntaxHighlight;
+                            bool.TryParse(parts[0], out smartIndent);
+                            bool.TryParse(parts[1], out autoBrackets);
+                            bool.TryParse(parts[2], out autoQuotes);
+                            bool.TryParse(parts[3], out smartDelete);
+                            bool.TryParse(parts[4], out syntaxHighlight);
+                            
+                            EnableSmartIndent = smartIndent;
+                            EnableAutoCompleteBrackets = autoBrackets;
+                            EnableAutoCompleteQuotes = autoQuotes;
+                            EnableSmartDelete = smartDelete;
+                            EnableSyntaxHighlight = syntaxHighlight;
+                        }
+                    }
+                }
+            }
+            catch
+            {
+            }
+        }
+    }
+
     public class Nano
     {
         private string path;
@@ -22,6 +86,7 @@ namespace CMLeonOS
         private FileSystem fileSystem;
         private UserSystem userSystem;
         private Shell shell;
+        private NanoSettings settings = new NanoSettings();
 
         private readonly (string, string)[] SHORTCUTS = new (string, string)[]
         {
@@ -107,7 +172,7 @@ namespace CMLeonOS
                     {
                         string line = lines[i].Substring(scrollX, Math.Min(consoleWidth, lines[i].Length - scrollX));
                         
-                        if (IsLuaFile())
+                        if (IsLuaFile() && settings.EnableSyntaxHighlight)
                         {
                             RenderLuaLine(line, consoleWidth);
                         }
@@ -453,22 +518,67 @@ namespace CMLeonOS
         private void InsertLine()
         {
             string line = lines[currentLine];
-            if (linePos == line.Length)
+            
+            if (IsLuaFile() && settings.EnableSmartIndent)
             {
-                lines.Insert(currentLine + 1, string.Empty);
+                string currentIndent = GetLineIndent(line);
+                
+                if (linePos == line.Length)
+                {
+                    lines.Insert(currentLine + 1, currentIndent);
+                }
+                else
+                {
+                    lines.Insert(currentLine + 1, currentIndent + line.Substring(linePos, line.Length - linePos));
+                    lines[currentLine] = line.Remove(linePos, line.Length - linePos);
+                }
+                
+                if (line.TrimEnd().EndsWith("then") || line.TrimEnd().EndsWith("do") || line.TrimEnd().EndsWith("else") || line.TrimEnd().EndsWith("elseif") || line.TrimEnd().EndsWith("repeat"))
+                {
+                    lines[currentLine + 1] = lines[currentLine + 1] + "    ";
+                }
             }
             else
             {
-                lines.Insert(currentLine + 1, line.Substring(linePos, line.Length - linePos));
-                lines[currentLine] = line.Remove(linePos, line.Length - linePos);
+                if (linePos == line.Length)
+                {
+                    lines.Insert(currentLine + 1, string.Empty);
+                }
+                else
+                {
+                    lines.Insert(currentLine + 1, line.Substring(linePos, line.Length - linePos));
+                    lines[currentLine] = line.Remove(linePos, line.Length - linePos);
+                }
             }
+            
             updatedLinesStart = currentLine;
             updatedLinesEnd = lines.Count - 1;
 
             currentLine += 1;
-            linePos = 0;
+            linePos = lines[currentLine].Length;
 
             modified = true;
+        }
+
+        private string GetLineIndent(string line)
+        {
+            int indent = 0;
+            foreach (char c in line)
+            {
+                if (c == ' ')
+                {
+                    indent++;
+                }
+                else if (c == '\t')
+                {
+                    indent += 4;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            return new string(' ', indent);
         }
 
         // Insert text at the cursor.
@@ -476,13 +586,68 @@ namespace CMLeonOS
         {
             for (int i = 0; i < text.Length; i++)
             {
-                lines[currentLine] = lines[currentLine].Insert(linePos, text[i].ToString());
+                char c = text[i];
+                
+                if (IsLuaFile())
+                {
+                    c = HandleLuaAutoComplete(c);
+                }
+                
+                lines[currentLine] = lines[currentLine].Insert(linePos, c.ToString());
                 linePos++;
 
                 updatedLinesStart = currentLine;
                 updatedLinesEnd = currentLine;
             }
             modified = true;
+        }
+
+        private char HandleLuaAutoComplete(char c)
+        {
+            string line = lines[currentLine];
+            
+            if (settings.EnableAutoCompleteBrackets)
+            {
+                if (c == '(')
+                {
+                    lines[currentLine] = lines[currentLine].Insert(linePos, ")");
+                    return '(';
+                }
+                else if (c == '[')
+                {
+                    lines[currentLine] = lines[currentLine].Insert(linePos, "]");
+                    return '[';
+                }
+                else if (c == '{')
+                {
+                    lines[currentLine] = lines[currentLine].Insert(linePos, "}");
+                    return '{';
+                }
+            }
+            
+            if (settings.EnableAutoCompleteQuotes)
+            {
+                if (c == '"')
+                {
+                    if (linePos > 0 && line[linePos - 1] == '\\')
+                    {
+                        return '"';
+                    }
+                    lines[currentLine] = lines[currentLine].Insert(linePos, "\"");
+                    return '"';
+                }
+                else if (c == '\'')
+                {
+                    if (linePos > 0 && line[linePos - 1] == '\\')
+                    {
+                        return '\'';
+                    }
+                    lines[currentLine] = lines[currentLine].Insert(linePos, "'");
+                    return '\'';
+                }
+            }
+            
+            return c;
         }
 
         private void InsertTab()
@@ -507,6 +672,17 @@ namespace CMLeonOS
             }
             else
             {
+                if (IsLuaFile() && settings.EnableSmartDelete)
+                {
+                    string line = lines[currentLine];
+                    char charToDelete = line[linePos - 1];
+                    
+                    if (linePos < line.Length && IsMatchingPair(charToDelete, line[linePos]))
+                    {
+                        lines[currentLine] = lines[currentLine].Remove(linePos, 1);
+                    }
+                }
+                
                 lines[currentLine] = lines[currentLine].Remove(linePos - 1, 1);
                 linePos--;
 
@@ -514,6 +690,15 @@ namespace CMLeonOS
                 updatedLinesEnd = currentLine;
             }
             modified = true;
+        }
+
+        private bool IsMatchingPair(char open, char close)
+        {
+            return (open == '(' && close == ')') ||
+                   (open == '[' && close == ']') ||
+                   (open == '{' && close == '}') ||
+                   (open == '"' && close == '"') ||
+                   (open == '\'' && close == '\'');
         }
 
         // Move the cursor left.
@@ -1040,6 +1225,9 @@ namespace CMLeonOS
             }
             switch (key.Key)
             {
+                case ConsoleKey.F2:
+                    ShowSettingsMenu();
+                    return true;
                 case ConsoleKey.Tab:
                     InsertTab();
                     break;
@@ -1145,12 +1333,163 @@ namespace CMLeonOS
             RenderShortcuts(SHORTCUTS);
         }
 
+        private void ShowSettingsMenu()
+        {
+            Console.BackgroundColor = ConsoleColor.Blue;
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Clear();
+
+            int consoleWidth = 80;
+            int consoleHeight = 25;
+            
+            string title = " Nano Settings";
+            string[] options = new string[]
+            {
+                "1. Smart Indent",
+                "2. Auto Complete Brackets",
+                "3. Auto Complete Quotes",
+                "4. Smart Delete",
+                "5. Syntax Highlight",
+                "6. Save and Exit"
+            };
+
+            int maxOptionLength = 0;
+            foreach (string option in options)
+            {
+                if (option.Length > maxOptionLength)
+                {
+                    maxOptionLength = option.Length;
+                }
+            }
+
+            int menuWidth = maxOptionLength + 10;
+            int menuHeight = options.Length + 4;
+            int menuX = (consoleWidth - menuWidth) / 2;
+            int menuY = (consoleHeight - menuHeight) / 2;
+
+            int titleX = menuX + (menuWidth - title.Length) / 2;
+            Console.SetCursorPosition(titleX, menuY);
+            Console.Write(title);
+
+            int borderLeft = menuX;
+            int borderRight = menuX + menuWidth - 1;
+            int borderTop = menuY;
+            int borderBottom = menuY + menuHeight - 1;
+
+            for (int i = 0; i < menuWidth; i++)
+            {
+                Console.SetCursorPosition(borderLeft + i, borderTop);
+                Console.Write("-");
+            }
+
+            for (int i = 0; i < menuHeight; i++)
+            {
+                Console.SetCursorPosition(borderLeft, borderTop + 1 + i);
+                Console.Write("|");
+                Console.SetCursorPosition(borderRight, borderTop + 1 + i);
+                Console.Write("|");
+            }
+
+            for (int i = 0; i < menuWidth; i++)
+            {
+                Console.SetCursorPosition(borderLeft + i, borderBottom);
+                Console.Write("-");
+            }
+
+            for (int i = 0; i < options.Length; i++)
+            {
+                int optionY = borderTop + 2 + i;
+                Console.SetCursorPosition(borderLeft + 2, optionY);
+                Console.Write(options[i]);
+                
+                string status = GetSettingStatus(i);
+                int statusX = borderRight - status.Length - 2;
+                Console.SetCursorPosition(statusX, optionY);
+                Console.Write($"[{status}]");
+            }
+
+            int promptY = borderBottom - 2;
+            string prompt = "Use 1-6 to toggle, ESC to exit";
+            int promptX = menuX + (menuWidth - prompt.Length) / 2;
+            Console.SetCursorPosition(promptX, promptY);
+            Console.Write(prompt);
+
+            while (true)
+            {
+                ConsoleKeyInfo key = Console.ReadKey(true);
+                
+                if (key.Key == ConsoleKey.Escape)
+                {
+                    break;
+                }
+                else if (key.KeyChar >= '1' && key.KeyChar <= '6')
+                {
+                    int option = key.KeyChar - '1';
+                    ToggleSetting(option);
+                    ShowSettingsMenu();
+                    break;
+                }
+            }
+
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Clear();
+            RenderUI();
+            updatedLinesStart = 0;
+            updatedLinesEnd = lines.Count - 1;
+        }
+
+        private string GetSettingStatus(int option)
+        {
+            switch (option)
+            {
+                case 0:
+                    return settings.EnableSmartIndent ? "ON " : "OFF";
+                case 1:
+                    return settings.EnableAutoCompleteBrackets ? "ON " : "OFF";
+                case 2:
+                    return settings.EnableAutoCompleteQuotes ? "ON " : "OFF";
+                case 3:
+                    return settings.EnableSmartDelete ? "ON " : "OFF";
+                case 4:
+                    return settings.EnableSyntaxHighlight ? "ON " : "OFF";
+                default:
+                    return "";
+            }
+        }
+
+        private void ToggleSetting(int option)
+        {
+            switch (option)
+            {
+                case 0:
+                    settings.EnableSmartIndent = !settings.EnableSmartIndent;
+                    break;
+                case 1:
+                    settings.EnableAutoCompleteBrackets = !settings.EnableAutoCompleteBrackets;
+                    break;
+                case 2:
+                    settings.EnableAutoCompleteQuotes = !settings.EnableAutoCompleteQuotes;
+                    break;
+                case 3:
+                    settings.EnableSmartDelete = !settings.EnableSmartDelete;
+                    break;
+                case 4:
+                    settings.EnableSyntaxHighlight = !settings.EnableSyntaxHighlight;
+                    break;
+                case 5:
+                    break;
+            }
+        }
+
         public void Start()
         {
             Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.White;
             Console.Clear();
 
+            settings.Load(@"0:\system\nano.dat");
+            
             RenderUI();
             while (!quit)
             {
@@ -1164,6 +1503,8 @@ namespace CMLeonOS
                 HandleInput();
                 UpdateScrolling();
             }
+            
+            settings.Save(@"0:\system\nano.dat");
 
             Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.White;
