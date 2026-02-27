@@ -403,7 +403,7 @@ namespace CMLeonOS.Commands
             {
                 Command = "help",
                 Parameters = "<page>",
-                Description = "Show help page (1-3)",
+                Description = "Show help page (1-4)",
                 SubCommands = new[] { new SubCommandInfo { Command = "help all", Description = "Show all help pages" } }
             }
         };
@@ -483,24 +483,32 @@ namespace CMLeonOS.Commands
                 pageNumber = 1;
             }
             
-            int startIndex = (pageNumber - 1) * CommandsPerPage;
-            int endIndex = Math.Min(startIndex + CommandsPerPage, allCommands.Count);
-            
             Console.WriteLine("====================================");
             Console.WriteLine($"        Help - Page {pageNumber}/{totalPages}");
             Console.WriteLine("====================================");
             Console.WriteLine();
             
             int linesOnPage = 0;
-            for (int i = startIndex; i < endIndex; i++)
+            int currentLine = 0;
+            
+            for (int i = 0; i < allCommands.Count; i++)
             {
                 int cmdLines = GetCommandLinesCount(allCommands[i]);
-                if (linesOnPage + cmdLines > CommandsPerPage)
+                
+                if (currentLine + cmdLines <= (pageNumber - 1) * CommandsPerPage)
+                {
+                    currentLine += cmdLines;
+                    continue;
+                }
+                
+                if (linesOnPage >= CommandsPerPage)
                 {
                     break;
                 }
+                
                 DisplayCommand(allCommands[i]);
                 linesOnPage += cmdLines;
+                currentLine += cmdLines;
             }
             
             if (pageNumber < totalPages)
