@@ -498,6 +498,41 @@ lua <file>
 lua script.lua
 ```
 
+### lua2cla
+将 Lua 文件转换为 CMLeonOS Lua 应用格式（.cla）。
+
+**用法：**
+```bash
+lua2cla <lua_file>
+```
+
+**示例：**
+```bash
+lua2cla app.lua
+```
+
+**说明：**
+- 文件头为 `CMLeonOS_CLA`
+- 转换后的文件可以通过 `cla` 命令运行
+
+### cla
+运行 CMLeonOS Lua 应用格式（.cla）文件。
+
+**用法：**
+```bash
+cla <cla_file>
+```
+
+**示例：**
+```bash
+cla app.cla
+```
+
+**说明：**
+- 运行 .cla 格式的加密 Lua 应用
+- 自动解密并执行 Lua 代码
+- 文件头必须为 `CMLeonOS_CLA`
+
 ### com
 执行命令脚本文件。
 
@@ -636,7 +671,7 @@ app list              # 列出所有可用应用
 app install <name>    # 安装应用
 app uninstall <name>  # 卸载应用
 app installed         # 列出已安装应用
-app help             # 显示帮助信息
+app help              # 显示帮助信息
 ```
 
 **示例：**

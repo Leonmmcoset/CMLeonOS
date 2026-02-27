@@ -116,6 +116,60 @@ namespace CMLeonOS.Commands.Script
             }
         }
 
+        public static void ExecuteLuaCode(string code, CMLeonOS.FileSystem fileSystem, Shell shell, Action<string> showError, Action<string> showWarning)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+            {
+                showWarning("Lua code is empty");
+                return;
+            }
+            
+            try
+            {
+                ILuaState lua = LuaAPI.NewState();
+                lua.L_OpenLibs();
+                
+                UniLua.ThreadStatus loadResult = lua.L_LoadString(code);
+                
+                if (loadResult == UniLua.ThreadStatus.LUA_OK)
+                {
+                    UniLua.ThreadStatus callResult = lua.PCall(0, 0, 0);
+                    
+                    if (callResult == UniLua.ThreadStatus.LUA_OK)
+                    {
+                    }
+                    else
+                    {
+                        string errorMsg = lua.ToString(-1);
+                        if (string.IsNullOrWhiteSpace(errorMsg))
+                        {
+                            showError($"Script execution error: Unknown error");
+                        }
+                        else
+                        {
+                            showError($"Script execution error: {errorMsg}");
+                        }
+                    }
+                }
+                else
+                {
+                    string errorMsg = lua.ToString(-1);
+                    if (string.IsNullOrWhiteSpace(errorMsg))
+                    {
+                        showError($"Script load error: Unknown error");
+                    }
+                    else
+                    {
+                        showError($"Script load error: {errorMsg}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                showError($"Lua execution error: {ex.Message}");
+            }
+        }
+
         private static void EnterLuaShell(Action<string> showError)
         {
             Console.WriteLine("====================================");

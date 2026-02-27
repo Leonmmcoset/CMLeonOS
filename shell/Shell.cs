@@ -407,8 +407,8 @@ namespace CMLeonOS
                 "rmdir", "cat", "version", "about", "head", "tail", "wc", "cp",
                 "mv", "rename", "touch", "find", "tree", "grep", "getdisk", "user",
                 "cpass", "hostname", "ipconfig", "setdns", "setgateway", "nslookup",
-                "ping", "wget", "ftp", "tcpserver", "tcpclient", "lua", "branswe",
-                "beep", "env", "whoami", "uptime", "alias",
+                "ping", "wget", "ftp", "tcpserver", "tcpclient", "lua", "lua2cla", "cla",
+                "branswe", "beep", "env", "whoami", "uptime", "alias",
                 "unalias", "base64", "testgui"
             };
         }
@@ -1500,6 +1500,16 @@ namespace CMLeonOS
         public void ExecuteLuaScript(string args)
         {
             Commands.Script.LuaCommand.ExecuteLuaScript(args, fileSystem, this, ShowError, ShowWarning);
+        }
+
+        public void ConvertLuaToCla(string args)
+        {
+            Commands.Script.Lua2ClaCommand.ConvertLuaToCla(args, fileSystem, ShowError, ShowSuccess);
+        }
+
+        public void RunClaFile(string args)
+        {
+            Commands.Script.ClaCommand.RunClaFile(args, fileSystem, this, ShowError, ShowWarning);
         }
 
         public void ProcessTestGui()
