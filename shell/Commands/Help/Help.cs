@@ -370,6 +370,18 @@ namespace CMLeonOS.Commands
             },
             new CommandInfo
             {
+                Command = "lua2cla",
+                Parameters = "<lua_file>",
+                Description = "Convert Lua to CLA format"
+            },
+            new CommandInfo
+            {
+                Command = "cla",
+                Parameters = "<cla_file>",
+                Description = "Run CLA application"
+            },
+            new CommandInfo
+            {
                 Command = "version",
                 Parameters = "",
                 Description = "Show OS version"
