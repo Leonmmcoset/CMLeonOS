@@ -58,6 +58,18 @@ namespace CMLeonOS.Commands
                         Console.WriteLine("Error: LoggerEnabled must be 'true' or 'false'");
                     }
                 }
+                else if (key.ToLower() == "maxloginattempts")
+                {
+                    if (int.TryParse(value, out int attempts) && attempts > 0)
+                    {
+                        SettingsManager.MaxLoginAttempts = attempts;
+                        Console.WriteLine($"MaxLoginAttempts set to {attempts}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error: MaxLoginAttempts must be a positive integer");
+                    }
+                }
                 else
                 {
                     SettingsManager.SetSetting(key, value);

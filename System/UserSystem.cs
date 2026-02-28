@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using Sys = Cosmos.System;
 using CMLeonOS.Logger;
+using CMLeonOS.Settings;
 
 namespace CMLeonOS
 {
@@ -25,6 +26,7 @@ namespace CMLeonOS
         public bool fixmode = Kernel.FixMode;
         private User currentLoggedInUser;
         private static CMLeonOS.Logger.Logger _logger = CMLeonOS.Logger.Logger.Instance;
+        private Dictionary<string, int> loginAttempts = new Dictionary<string, int>();
 
         public User CurrentLoggedInUser
         {
@@ -593,12 +595,36 @@ namespace CMLeonOS
 
             if (foundUser.Password != hashedInputPassword)
             {
+                string usernameLower = username.ToLower();
+                
+                if (!loginAttempts.ContainsKey(usernameLower))
+                {
+                    loginAttempts[usernameLower] = 0;
+                }
+                
+                loginAttempts[usernameLower]++;
+                int attempts = loginAttempts[usernameLower];
+                int maxAttempts = Settings.SettingsManager.MaxLoginAttempts;
+                
+                if (attempts >= maxAttempts)
+                {
+                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Red, global::System.ConsoleColor.Black);
+                    global::System.Console.SetCursorPosition(17, 24);
+                    global::System.Console.Write($"Maximum login attempts ({maxAttempts}) reached.  ");
+                    global::System.Console.SetCursorPosition(17, 25);
+                    global::System.Console.Write("Please restart to enter password again. ");
+                    global::System.Threading.Thread.Sleep(3000);
+                    Sys.Power.Reboot();
+                }
+                
                 CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Red, global::System.ConsoleColor.Black);
                 global::System.Console.SetCursorPosition(17, 24);
-                global::System.Console.Write("Invalid password.                           ");
+                global::System.Console.Write($"Invalid password. Attempts: {attempts}/{maxAttempts}  ");
                 global::System.Threading.Thread.Sleep(1000);
                 return false;
             }
+
+            loginAttempts.Remove(username.ToLower());
 
             CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Green, global::System.ConsoleColor.Black);
             global::System.Console.SetCursorPosition(17, 24);

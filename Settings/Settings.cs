@@ -11,7 +11,8 @@ namespace CMLeonOS.Settings
         
         private static Dictionary<string, string> defaultSettings = new Dictionary<string, string>
         {
-            { "LoggerEnabled", "true" }
+            { "LoggerEnabled", "true" },
+            { "MaxLoginAttempts", "3" }
         };
 
         public static bool LoggerEnabled
@@ -27,6 +28,26 @@ namespace CMLeonOS.Settings
             set
             {
                 settings["LoggerEnabled"] = value ? "true" : "false";
+                SaveSettings();
+            }
+        }
+
+        public static int MaxLoginAttempts
+        {
+            get
+            {
+                if (settings.TryGetValue("MaxLoginAttempts", out string value))
+                {
+                    if (int.TryParse(value, out int result))
+                    {
+                        return result;
+                    }
+                }
+                return 3;
+            }
+            set
+            {
+                settings["MaxLoginAttempts"] = value.ToString();
                 SaveSettings();
             }
         }
