@@ -118,7 +118,7 @@ namespace UniLua
 				return 1;
 			}
 			
-			CMLeonOS.Kernel.shell?.ExecuteCommand(command);
+			CMLeonOS.Kernel.ExecuteCommand(command);
 			lua.PushBoolean(true);
 			return 1;
 		}
@@ -132,7 +132,7 @@ namespace UniLua
 				return 1;
 			}
 			
-			CMLeonOS.Kernel.shell?.ExecuteCommand($"com {filePath}");
+			CMLeonOS.Kernel.ExecuteCommand($"com {filePath}");
 			lua.PushBoolean(true);
 			return 1;
 		}

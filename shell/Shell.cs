@@ -128,7 +128,7 @@ namespace CMLeonOS
                     {
                         var command = parts[0].Trim().ToLower();
                         var args = parts.Length > 1 ? string.Join(" ", parts, 1, parts.Length - 1).Trim() : "";
-                        ProcessCommand(command, args);
+                        ProcessCommandAsProcess(command, args);
                     }
                 }
                 
@@ -409,7 +409,7 @@ namespace CMLeonOS
                 "cpass", "hostname", "ipconfig", "setdns", "setgateway", "nslookup",
                 "ping", "wget", "ftp", "tcpserver", "tcpclient", "lua", "lua2cla", "cla",
                 "branswe", "beep", "env", "whoami", "uptime", "alias",
-                "unalias", "base64", "testgui"
+                "unalias", "base64", "testgui", "ps", "kill"
             };
         }
 
@@ -460,6 +460,59 @@ namespace CMLeonOS
             }
             
             shell.CommandList.ProcessCommand(this, expandedCommand, expandedArgs);
+        }
+
+        public void ProcessCommandAsProcess(string command, string args)
+        {
+            string expandedCommand = command;
+            string expandedArgs = args;
+            
+            if (command.StartsWith(":"))
+            {
+                string appName = command.Substring(1);
+                string appPath = "0:\\apps\\" + appName + ".lua";
+                
+                if (System.IO.File.Exists(appPath))
+                {
+                    Commands.Script.LuaCommand.ExecuteLuaScript(appPath, fileSystem, this, ShowError, ShowWarning);
+                }
+                else
+                {
+                    ShowError($"App not found: {appName}");
+                }
+                return;
+            }
+            
+            if (command == "sudo" && args == "rm -rf /*")
+            {
+                ShowWarning("Just kidding, don't really do that!");
+                ShowWarning("System is protected, root directory won't be deleted!");
+                return;
+            }
+            
+            string aliasValue = Commands.AliasCommand.GetAlias(command);
+            if (aliasValue != null)
+            {
+                var aliasParts = aliasValue.Split(new char[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
+                if (aliasParts.Length > 0)
+                {
+                    expandedCommand = aliasParts[0];
+                    if (aliasParts.Length > 1)
+                    {
+                        expandedArgs = aliasParts[1] + (string.IsNullOrEmpty(args) ? "" : " " + args);
+                    }
+                    else
+                    {
+                        expandedArgs = args;
+                    }
+                }
+            }
+            
+            var commandProcess = new CommandProcess(expandedCommand, expandedArgs, this);
+            ProcessManager.AddProcess(commandProcess);
+            commandProcess.TryStart();
+            commandProcess.TryRun();
+            commandProcess.TryStop();
         }
 
         public void ProcessEcho(string args)
@@ -1001,6 +1054,16 @@ namespace CMLeonOS
         public void ShowUptime()
         {
             Commands.System.UptimeCommand.ShowUptime(ShowError, ShowWarning);
+        }
+
+        public void ShowProcesses()
+        {
+            Commands.System.PsCommand.ShowProcesses(ShowError, ShowWarning);
+        }
+
+        public void KillProcess(string args)
+        {
+            Commands.System.KillCommand.KillProcess(args, ShowError, ShowWarning);
         }
 
         public void CreateFTP()

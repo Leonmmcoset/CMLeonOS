@@ -163,6 +163,12 @@ namespace CMLeonOS.shell
                 case "uptime":
                     shell.ShowUptime();
                     break;
+                case "ps":
+                    shell.ShowProcesses();
+                    break;
+                case "kill":
+                    shell.KillProcess(args);
+                    break;
                 case "grep":
                     shell.GrepFile(args);
                     break;

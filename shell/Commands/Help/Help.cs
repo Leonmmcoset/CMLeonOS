@@ -261,6 +261,18 @@ namespace CMLeonOS.Commands
             },
             new CommandInfo
             {
+                Command = "ps",
+                Parameters = "",
+                Description = "List all running processes"
+            },
+            new CommandInfo
+            {
+                Command = "kill",
+                Parameters = "<process_id>",
+                Description = "Kill a process by ID"
+            },
+            new CommandInfo
+            {
                 Command = "matrix",
                 Parameters = "",
                 Description = "Show Matrix effect (The Matrix movie)"
@@ -403,7 +415,7 @@ namespace CMLeonOS.Commands
             {
                 Command = "help",
                 Parameters = "<page>",
-                Description = "Show help page (1-4)",
+                Description = "Show help page (1-5)",
                 SubCommands = new[] { new SubCommandInfo { Command = "help all", Description = "Show all help pages" } }
             }
         };

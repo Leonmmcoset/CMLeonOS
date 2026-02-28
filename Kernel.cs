@@ -28,8 +28,13 @@ namespace CMLeonOS
 
         // 创建全局CosmosVFS实例
         public static Sys.FileSystem.CosmosVFS fs = new Sys.FileSystem.CosmosVFS();
-        public static Shell shell;
         public static UserSystem userSystem;
+        
+        public static void ExecuteCommand(string command)
+        {
+            var tempShell = new Shell(userSystem);
+            tempShell.ExecuteCommand(command);
+        }
         
         public static bool FixMode = false;
         public static DateTime SystemStartTime;
@@ -248,9 +253,6 @@ namespace CMLeonOS
                         
                         _logger.Info("Kernel", $"User '{userSystem.CurrentUsername}' logged in successfully");
                         
-                        // 登录成功后，初始化Shell
-                        shell = new Shell(userSystem);
-                        
                         // 检查并执行启动脚本
                         ExecuteStartupScript();
 
@@ -282,10 +284,14 @@ namespace CMLeonOS
                             Console.WriteLine("A bug brings new wake, a line brings new shine.");
                         }
                         
-                        // 运行Shell（用户可以输入exit退出）
-                        _logger.Info("Kernel", "Starting Shell");
-                        shell.Run();
-                        _logger.Info("Kernel", "Shell exited");
+                        // 运行Shell进程（用户可以输入exit退出）
+                        _logger.Info("Kernel", "Starting Shell process");
+                        var shellProcess = new ShellProcess(userSystem);
+                        ProcessManager.AddProcess(shellProcess);
+                        shellProcess.TryStart();
+                        shellProcess.TryRun();
+                        shellProcess.TryStop();
+                        _logger.Info("Kernel", "Shell process exited");
                         
                         // 如果用户输入了exit，Shell.Run()会返回，继续循环
                     }
@@ -442,6 +448,9 @@ namespace CMLeonOS
                     Console.WriteLine("Executing startup script...");
                     // Console.WriteLine("--------------------------------");
                     
+                    // 创建临时 Shell 实例来执行启动脚本
+                    var tempShell = new Shell(userSystem);
+                    
                     // 逐行执行命令
                     foreach (string line in lines)
                     {
@@ -453,7 +462,7 @@ namespace CMLeonOS
                         
                         // 执行命令
                         // Console.WriteLine($"Executing: {line}");
-                        shell.ExecuteCommand(line);
+                        tempShell.ExecuteCommand(line);
                     }
                     
                     // Console.WriteLine("--------------------------------");
@@ -536,10 +545,7 @@ namespace CMLeonOS
 
         protected override void Run()
         {
-            if (shell != null)
-            {
-                shell.Run();
-            }
+            ProcessManager.Yield();
         }
     }
 }
