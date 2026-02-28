@@ -409,7 +409,7 @@ namespace CMLeonOS
                 "cpass", "hostname", "ipconfig", "setdns", "setgateway", "nslookup",
                 "ping", "wget", "ftp", "tcpserver", "tcpclient", "lua", "lua2cla", "cla",
                 "branswe", "beep", "env", "whoami", "uptime", "alias",
-                "unalias", "base64", "testgui", "ps", "kill"
+                "unalias", "base64", "testgui", "ps", "kill", "hex"
             };
         }
 
@@ -1064,6 +1064,11 @@ namespace CMLeonOS
         public void KillProcess(string args)
         {
             Commands.System.KillCommand.KillProcess(args, ShowError, ShowWarning);
+        }
+
+        public void EditHexFile(string args)
+        {
+            Commands.Utility.HexCommand.EditHexFile(args);
         }
 
         public void CreateFTP()

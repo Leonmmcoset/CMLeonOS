@@ -214,6 +214,9 @@ namespace CMLeonOS.shell
                 case "snake":
                     shell.PlaySnake();
                     break;
+                case "hex":
+                    shell.EditHexFile(args);
+                    break;
                 case "alias":
                     shell.ProcessAlias(args);
                     break;

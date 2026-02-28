@@ -329,6 +329,60 @@ nano <file>
 nano myfile.txt
 ```
 
+### hex
+使用16进制编辑器编辑二进制文件。
+
+**用法：**
+```bash
+hex <filename>
+```
+
+**示例：**
+```bash
+hex test.bin
+hex kernel.sys
+```
+
+**控制键：**
+- `↑ ↓ ← →` - 移动光标
+- `Page Up / Page Down` - 滚动视图
+- `0-9, A-F` - 编辑字节值
+- `S` - 保存文件
+- `Q` - 退出编辑器
+
+**说明：**
+- 显示文件的16进制字节值和对应的ASCII字符
+- 每行显示16个字节，分为8个字节一组
+- 显示每行的偏移地址（8位16进制）
+- 光标位置用白色背景高亮显示
+- 文件修改后显示 [MODIFIED] 标记
+- 支持查看和编辑任意大小的二进制文件
+- 按 S 键保存修改到文件
+- 按 Q 键退出编辑器（不保存修改）
+
+**界面示例：**
+```
+====================================
+       Hex Editor
+====================================
+
+File: test.bin
+Size: 256 bytes [MODIFIED]
+
+00000000  48 65 6C 6C 6F 20 57 6F  72 6C 64 21 00 00 00 00  |Hello World.....|
+00000010  00 00 00 00 00 00 00 00  00 00 00 00 00 00 00 00  |................|
+
+Cursor: 0x00000000 (0)
+Value: 0x48
+
+Controls:
+  Arrow Keys - Move cursor
+  Page Up/Down - Scroll view
+  0-9, A-F - Edit byte
+  S - Save file
+  Q - Quit
+```
+
 ## 用户管理命令
 
 ### user

@@ -297,6 +297,12 @@ namespace CMLeonOS.Commands
             },
             new CommandInfo
             {
+                Command = "hex",
+                Parameters = "<filename>",
+                Description = "Hexadecimal file editor"
+            },
+            new CommandInfo
+            {
                 Command = "ping",
                 Parameters = "<ip>",
                 Description = "Ping IP address (5 times)"
