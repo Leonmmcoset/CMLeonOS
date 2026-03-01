@@ -3,6 +3,7 @@ using Sys = Cosmos.System;
 using Cosmos.HAL;
 using Cosmos.Core;
 using System.Threading;
+using System.IO;
 
 namespace CMLeonOS
 {
@@ -16,6 +17,10 @@ namespace CMLeonOS
 
     internal static class BootMenu
     {
+        private static bool UserDatExists()
+        {
+            return File.Exists(@"0:\system\user.dat");
+        }
         private static void PrintOption(string text, bool selected)
         {
             Console.SetCursorPosition(1, Console.GetCursorPosition().Top);
@@ -35,8 +40,6 @@ namespace CMLeonOS
 
             uint mem = Cosmos.Core.CPU.GetAmountOfRAM();
             Console.WriteLine($"{Version.DisplayVersion} [{mem} MB memory]");
-            // 这里老显示 unknown，谁知道为啥
-            // Console.WriteLine($"Git Commit: {Version.GitCommit}");
             Console.WriteLine($"Build Time: {GetBuildTime()}");
             Console.WriteLine();
             Console.WriteLine($"Auto-select in {remainingTime} seconds...");
@@ -44,10 +47,16 @@ namespace CMLeonOS
             Console.WriteLine("Select an option:");
             Console.WriteLine();
 
-            PrintOption("Normal Boot", selIdx == 0);
-            PrintOption("GUI Boot", selIdx == 1);
-            PrintOption("Reboot", selIdx == 2);
-            PrintOption("Shutdown", selIdx == 3);
+            bool userDatExists = UserDatExists();
+            int optionIndex = 0;
+
+            PrintOption("Normal Boot", selIdx == optionIndex++);
+            if (userDatExists)
+            {
+                PrintOption("GUI Boot", selIdx == optionIndex++);
+            }
+            PrintOption("Reboot", selIdx == optionIndex++);
+            PrintOption("Shutdown", selIdx == optionIndex++);
         }
 
         private static BootMenuAction Confirm(int selIdx)
@@ -61,21 +70,29 @@ namespace CMLeonOS
 
             Console.CursorVisible = true;
 
-            switch (selIdx)
+            bool userDatExists = UserDatExists();
+            int optionIndex = 0;
+
+            if (selIdx == optionIndex++)
             {
-                case 0:
-                    return BootMenuAction.NormalBoot;
-                case 1:
-                    return BootMenuAction.GuiBoot;
-                case 2:
-                    Sys.Power.Reboot();
-                    return BootMenuAction.Reboot;
-                case 3:
-                    Sys.Power.Shutdown();
-                    return BootMenuAction.Shutdown;
-                default:
-                    return BootMenuAction.NormalBoot;
+                return BootMenuAction.NormalBoot;
             }
+            if (userDatExists && selIdx == optionIndex++)
+            {
+                return BootMenuAction.GuiBoot;
+            }
+            if (selIdx == optionIndex++)
+            {
+                Sys.Power.Reboot();
+                return BootMenuAction.Reboot;
+            }
+            if (selIdx == optionIndex++)
+            {
+                Sys.Power.Shutdown();
+                return BootMenuAction.Shutdown;
+            }
+
+            return BootMenuAction.NormalBoot;
         }
 
         public static BootMenuAction Show()
@@ -131,12 +148,14 @@ namespace CMLeonOS
                     }
                 }
 
+                int maxOptionIndex = UserDatExists() ? 3 : 2;
+
                 if (selIdx < 0)
                 {
-                    selIdx = 3;
+                    selIdx = maxOptionIndex;
                 }
 
-                if (selIdx > 3)
+                if (selIdx > maxOptionIndex)
                 {
                     selIdx = 0;
                 }

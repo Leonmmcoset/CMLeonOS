@@ -159,7 +159,7 @@ namespace CMLeonOS.Gui.ShellComponents
             }
             
             window = new AppWindow(this, (int)(wm.ScreenWidth / 2 - width / 2), (int)(wm.ScreenHeight / 2 - height / 2), width, height);
-            window.Title = "CMLeonOS Logon";
+            window.Title = "CMLeonOS Login";
             window.Icon = Images.Icon_Key;
             window.CanMove = false;
             window.CanClose = false;
