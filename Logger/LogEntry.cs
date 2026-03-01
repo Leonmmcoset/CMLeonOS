@@ -8,6 +8,16 @@ namespace CMLeonOS.Logger
         public LogLevel Level;
         public string Source;
         public string Message;
+        
+        public LogLevel Priority
+        {
+            get { return Level; }
+        }
+        
+        public DateTime Date
+        {
+            get { return Timestamp; }
+        }
 
         public LogEntry(LogLevel level, string source, string message)
         {

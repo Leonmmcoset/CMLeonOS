@@ -29,5 +29,10 @@ namespace CMLeonOS
         {
             get { return $"CMLeonOS v{ShortVersion} ({VersionType}) - Git: {GitCommit}"; }
         }
+        
+        public static string GetVersion()
+        {
+            return ShortVersion;
+        }
     }
 }

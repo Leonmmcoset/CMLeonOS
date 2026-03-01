@@ -16,21 +16,61 @@ namespace CMLeonOS
         public string Password { get; set; }
         public bool IsAdmin { get; set; }
         public string Hostname { get; set; }
+        public List<string> Messages { get; set; }
+        public bool Admin
+        {
+            get { return IsAdmin; }
+        }
+        public bool LockedOut { get; set; }
+        public DateTime LockoutEnd { get; set; }
+        
+        public bool Authenticate(string password)
+        {
+            string hashedInputPassword = UserSystem.HashPasswordSha256(password);
+            return Password == hashedInputPassword;
+        }
     }
 
     public class UserSystem
     {
         private string sysDirectory = @"0:\system";
         private string userFilePath;
-        private List<User> users;
+
+        private static List<User> users;
         public bool fixmode = Kernel.FixMode;
-        private User currentLoggedInUser;
+        private static User currentLoggedInUser;
         private static CMLeonOS.Logger.Logger _logger = CMLeonOS.Logger.Logger.Instance;
         private Dictionary<string, int> loginAttempts = new Dictionary<string, int>();
+        
+        private static bool initialized = false;
 
-        public User CurrentLoggedInUser
+        public static List<User> GetUsers()
+        {
+            return users;
+        }
+
+        public static User CurrentLoggedInUser
         {
             get { return currentLoggedInUser; }
+        }
+
+        public static void Initialize()
+        {
+            // 清空用户列表并重新加载
+            users = null;
+            var tempUserSystem = new UserSystem();
+            tempUserSystem.LoadUsers();
+            initialized = true;
+            _logger.Info("UserSystem", $"User system initialized. Loaded {users?.Count ?? 0} users.");
+        }
+
+        public static void ReloadUsers()
+        {
+            // 清空用户列表并重新加载
+            users = null;
+            var tempUserSystem = new UserSystem();
+            tempUserSystem.LoadUsers();
+            _logger.Info("UserSystem", $"User data reloaded. Total users: {users?.Count ?? 0}");
         }
 
         public void ShowError(string error)
@@ -78,7 +118,8 @@ namespace CMLeonOS
             
             currentLoggedInUser = null;
             
-            LoadUsers();
+            // 不在构造函数中调用 LoadUsers()，避免重复初始化
+            // LoadUsers() 会在 UserSystem.Initialize() 中调用
             
             LoadHostname();
         }
@@ -181,13 +222,28 @@ namespace CMLeonOS
 
         private void LoadUsers()
         {
+            _logger.Info("UserSystem", "LoadUsers() called");
+            _logger.Info("UserSystem", $"  - userFilePath: {userFilePath}");
+            _logger.Info("UserSystem", $"  - File.Exists: {File.Exists(userFilePath)}");
+            _logger.Info("UserSystem", $"  - users is null: {users == null}");
+            _logger.Info("UserSystem", $"  - users.Count: {users?.Count ?? 0}");
+
             try
             {
                 if (File.Exists(userFilePath))
                 {
+                    _logger.Info("UserSystem", "  - Reading user file...");
                     string[] lines = File.ReadAllLines(userFilePath);
-                    users = new List<User>();
+                    _logger.Info("UserSystem", $"  - Total lines in file: {lines.Length}");
                     
+                    // 只在第一次加载时创建列表，后续加载不清空
+                    if (users == null)
+                    {
+                        users = new List<User>();
+                        _logger.Info("UserSystem", "  - Created new users list");
+                    }
+                    
+                    int userCount = 0;
                     foreach (string line in lines)
                     {
                         if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#"))
@@ -206,20 +262,38 @@ namespace CMLeonOS
                                 Hostname = parts.Length >= 4 ? parts[3].Trim() : ""
                             };
                             users.Add(user);
+                            userCount++;
+                            _logger.Info("UserSystem", $"  - Loaded user: {user.Username}, Admin: {user.Admin}");
                         }
                     }
+                    
+                    _logger.Info("UserSystem", $"  - Total users loaded: {userCount}");
                     
                     // Note: Passwords are stored as SHA256 hashes in the file
                     // When comparing passwords during login, hash the input password first
                 }
                 else
                 {
-                    users = new List<User>();
+                    // 只在第一次加载时创建列表
+                    if (users == null)
+                    {
+                        users = new List<User>();
+                        _logger.Info("UserSystem", "  - Created empty users list (file not found)");
+                    }
+                    else
+                    {
+                        _logger.Info("UserSystem", $"  - Using existing users list (count: {users.Count})");
+                    }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                users = new List<User>();
+                _logger.Error("UserSystem", $"Error loading users: {ex.Message}");
+                // 只在第一次加载时创建列表
+                if (users == null)
+                {
+                    users = new List<User>();
+                }
             }
         }
 
@@ -319,6 +393,11 @@ namespace CMLeonOS
                 }
                 return false;
             }
+        }
+
+        public static void SetCurrentLoggedInUser(User user)
+        {
+            currentLoggedInUser = user;
         }
 
         public void FirstTimeSetup()

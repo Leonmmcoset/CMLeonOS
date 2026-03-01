@@ -9,6 +9,7 @@ namespace CMLeonOS
     public enum BootMenuAction
     {
         NormalBoot,
+        GuiBoot,
         Reboot,
         Shutdown
     }
@@ -44,8 +45,9 @@ namespace CMLeonOS
             Console.WriteLine();
 
             PrintOption("Normal Boot", selIdx == 0);
-            PrintOption("Reboot", selIdx == 1);
-            PrintOption("Shutdown", selIdx == 2);
+            PrintOption("GUI Boot", selIdx == 1);
+            PrintOption("Reboot", selIdx == 2);
+            PrintOption("Shutdown", selIdx == 3);
         }
 
         private static BootMenuAction Confirm(int selIdx)
@@ -64,9 +66,11 @@ namespace CMLeonOS
                 case 0:
                     return BootMenuAction.NormalBoot;
                 case 1:
+                    return BootMenuAction.GuiBoot;
+                case 2:
                     Sys.Power.Reboot();
                     return BootMenuAction.Reboot;
-                case 2:
+                case 3:
                     Sys.Power.Shutdown();
                     return BootMenuAction.Shutdown;
                 default:
@@ -129,10 +133,10 @@ namespace CMLeonOS
 
                 if (selIdx < 0)
                 {
-                    selIdx = 2;
+                    selIdx = 3;
                 }
 
-                if (selIdx > 2)
+                if (selIdx > 3)
                 {
                     selIdx = 0;
                 }

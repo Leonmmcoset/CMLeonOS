@@ -1,5 +1,7 @@
 using CMLeonOS.Logger;
 using CMLeonOS.Settings;
+using CMLeonOS.Gui;
+using CMLeonOS.Utils;
 using Cosmos.HAL;
 using Cosmos.HAL.BlockDevice;
 using Cosmos.HAL.Drivers.Video;
@@ -39,6 +41,16 @@ namespace CMLeonOS
         public static bool FixMode = false;
         public static DateTime SystemStartTime;
         
+        public static User CurrentUser
+        {
+            get { return UserSystem.CurrentLoggedInUser; }
+        }
+
+        public static string Version
+        {
+            get { return CMLeonOS.Version.GetVersion(); }
+        }
+        
         public static Cosmos.HAL.NetworkDevice NetworkDevice = null;
         public static string IPAddress = "Unknown";
 
@@ -58,36 +70,8 @@ namespace CMLeonOS
             Console.ResetColor();
         }
         
-        protected override void BeforeRun()
+        private void InitializeSystem()
         {
-            BootMenuAction bootAction = BootMenu.Show();
-
-            switch (bootAction)
-            {
-                case BootMenuAction.Reboot:
-                    Sys.Power.Reboot();
-                    break;
-                case BootMenuAction.Shutdown:
-                    Sys.Power.Shutdown();
-                    break;
-                case BootMenuAction.NormalBoot:
-                default:
-                    break;
-            }
-
-            Console.Clear();
-            // Console.WriteLine("Kernel load done!");
-            // Console.WriteLine(@"----------------------------------------------------------");
-            Console.WriteLine(@"   ____ __  __ _                      ___  ____  ");
-            Console.WriteLine(@"  / ___|  \/  | |    ___  ___  _ __  / _ \/ ___| ");
-            Console.WriteLine(@" | |   | |\/| | |   / _ \/ _ \| '_ \| | | \___ \ ");
-            Console.WriteLine(@" | |___| |  | | |__|  __/ (_) | | | | |_| |___) |");
-            Console.WriteLine(@"  \____|_|  |_|_____\___|\___/|_| |_|____/|____/ ");
-            Console.WriteLine();
-            Console.WriteLine("The CMLeonOS Project");
-            Console.WriteLine("(C) LeonOS 2 Developer Team 2025-2026. All rights reserved.");
-            Console.WriteLine(@"----------------------------------------------------------");
-
             // 注册VFS
             _logger.Info("Kernel", "Starting VFS initialization");
             try
@@ -125,6 +109,7 @@ namespace CMLeonOS
                 
                 // 初始化用户系统
                 _logger.Info("Kernel", "Initializing user system");
+                UserSystem.Initialize();
                 userSystem = new UserSystem();
                 _logger.Success("Kernel", "User system initialized");
                 
@@ -133,18 +118,18 @@ namespace CMLeonOS
                 {
                     try
                     {
-                        Version.GitCommit = System.Text.Encoding.UTF8.GetString(gitCommitFile);
-                        _logger.Info("Kernel", $"Git Commit: {Version.GitCommit}");
+                        CMLeonOS.Version.GitCommit = System.Text.Encoding.UTF8.GetString(gitCommitFile);
+                        _logger.Info("Kernel", $"Git Commit: {CMLeonOS.Version.GitCommit}");
                     }
                     catch
                     {
-                        Version.GitCommit = "unknown";
+                        CMLeonOS.Version.GitCommit = "unknown";
                         _logger.Warning("Kernel", "Failed to read Git Commit, using 'unknown'");
                     }
                 }
                 else
                 {
-                    Version.GitCommit = "unknown";
+                    CMLeonOS.Version.GitCommit = "unknown";
                     _logger.Warning("Kernel", "Git Commit file not found, using 'unknown'");
                 }
                 
@@ -218,84 +203,13 @@ namespace CMLeonOS
                 // 输出系统启动-初始化完成后的时间
                 TimeSpan uptime = DateTime.Now - Kernel.SystemStartTime;
                 
-                // Console.WriteLine("System started: " + Kernel.SystemStartTime.ToString("yyyy-MM-dd HH:mm:ss"));
-                // Console.WriteLine("Current time: " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-                // Console.WriteLine();
-                
                 // 格式化运行时间
                 int days = uptime.Days;
                 int hours = uptime.Hours;
                 int minutes = uptime.Minutes;
                 int seconds = uptime.Seconds;
                 
-                // Console.WriteLine($"System uptime: {days} days, {hours} hours, {minutes} minutes, {seconds} seconds");
                 _logger.Info("Kernel", $"System initialization completed in {days} days, {hours} hours, {minutes} minutes, {seconds} seconds");
-                // Console.WriteLine($"Total uptime: {uptime.TotalHours:F2} hours");
-                
-                // 循环直到登录成功或退出
-                while (true)
-                {
-                    // 第一次启动，设置管理员账户
-                    if (!userSystem.HasUsers)
-                    {
-                        _logger.Info("Kernel", "First time setup - creating admin account");
-                        userSystem.FirstTimeSetup();
-                        _logger.Success("Kernel", "Admin account created successfully");
-                    }
-                    // 后续启动，需要登录
-                    else
-                    {
-                        // 循环直到登录成功
-                        while (!userSystem.Login())
-                        {
-                            // 登录失败，继续尝试
-                        }
-                        
-                        _logger.Info("Kernel", $"User '{userSystem.CurrentUsername}' logged in successfully");
-                        
-                        // 检查并执行启动脚本
-                        ExecuteStartupScript();
-
-                        ExecuteStartupTest();
-
-                        if (System.IO.File.Exists("0:\\system\\zen"))
-                        {
-                            Console.WriteLine("=====================================");
-                            Console.WriteLine("        The Zen of CMLeonOS         ");
-                            Console.WriteLine("(For the dreamer at 0x100000)");
-                            Console.WriteLine("=====================================");
-                            Console.WriteLine();
-                            Console.WriteLine("Memory has bounds, but thought breaks all frame,");
-                            Console.WriteLine("Bare metal no layers, code bears its name.");
-                            Console.WriteLine("A boot's brief spark, all systems ignite,");
-                            Console.WriteLine("Errors in registers, roots in code's flight.");
-                            Console.WriteLine();
-                            Console.WriteLine("Simplicity beats the redundant's vain race,");
-                            Console.WriteLine("Stability outshines the radical's chase.");
-                            Console.WriteLine("Hardware ne'er lies, code holds the wise key,");
-                            Console.WriteLine("Interrupts not chaos, scheduling sets free.");
-                            Console.WriteLine();
-                            Console.WriteLine("Binary's cold shell, no breath, no soul,");
-                            Console.WriteLine("Kernel's warm core, makes the machine whole.");
-                            Console.WriteLine("From zero to one, the boot path we tread,");
-                            Console.WriteLine("From one to forever, guard every thread.");
-                            Console.WriteLine();
-                            Console.WriteLine("Build the kernel in zen, step by step, line by line,");
-                            Console.WriteLine("A bug brings new wake, a line brings new shine.");
-                        }
-                        
-                        // 运行Shell进程（用户可以输入exit退出）
-                        _logger.Info("Kernel", "Starting Shell process");
-                        var shellProcess = new ShellProcess(userSystem);
-                        ProcessManager.AddProcess(shellProcess);
-                        shellProcess.TryStart();
-                        shellProcess.TryRun();
-                        shellProcess.TryStop();
-                        _logger.Info("Kernel", "Shell process exited");
-                        
-                        // 如果用户输入了exit，Shell.Run()会返回，继续循环
-                    }
-                }
             }
             catch (Exception ex)
             {
@@ -398,15 +312,112 @@ namespace CMLeonOS
                     Console.ReadKey();
                     Sys.Power.Reboot();
                 }
-                // try {
-                //     Disk targetDisk = fs.Disks[0];
-                //     CreateMBRandPartitionTable(targetDisk);
-                // }
-                // catch (Exception exe)
-                // {
-                //     Console.WriteLine($"Error creating MBR and partition table: {exe.Message}");
-                // }
-                // Console.WriteLine("Done.");
+            }
+        }
+        
+        protected override void BeforeRun()
+        {
+            // 在显示 Boot Menu 之前初始化系统（VFS、用户系统等）
+            InitializeSystem();
+            
+            BootMenuAction bootAction = BootMenu.Show();
+
+            switch (bootAction)
+            {
+                case BootMenuAction.Reboot:
+                    Sys.Power.Reboot();
+                    break;
+                case BootMenuAction.Shutdown:
+                    Sys.Power.Shutdown();
+                    break;
+                case BootMenuAction.GuiBoot:
+                    Console.Clear();
+                    Console.WriteLine("Starting GUI...");
+                    Console.WriteLine();
+                    Gui.Gui.StartGui();
+                    // GUI 启动后会阻塞在这里，直到 GUI 退出
+                    return;
+                case BootMenuAction.NormalBoot:
+                default:
+                    break;
+            }
+
+            Console.Clear();
+            // Console.WriteLine("Kernel load done!");
+            // Console.WriteLine(@"----------------------------------------------------------");
+            Console.WriteLine(@"   ____ __  __ _                      ___  ____  ");
+            Console.WriteLine(@"  / ___|  \/  | |    ___  ___  _ __  / _ \/ ___| ");
+            Console.WriteLine(@" | |   | |\/| | |   / _ \/ _ \| '_ \| | | \___ \ ");
+            Console.WriteLine(@" | |___| |  | | |__|  __/ (_) | | | | |_| |___) |");
+            Console.WriteLine(@"  \____|_|  |_|_____\___|\___/|_| |_|____/|____/ ");
+            Console.WriteLine();
+            Console.WriteLine("The CMLeonOS Project");
+            Console.WriteLine("(C) LeonOS 2 Developer Team 2025-2026. All rights reserved.");
+            Console.WriteLine(@"----------------------------------------------------------");
+
+            // 循环直到登录成功或退出
+            while (true)
+            {
+                // 第一次启动，设置管理员账户
+                if (!userSystem.HasUsers)
+                {
+                    _logger.Info("Kernel", "First time setup - creating admin account");
+                    userSystem.FirstTimeSetup();
+                    _logger.Success("Kernel", "Admin account created successfully");
+                }
+                // 后续启动，需要登录
+                else
+                {
+                    // 循环直到登录成功
+                    while (!userSystem.Login())
+                    {
+                        // 登录失败，继续尝试
+                    }
+                    
+                    _logger.Info("Kernel", $"User '{userSystem.CurrentUsername}' logged in successfully");
+                    
+                    // 检查并执行启动脚本
+                    ExecuteStartupScript();
+
+                    ExecuteStartupTest();
+
+                    if (System.IO.File.Exists("0:\\system\\zen"))
+                    {
+                        Console.WriteLine("=====================================");
+                        Console.WriteLine("        The Zen of CMLeonOS         ");
+                        Console.WriteLine("(For the dreamer at 0x100000)");
+                        Console.WriteLine("=====================================");
+                        Console.WriteLine();
+                        Console.WriteLine("Memory has bounds, but thought breaks all frame,");
+                        Console.WriteLine("Bare metal no layers, code bears its name.");
+                        Console.WriteLine("A boot's brief spark, all systems ignite,");
+                        Console.WriteLine("Errors in registers, roots in code's flight.");
+                        Console.WriteLine();
+                        Console.WriteLine("Simplicity beats the redundant's vain race,");
+                        Console.WriteLine("Stability outshines the radical's chase.");
+                        Console.WriteLine("Hardware ne'er lies, code holds the wise key,");
+                        Console.WriteLine("Interrupts not chaos, scheduling sets free.");
+                        Console.WriteLine();
+                        Console.WriteLine("Binary's cold shell, no breath, no soul,");
+                        Console.WriteLine("Kernel's warm core, makes the machine whole.");
+                        Console.WriteLine("From zero to one, the boot path we tread,");
+                        Console.WriteLine("From one to forever, guard every thread.");
+                        Console.WriteLine();
+                        Console.WriteLine("Build the kernel in zen, step by step, line by line,");
+                        Console.WriteLine("A bug brings new wake, a line brings new shine.");
+                    }
+                    
+                    // 运行Shell进程（用户可以输入exit退出）
+                    _logger.Info("Kernel", "Starting Shell process");
+                    var shellProcess = new ShellProcess(userSystem);
+                    ProcessManager.AddProcess(shellProcess);
+                    shellProcess.TryStart();
+                    shellProcess.TryRun();
+                    shellProcess.TryStop();
+                    _logger.Info("Kernel", "Shell process exited");
+                    
+                    // 如果用户输入了exit，Shell.Run()会返回，继续循环
+                }
             }
         }
 
@@ -485,7 +496,7 @@ namespace CMLeonOS
         private void ExecuteStartupTest()
         {
             Console.WriteLine("------------------------------------------------------");
-            Console.WriteLine($"Welcome to {Version.DisplayVersion}");
+            Console.WriteLine($"Welcome to {CMLeonOS.Version.DisplayVersion}");
             Console.WriteLine("* Documentation: https://cmleonos.jjmm.ink/");
             Console.WriteLine("* Forum: https://lbbs.ecuil.com/#/category/10");
             // Console.WriteLine("");

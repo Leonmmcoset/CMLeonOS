@@ -61,7 +61,7 @@ namespace CMLeonOS
             Commands.SettingsCommand.SetUserSystem(userSystem);
             Commands.User.UserCommand.SetUserSystem(userSystem);
             
-            User currentUser = userSystem.CurrentLoggedInUser;
+            User currentUser = UserSystem.CurrentLoggedInUser;
             if (currentUser != null && !string.IsNullOrWhiteSpace(currentUser.Username))
             {
                 string userHomePath = $@"0:\user\{currentUser.Username}";
@@ -86,7 +86,7 @@ namespace CMLeonOS
 
         public void Run()
         {
-            User currentUser = userSystem.CurrentLoggedInUser;
+            User currentUser = UserSystem.CurrentLoggedInUser;
             bool shouldExit = false;
 
             while (true)

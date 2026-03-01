@@ -28,7 +28,7 @@ namespace CMLeonOS.Commands.User
 
         public static void ProcessUserCommand(string args, CMLeonOS.UserSystem userSystem, Action<string> showError)
         {
-            if (userSystem == null || userSystem.CurrentLoggedInUser == null || !userSystem.CurrentLoggedInUser.IsAdmin)
+            if (userSystem == null || UserSystem.CurrentLoggedInUser == null || !UserSystem.CurrentLoggedInUser.IsAdmin)
             {
                 showError("Error: Only administrators can use this command.");
                 return;

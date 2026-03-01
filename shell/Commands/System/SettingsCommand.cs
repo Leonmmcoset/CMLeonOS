@@ -20,7 +20,7 @@ namespace CMLeonOS.Commands
                 return;
             }
 
-            if (userSystem == null || userSystem.CurrentLoggedInUser == null || !userSystem.CurrentLoggedInUser.IsAdmin)
+            if (userSystem == null || UserSystem.CurrentLoggedInUser == null || !UserSystem.CurrentLoggedInUser.IsAdmin)
             {
                 Console.WriteLine("Error: Only administrators can change settings.");
                 return;
