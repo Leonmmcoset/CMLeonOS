@@ -120,6 +120,7 @@ namespace CMLeonOS.Gui
             RegisterApp(new AppMetadata("Stopwatch", () => { return new Stopwatch(); }, Icons.Icon_Stopwatch, Color.FromArgb(168, 55, 47)));
             RegisterApp(new AppMetadata("Paint", () => { return new Apps.Paint.Paint(); }, Icons.Icon_Paint, Color.FromArgb(0, 115, 186)));
             RegisterApp(new AppMetadata("Memory Statistics", () => { return new Apps.MemoryStatistics(); }, Icons.Icon_MemoryStatistics, Color.FromArgb(25, 25, 25)));
+            RegisterApp(new AppMetadata("CodeStudio", () => { return new Apps.CodeStudio.CodeStudio(); }, Icons.Icon_CodeStudio, Color.FromArgb(14, 59, 76)));
 
             Logger.Logger.Instance.Info("AppManager", $"{AppMetadatas.Count} apps were registered.");
 
