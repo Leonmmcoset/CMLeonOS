@@ -421,7 +421,7 @@ namespace CMLeonOS
             }
         }
 
-        // 我他妈居然成功了，我在没有任何文档的情况下研究出来了
+        // 我居然成功了，我在没有任何文档的情况下研究出来了
         private void CreateMBRandPartitionTable(Disk disk)
         {
             disk.Clear();

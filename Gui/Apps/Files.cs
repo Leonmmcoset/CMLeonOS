@@ -75,7 +75,6 @@ namespace CMLeonOS.Gui.Apps
             ("CMLeonOS (0:)", @"0:\"),
             ("My Home", @$"0:\user\{UserSystem.CurrentLoggedInUser.Username}"),
             ("Users", @"0:\user"),
-            ("etc", @"0:\etc"),
         };
 
         private Bitmap GetFileIcon(string path)

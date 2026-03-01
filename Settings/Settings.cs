@@ -12,7 +12,14 @@ namespace CMLeonOS.Settings
         private static Dictionary<string, string> defaultSettings = new Dictionary<string, string>
         {
             { "LoggerEnabled", "true" },
-            { "MaxLoginAttempts", "3" }
+            { "MaxLoginAttempts", "3" },
+            { "GUI_LeftHandStartButton", "false" },
+            { "GUI_ShowFps", "true" },
+            { "GUI_TwelveHourClock", "false" },
+            { "GUI_MouseSensitivity", "1.0" },
+            { "GUI_ScreenWidth", "1280" },
+            { "GUI_ScreenHeight", "800" },
+            { "GUI_DarkNotepad", "false" }
         };
 
         public static bool LoggerEnabled
@@ -48,6 +55,134 @@ namespace CMLeonOS.Settings
             set
             {
                 settings["MaxLoginAttempts"] = value.ToString();
+                SaveSettings();
+            }
+        }
+
+        public static bool GUI_LeftHandStartButton
+        {
+            get
+            {
+                if (settings.TryGetValue("GUI_LeftHandStartButton", out string value))
+                {
+                    return value.ToLower() == "true";
+                }
+                return false;
+            }
+            set
+            {
+                settings["GUI_LeftHandStartButton"] = value ? "true" : "false";
+                SaveSettings();
+            }
+        }
+
+        public static bool GUI_ShowFps
+        {
+            get
+            {
+                if (settings.TryGetValue("GUI_ShowFps", out string value))
+                {
+                    return value.ToLower() == "true";
+                }
+                return true;
+            }
+            set
+            {
+                settings["GUI_ShowFps"] = value ? "true" : "false";
+                SaveSettings();
+            }
+        }
+
+        public static bool GUI_TwelveHourClock
+        {
+            get
+            {
+                if (settings.TryGetValue("GUI_TwelveHourClock", out string value))
+                {
+                    return value.ToLower() == "true";
+                }
+                return false;
+            }
+            set
+            {
+                settings["GUI_TwelveHourClock"] = value ? "true" : "false";
+                SaveSettings();
+            }
+        }
+
+        public static float GUI_MouseSensitivity
+        {
+            get
+            {
+                if (settings.TryGetValue("GUI_MouseSensitivity", out string value))
+                {
+                    if (float.TryParse(value, out float result))
+                    {
+                        return result;
+                    }
+                }
+                return 1.0f;
+            }
+            set
+            {
+                settings["GUI_MouseSensitivity"] = value.ToString();
+                SaveSettings();
+            }
+        }
+
+        public static int GUI_ScreenWidth
+        {
+            get
+            {
+                if (settings.TryGetValue("GUI_ScreenWidth", out string value))
+                {
+                    if (int.TryParse(value, out int result))
+                    {
+                        return result;
+                    }
+                }
+                return 1280;
+            }
+            set
+            {
+                settings["GUI_ScreenWidth"] = value.ToString();
+                SaveSettings();
+            }
+        }
+
+        public static int GUI_ScreenHeight
+        {
+            get
+            {
+                if (settings.TryGetValue("GUI_ScreenHeight", out string value))
+                {
+                    if (int.TryParse(value, out int result))
+                    {
+                        return result;
+                    }
+                }
+                return 800;
+            }
+            set
+            {
+                settings["GUI_ScreenHeight"] = value.ToString();
+                SaveSettings();
+            }
+        }
+
+        public static bool GUI_DarkNotepad
+        {
+            get
+            {
+                if (settings.TryGetValue("GUI_DarkNotepad", out string value))
+                {
+                    return value.ToLower() == "true";
+                }
+                return false;
+            }
+            set
+            {
+                settings["GUI_DarkNotepad"] = value ? "true" : "false";
                 SaveSettings();
             }
         }

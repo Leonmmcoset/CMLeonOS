@@ -15,18 +15,26 @@ namespace CMLeonOS.Utils
 
             string sanitized = path;
 
-            sanitized = sanitized.Replace('\\', '/');
-            sanitized = sanitized.Replace(':', '_');
-            sanitized = sanitized.Replace('*', '_');
-            sanitized = sanitized.Replace('?', '_');
-            sanitized = sanitized.Replace('"', '_');
-            sanitized = sanitized.Replace('<', '_');
-            sanitized = sanitized.Replace('>', '_');
-            sanitized = sanitized.Replace('|', '_');
+            // 保留驱动器字母和冒号（如 0:）
+            // 检查格式：X:\ 其中 X 是单个字符（字母或数字）
+            bool hasDrive = sanitized.Length >= 2 && sanitized[1] == ':';
+            string drive = hasDrive ? sanitized.Substring(0, 2) : "";
+            string rest = hasDrive ? sanitized.Substring(2) : sanitized;
 
-            sanitized = sanitized.Trim('/', '\\');
+            // 不替换反斜杠，因为 Cosmos 文件系统需要反斜杠
+            rest = rest.Replace(':', '_');
+            rest = rest.Replace('*', '_');
+            rest = rest.Replace('?', '_');
+            rest = rest.Replace('"', '_');
+            rest = rest.Replace('<', '_');
+            rest = rest.Replace('>', '_');
+            rest = rest.Replace('|', '_');
 
-            return sanitized;
+            // 只移除结尾的斜杠，保留开头的斜杠（因为驱动器后面需要斜杠）
+            rest = rest.TrimEnd('/');
+            rest = rest.TrimEnd('\\');
+
+            return drive + rest;
         }
 
         public static string Combine(string path1, string path2)

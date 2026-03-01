@@ -1,6 +1,7 @@
 using Cosmos.System.Graphics;
 using CMLeonOS;
 using CMLeonOS.Gui.UILib;
+using CMLeonOS.Settings;
 
 using System.Drawing;
 
@@ -15,8 +16,6 @@ namespace CMLeonOS.Gui.Apps
         Window currentCategoryWindow;
 
         WindowManager wm = ProcessManager.GetProcess<WindowManager>();
-
-        SettingsService settingsService = ProcessManager.GetProcess<SettingsService>();
 
         private static class Icons
         {
@@ -59,22 +58,22 @@ namespace CMLeonOS.Gui.Apps
 
         private void LeftStartButtonChanged(bool @checked)
         {
-            settingsService.LeftHandStartButton = @checked;
+            SettingsManager.GUI_LeftHandStartButton = @checked;
         }
 
         private void TwelveHourClockChanged(bool @checked)
         {
-            settingsService.TwelveHourClock = @checked;
+            SettingsManager.GUI_TwelveHourClock = @checked;
         }
 
         private void ShowFpsChanged(bool @checked)
         {
-            settingsService.ShowFps = @checked;
+            SettingsManager.GUI_ShowFps = @checked;
         }
 
         private void MouseSensitivityChanged(float value)
         {
-            settingsService.MouseSensitivity = value;
+            SettingsManager.GUI_MouseSensitivity = value;
         }
 
         private void ShowAppearanceCategory()
@@ -90,13 +89,13 @@ namespace CMLeonOS.Gui.Apps
 
             Switch leftStartButton = new Switch(appearance, 12, 40, 244, 16);
             leftStartButton.Text = "Left-hand start button";
-            leftStartButton.Checked = settingsService.LeftHandStartButton;
+            leftStartButton.Checked = SettingsManager.GUI_LeftHandStartButton;
             leftStartButton.CheckBoxChanged = LeftStartButtonChanged;
             wm.AddWindow(leftStartButton);
 
             Switch showFps = new Switch(appearance, 12, 68, 244, 16);
             showFps.Text = "Show frames per second";
-            showFps.Checked = settingsService.ShowFps;
+            showFps.Checked = SettingsManager.GUI_ShowFps;
             showFps.CheckBoxChanged = ShowFpsChanged;
             wm.AddWindow(showFps);
 
@@ -116,7 +115,7 @@ namespace CMLeonOS.Gui.Apps
 
             Switch twelveHourClock = new Switch(dateTime, 12, 40, 244, 16);
             twelveHourClock.Text = "12-hour clock";
-            twelveHourClock.Checked = settingsService.TwelveHourClock;
+            twelveHourClock.Checked = SettingsManager.GUI_TwelveHourClock;
             twelveHourClock.CheckBoxChanged = TwelveHourClockChanged;
             wm.AddWindow(twelveHourClock);
 
@@ -152,7 +151,7 @@ namespace CMLeonOS.Gui.Apps
             {
                 Mode mode = wm.AvailableModes[i];
                 resolutionsTable.Cells.Add(new TableCell($"{mode.Width}x{mode.Height}"));
-                if (mode.Equals(settingsService.Mode))
+                if (mode.Width == SettingsManager.GUI_ScreenWidth && mode.Height == SettingsManager.GUI_ScreenHeight)
                 {
                     resolutionsTable.SelectedCellIndex = i;
                 }
@@ -161,8 +160,8 @@ namespace CMLeonOS.Gui.Apps
             resolutionsTable.TableCellSelected = (int index) =>
             {
                 Mode mode = wm.AvailableModes[index];
-                settingsService.Mode = mode;
-                settingsService.Flush();
+                SettingsManager.GUI_ScreenWidth = (int)mode.Width;
+                SettingsManager.GUI_ScreenHeight = (int)mode.Height;
 
                 MessageBox messageBox = new MessageBox(this, "Restart Required", "Restart your PC to apply changes.");
                 messageBox.Show();
@@ -242,7 +241,7 @@ namespace CMLeonOS.Gui.Apps
 
             mouse.DrawString("Mouse sensitivity", Color.Gray, 12, 40);
 
-            RangeSlider mouseSensitivity = new RangeSlider(mouse, 12, 68, 244, 30, min: 0.25f, value: settingsService.MouseSensitivity, max: 2f);
+            RangeSlider mouseSensitivity = new RangeSlider(mouse, 12, 68, 244, 30, min: 0.25f, value: SettingsManager.GUI_MouseSensitivity, max: 2f);
             mouseSensitivity.Changed = MouseSensitivityChanged;
             wm.AddWindow(mouseSensitivity);
 

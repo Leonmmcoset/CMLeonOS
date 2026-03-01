@@ -30,9 +30,8 @@ namespace CMLeonOS.Gui.Apps
             window.DrawString($"Memory: {Cosmos.Core.CPU.GetAmountOfRAM()} MB", Color.Black, 12, 80);
 
             window.DrawString("Credits", Color.DarkBlue, 12, 108);
-            window.DrawString("Cosmos Team - OS tooling", Color.Black, 12, 132);
-            window.DrawString("Microsoft - .NET Runtime", Color.Black, 12, 156);
-            window.DrawString("Google Fonts - Font", Color.Black, 12, 180);
+            window.DrawString("Microsoft - .NET Runtime", Color.Black, 12, 132);
+            window.DrawString("Google Fonts - Font", Color.Black, 12, 156);
 
             Button button = new Button(window, window.Width - 80 - 12, window.Height - 20 - 12, 80, 20);
             button.Text = "OK";
