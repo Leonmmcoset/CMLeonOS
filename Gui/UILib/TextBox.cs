@@ -19,6 +19,11 @@ namespace CMLeonOS.Gui.UILib
         internal Action Submitted;
         internal Action Changed;
 
+        internal virtual void RenderLine(int lineIndex, string lineText, int lineY, int xOffset)
+        {
+            DrawString(lineText, Foreground, xOffset, lineY);
+        }
+
         internal string Text
         {
             get
@@ -355,7 +360,8 @@ namespace CMLeonOS.Gui.UILib
 
                 if (i < lines.Count)
                 {
-                    DrawString(Shield ? new string('*', lines[i].Length) : lines[i], Foreground, -scrollX, lineY);
+                    string lineText = Shield ? new string('*', lines[i].Length) : lines[i];
+                    RenderLine(i, lineText, lineY, -scrollX);
 
                     if (caretLine == i)
                     {

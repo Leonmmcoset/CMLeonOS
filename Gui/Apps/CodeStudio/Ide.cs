@@ -29,11 +29,13 @@ namespace CMLeonOS.Gui.Apps.CodeStudio
 
         Button runButton;
 
-        TextBox editor;
+        CodeEditor editor;
 
         TextBox problems;
 
         TextBox output;
+
+        FileBrowser fileBrowser;
 
         private const int headersHeight = 24;
         private const int problemsHeight = 128;
@@ -90,6 +92,9 @@ namespace CMLeonOS.Gui.Apps.CodeStudio
             {
                 editor.Text = File.ReadAllText(path);
 
+                string extension = Path.GetExtension(path).ToLower();
+                editor.SetSyntaxHighlighting(extension == ".lua", extension);
+
                 editor.MarkAllLines();
                 editor.Render();
 
@@ -101,35 +106,27 @@ namespace CMLeonOS.Gui.Apps.CodeStudio
 
         private void OpenFilePrompt()
         {
-            PromptBox prompt = new PromptBox(process, "Open File", "Enter the path to open.", "Path", (string newPath) =>
+            fileBrowser = new FileBrowser(process, wm, (string selectedPath) =>
             {
-                if (!newPath.Contains(':'))
+                if (selectedPath != null)
                 {
-                    newPath = $@"0:\{newPath}";
+                    Open(selectedPath);
                 }
-                Open(newPath);
             });
-            prompt.Show();
+            fileBrowser.Show();
         }
 
         private void SaveAsPrompt()
         {
-            PromptBox prompt = new PromptBox(process, "Save As", "Enter the path to save to.", "Path", (string newPath) =>
+            fileBrowser = new FileBrowser(process, wm, (string selectedPath) =>
             {
-                if (!newPath.Contains(':'))
+                if (selectedPath != null)
                 {
-                    newPath = $@"0:\{newPath}";
-                }
-
-                Open(newPath, readFile: false);
-
-                // Check if open succeeded.
-                if (path != null)
-                {
+                    path = selectedPath;
                     Save();
                 }
-            });
-            prompt.Show();
+            }, selectDirectoryOnly: true);
+            fileBrowser.Show();
         }
 
         private void Save()
@@ -270,7 +267,7 @@ namespace CMLeonOS.Gui.Apps.CodeStudio
             runButton.OnClick = RunClicked;
             wm.AddWindow(runButton);
 
-            editor = new TextBox(mainWindow, 0, headersHeight, mainWindow.Width, mainWindow.Height - headersHeight - problemsHeight - outputHeight - (headersHeight * 3))
+            editor = new CodeEditor(mainWindow, 0, headersHeight, mainWindow.Width, mainWindow.Height - headersHeight - problemsHeight - outputHeight - (headersHeight * 3))
             {
                 Background = Theme.CodeBackground,
                 Foreground = Color.White,
@@ -278,6 +275,7 @@ namespace CMLeonOS.Gui.Apps.CodeStudio
                 Changed = TextChanged,
                 MultiLine = true
             };
+            editor.SetSyntaxHighlighting(true, ".lua");
             wm.AddWindow(editor);
 
             problems = new TextBox(mainWindow, 0, headersHeight + editor.Height + headersHeight, mainWindow.Width, problemsHeight + (headersHeight * 2))

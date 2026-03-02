@@ -19,12 +19,12 @@ namespace CMLeonOS.Gui.Apps
         AppWindow window;
 
         WindowManager wm = ProcessManager.GetProcess<WindowManager>();
-
         SettingsService settingsService = ProcessManager.GetProcess<SettingsService>();
-
         TextBox textBox;
 
         ShortcutBar shortcutBar;
+
+        FileBrowser fileBrowser;
 
         private string? path = null;
 
@@ -70,12 +70,6 @@ namespace CMLeonOS.Gui.Apps
         {
             if (newPath == null) return;
 
-            if (!FileSecurity.CanAccess(path))
-            {
-                MessageBox messageBox = new MessageBox(this, "Notepad", $"Access to '{Path.GetFileName(newPath)}' is unauthorised.");
-                messageBox.Show();
-            }
-
             if (readFile && !File.Exists(newPath))
             {
                 MessageBox messageBox = new MessageBox(this, "Notepad", $"No such file '{Path.GetFileName(newPath)}'.");
@@ -99,35 +93,27 @@ namespace CMLeonOS.Gui.Apps
 
         private void OpenFilePrompt()
         {
-            PromptBox prompt = new PromptBox(this, "Open File", "Enter the path to open.", "Path", (string newPath) =>
+            fileBrowser = new FileBrowser(this, wm, (string selectedPath) =>
             {
-                if (!newPath.Contains(':'))
+                if (selectedPath != null)
                 {
-                    newPath = $@"0:\{newPath}";
+                    Open(selectedPath);
                 }
-                Open(newPath);
             });
-            prompt.Show();
+            fileBrowser.Show();
         }
 
         private void SaveAsPrompt()
         {
-            PromptBox prompt = new PromptBox(this, "Save As", "Enter the path to save to.", "Path", (string newPath) =>
+            fileBrowser = new FileBrowser(this, wm, (string selectedPath) =>
             {
-                if (!newPath.Contains(':'))
+                if (selectedPath != null)
                 {
-                    newPath = $@"0:\{newPath}";
-                }
-
-                Open(newPath, readFile: false);
-
-                // Check if open succeeded.
-                if (path != null)
-                {
+                    path = selectedPath;
                     Save();
                 }
-            });
-            prompt.Show();
+            }, selectDirectoryOnly: true);
+            fileBrowser.Show();
         }
 
         private void Save()
