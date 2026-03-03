@@ -3,6 +3,7 @@ using Cosmos.System.Graphics;
 using CMLeonOS;
 using CMLeonOS.Gui.UILib;
 using CMLeonOS.UILib.Animations;
+using CMLeonOS.Settings;
 using System;
 using System.Drawing;
 
@@ -55,13 +56,8 @@ namespace CMLeonOS.Gui.ShellComponents
 
         internal void UpdateTime()
         {
-            if (settingsService == null)
-            {
-                settingsService = ProcessManager.GetProcess<SettingsService>();
-            }
-
             string timeText;
-            if (settingsService.TwelveHourClock)
+            if (SettingsManager.GUI_TwelveHourClock)
             {
                 timeText = DateTime.Now.ToString("ddd h:mm tt");
             }
@@ -119,6 +115,8 @@ namespace CMLeonOS.Gui.ShellComponents
             start.Image = startBitmap;
             start.OnClick = StartClicked;
             wm.AddWindow(start);
+
+            SetLeftHandStartButton(SettingsManager.GUI_LeftHandStartButton);
 
             UpdateTime();
 

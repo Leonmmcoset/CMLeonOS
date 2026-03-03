@@ -8,6 +8,9 @@ namespace CMLeonOS.Settings
     {
         private static string settingsFilePath = @"0:\system\settings.dat";
         private static Dictionary<string, string> settings = new Dictionary<string, string>();
+        private static bool savePending = false;
+        private static int pendingSaveCount = 0;
+        private const int MAX_PENDING_SAVES = 5;
         
         private static Dictionary<string, string> defaultSettings = new Dictionary<string, string>
         {
@@ -226,6 +229,8 @@ namespace CMLeonOS.Settings
                     }
                     SaveSettings();
                 }
+                
+                FlushSettings();
             }
             catch (Exception e)
             {
@@ -235,6 +240,22 @@ namespace CMLeonOS.Settings
 
         public static void SaveSettings()
         {
+            savePending = true;
+            pendingSaveCount++;
+            
+            if (pendingSaveCount >= MAX_PENDING_SAVES)
+            {
+                FlushSettings();
+            }
+        }
+        
+        public static void FlushSettings()
+        {
+            if (!savePending)
+            {
+                return;
+            }
+            
             try
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(settingsFilePath));
@@ -250,6 +271,9 @@ namespace CMLeonOS.Settings
                         writer.WriteLine($"{setting.Key}={setting.Value}");
                     }
                 }
+                
+                savePending = false;
+                pendingSaveCount = 0;
             }
             catch (Exception e)
             {

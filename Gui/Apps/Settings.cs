@@ -253,7 +253,11 @@ namespace CMLeonOS.Gui.Apps
         {
             base.Start();
             window = new AppWindow(this, 256, 256, 448, 272);
-            window.Closing = TryStop;
+            window.Closing = () => 
+            {
+                SettingsManager.FlushSettings();
+                TryStop();
+            };
             window.Icon = AppManager.GetAppMetadata("Settings").Icon;
             wm.AddWindow(window);
 

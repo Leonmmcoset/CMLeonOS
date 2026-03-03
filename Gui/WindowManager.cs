@@ -2,6 +2,7 @@ using Cosmos.System;
 using Cosmos.System.Graphics;
 using CMLeonOS;
 using CMLeonOS.Gui.ShellComponents;
+using CMLeonOS.Settings;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -381,7 +382,7 @@ namespace CMLeonOS.Gui
             RenderWallpaper();
 
             fpsCounter = new Window(this, (int)(ScreenWidth) - 64, (int)(ScreenHeight - 16), 64, 16);
-            if (settingsService.ShowFps)
+            if (SettingsManager.GUI_ShowFps)
             {
                 AddWindow(fpsCounter);
             }
