@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿using CMLeonOS;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using CMLeonOS;
 using CMLeonOS.Gui.UILib;
 using Cosmos.System.Graphics;
 using System.Drawing;
@@ -50,6 +50,29 @@ namespace CMLeonOS.Gui.Apps.CodeStudio
             modified = true;
 
             UpdateTitle();
+        }
+        
+        private void WindowResized()
+        {
+            int editorHeight = mainWindow.Height - headersHeight - problemsHeight - outputHeight - (headersHeight * 3);
+            editor.Move(0, headersHeight);
+            editor.Resize(mainWindow.Width, editorHeight);
+            editor.MarkAllLines();
+            editor.Render();
+            
+            problems.Move(0, headersHeight + editorHeight + headersHeight);
+            problems.Resize(mainWindow.Width, problemsHeight + (headersHeight * 2));
+            problems.MarkAllLines();
+            problems.Render();
+            
+            output.Move(0, headersHeight + editorHeight + problemsHeight + (headersHeight * 2));
+            output.Resize(mainWindow.Width, outputHeight + (headersHeight * 2));
+            output.MarkAllLines();
+            output.Render();
+            
+            mainWindow.Clear(Theme.Background);
+            mainWindow.DrawString("Problems", Color.White, 0, headersHeight + editorHeight);
+            mainWindow.DrawString("Output", Color.White, 0, headersHeight + editorHeight + problemsHeight + headersHeight);
         }
 
         private static class Theme
@@ -254,6 +277,8 @@ namespace CMLeonOS.Gui.Apps.CodeStudio
             mainWindow = new AppWindow(process, 96, 96, 800, 600);
             mainWindow.Clear(Theme.Background);
             mainWindow.Closing = process.TryStop;
+            mainWindow.CanResize = true;
+            mainWindow.UserResized = WindowResized;
             UpdateTitle();
             wm.AddWindow(mainWindow);
 

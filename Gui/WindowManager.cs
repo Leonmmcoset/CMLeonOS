@@ -3,6 +3,7 @@ using Cosmos.System.Graphics;
 using CMLeonOS;
 using CMLeonOS.Gui.ShellComponents;
 using CMLeonOS.Settings;
+using CMLeonOS.Driver;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -16,7 +17,7 @@ namespace CMLeonOS.Gui
             Critical = true;
         }
 
-        private Cosmos.HAL.Drivers.Video.SVGAII.VMWareSVGAII driver;
+        private VMWareSVGAII driver;
 
         internal List<Window> Windows = new List<Window>();
 
@@ -122,7 +123,7 @@ namespace CMLeonOS.Gui
             for (int y = 0; y < height; y++)
             {
                 int sourceIndex = y * window.Width;
-                driver.videoMemory.Copy(aByteOffset: byteOffset, aData: window.Buffer, aIndex: sourceIndex, aCount: width);
+                driver.VideoMemory.Copy(aByteOffset: byteOffset, aData: window.Buffer, aIndex: sourceIndex, aCount: width);
                 byteOffset += (int)(ScreenWidth * bytesPerPixel);
             }
         }
@@ -217,7 +218,7 @@ namespace CMLeonOS.Gui
 
         private void SetupDriver()
         {
-            driver = new Cosmos.HAL.Drivers.Video.SVGAII.VMWareSVGAII();
+            driver = new VMWareSVGAII();
             driver.SetMode(ScreenWidth, ScreenHeight, depth: bytesPerPixel * 8);
         }
 
@@ -229,7 +230,7 @@ namespace CMLeonOS.Gui
             MouseManager.X = ScreenWidth / 2;
             MouseManager.Y = ScreenHeight / 2;
 
-            driver.DefineAlphaCursor(cursorBitmap.Width, cursorBitmap.Height, cursorBitmap.RawData);
+            driver.DefineAlphaCursor(cursorBitmap);
         }
 
         private Window GetWindowAtPos(uint x, uint y)
@@ -329,7 +330,7 @@ namespace CMLeonOS.Gui
 
         private void RenderWallpaper()
         {
-            driver.videoMemory.Copy((int)driver.FrameSize, wallpaperResized.RawData, 0, wallpaperResized.RawData.Length);
+            driver.VideoMemory.Copy((int)driver.FrameSize, wallpaperResized.RawData, 0, wallpaperResized.RawData.Length);
         }
 
         private void SetupWallpaper()

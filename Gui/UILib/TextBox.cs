@@ -328,10 +328,10 @@ namespace CMLeonOS.Gui.UILib
 
         internal override void Render()
         {
+            Clear(_background);
+
             if (Text == string.Empty)
             {
-                Clear(_background);
-
                 DrawRectangle(0, 0, Width, Height, Color.Gray);
                 DrawString(PlaceholderText, PlaceholderForeground, 0, 0);
 
@@ -352,7 +352,6 @@ namespace CMLeonOS.Gui.UILib
             for (int i = markedLinesBegin; i <= markedLinesEnd; i++)
             {
                 int lineY = (i * fontHeight) - scrollY;
-
                 if (lineY < 0) continue;
                 if (lineY > Height) break;
 
