@@ -29,7 +29,7 @@
 		<OptimizationLevel>2</OptimizationLevel>
 		<VBEResolution>800x600x32</VBEResolution>
 		<RunPostBuildEvent>Always</RunPostBuildEvent>
-		<Timeout>1</Timeout>
+		<Timeout>0</Timeout>
 		<UseUEFI>False</UseUEFI>
     </PropertyGroup>
 

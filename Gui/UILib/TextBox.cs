@@ -345,11 +345,18 @@ namespace CMLeonOS.Gui.UILib
                 return;
             }
 
-            if (markedLinesBegin == -1 || markedLinesEnd == -1) return;
-
             AutoScroll();
 
-            for (int i = markedLinesBegin; i <= markedLinesEnd; i++)
+            int startLine = markedLinesBegin;
+            int endLine = markedLinesEnd;
+
+            if (startLine == -1 || endLine == -1)
+            {
+                startLine = (scrollY / fontHeight);
+                endLine = Math.Min(lines.Count - 1, ((scrollY + Height) / fontHeight));
+            }
+
+            for (int i = startLine; i <= endLine; i++)
             {
                 int lineY = (i * fontHeight) - scrollY;
                 if (lineY < 0) continue;

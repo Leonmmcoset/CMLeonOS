@@ -525,8 +525,6 @@ namespace CMLeonOS.Driver
             IRQPort = (ushort)(basePort + (uint)IOPortOffset.IRQ);
 
             WriteRegister(Register.ID, (uint)ID.V2);
-            if (ReadRegister(Register.ID) != (uint)ID.V2)
-                return;
 
             VideoMemory = new MemoryBlock(ReadRegister(Register.FrameBufferStart), ReadRegister(Register.VRamSize));
             capabilities = ReadRegister(Register.Capabilities);
@@ -554,10 +552,8 @@ namespace CMLeonOS.Driver
         /// <param name="depth">Depth.</param>
         public void SetMode(uint width, uint height, uint depth = 32)
         {
-            //Disable the Driver before writing new values and initiating it again to avoid a memory exception
-            //Disable();
+            Disable();
 
-            // Depth is color depth in bytes.
             this.depth = (depth / 8);
             this.width = width;
             this.height = height;

@@ -1,4 +1,4 @@
-﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using CMLeonOS;
+﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿﻿using CMLeonOS;
 using CMLeonOS.Gui.UILib;
 using Cosmos.System.Graphics;
 using System.Drawing;
@@ -16,6 +16,10 @@ namespace CMLeonOS.Gui.Apps.CodeStudio
             this.process = process;
             this.wm = wm;
         }
+
+        [IL2CPU.API.Attribs.ManifestResourceStream(ResourceName = "CMLeonOS.Gui.Resources.AppIcons.CodeStudio.bmp")]
+        private static byte[] _iconBytes;
+        private static Bitmap iconBitmap = new Bitmap(_iconBytes);
 
         [IL2CPU.API.Attribs.ManifestResourceStream(ResourceName = "CMLeonOS.Gui.Resources.CodeStudio.Run.bmp")]
         private static byte[] _runBytes;
@@ -175,6 +179,9 @@ namespace CMLeonOS.Gui.Apps.CodeStudio
                 ILuaState lua = LuaAPI.NewState();
                 lua.L_OpenLibs();
                 
+                LuaGuiLibrary.Initialize(wm, process);
+                LuaGuiLibrary.Register(lua);
+                
                 lua.PushCSharpFunction(L =>
                 {
                     int n = L.GetTop();
@@ -275,6 +282,7 @@ namespace CMLeonOS.Gui.Apps.CodeStudio
         internal void Start()
         {
             mainWindow = new AppWindow(process, 96, 96, 800, 600);
+            mainWindow.Icon = iconBitmap;
             mainWindow.Clear(Theme.Background);
             mainWindow.Closing = process.TryStop;
             mainWindow.CanResize = true;

@@ -1231,6 +1231,140 @@ print(jsonStr)
 ```
 
 ---
+## GUI 库 (gui)
+
+### gui.createWindow(title, x, y, width, height)
+创建一个窗口。
+
+```lua
+local window = gui.createWindow("My Window", 100, 100, 400, 300)
+```
+
+**参数**：
+- `title` - 窗口标题
+- `x` - 窗口左上角 X 坐标
+- `y` - 窗口左上角 Y 坐标
+- `width` - 窗口宽度
+- `height` - 窗口高度
+
+### gui.createButton(parent, text, x, y, width, height, callback)
+创建一个按钮。
+
+```lua
+local button = gui.createButton(window, "Click Me", 10, 10, 100, 30, function()
+    print("Button clicked!")
+end)
+```
+
+**参数**：
+- `parent` - 父窗口
+- `text` - 按钮文本
+- `x` - 按钮左上角 X 坐标
+- `y` - 按钮左上角 Y 坐标
+- `width` - 按钮宽度
+- `height` - 按钮高度
+- `callback` - 点击回调函数
+
+### gui.createLabel(parent, text, x, y)
+创建一个标签。
+
+```lua
+local label = gui.createLabel(window, "Hello, World!", 10, 50)
+```
+
+**参数**：
+- `parent` - 父窗口
+- `text` - 标签文本
+- `x` - 标签左上角 X 坐标
+- `y` - 标签左上角 Y 坐标
+
+### gui.createTextBox(parent, x, y, width, height)
+创建一个文本框。
+
+```lua
+local textbox = gui.createTextBox(window, 10, 80, 200, 25)
+```
+
+**参数**：
+- `parent` - 父窗口
+- `x` - 文本框左上角 X 坐标
+- `y` - 文本框左上角 Y 坐标
+- `width` - 文本框宽度
+- `height` - 文本框高度
+
+### gui.getText(textbox)
+获取文本框的内容。
+
+```lua
+local text = gui.getText(textbox)
+print(text)
+```
+
+### gui.setText(textbox, text)
+设置文本框的内容。
+
+```lua
+gui.setText(textbox, "New text")
+```
+
+### gui.show(window)
+显示窗口。
+
+```lua
+gui.show(window)
+```
+
+### gui.hide(window)
+隐藏窗口。
+
+```lua
+gui.hide(window)
+```
+
+### gui.close(window)
+关闭窗口。
+
+```lua
+gui.close(window)
+```
+
+### gui.setMessageLoop(callback)
+设置消息循环回调函数。
+
+```lua
+gui.setMessageLoop(function()
+    -- 处理消息循环
+end)
+```
+
+### gui.alert(message)
+显示警告对话框。
+
+```lua
+gui.alert("Operation completed!")
+```
+
+### gui.confirm(message)
+显示确认对话框，返回 true 或 false。
+
+```lua
+local result = gui.confirm("Are you sure?")
+if result then
+    print("User confirmed")
+else
+    print("User cancelled")
+end
+```
+
+### gui.prompt(message, default)
+显示输入对话框，返回用户输入的字符串。
+
+```lua
+local input = gui.prompt("Enter your name:", "John")
+print("Hello, " .. input)
+```
+
+---
 ## 包库 (package)
 
 ### package.loaded
