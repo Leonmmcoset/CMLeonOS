@@ -66,10 +66,10 @@ namespace CMLeonOS
             bool userDatExists = UserDatExists();
             int optionIndex = 0;
 
-            PrintOption("Normal Boot", selIdx == optionIndex++);
+            PrintOption("CMLeonOS (Shell)", selIdx == optionIndex++);
             if (userDatExists)
             {
-                PrintOption("GUI Boot", selIdx == optionIndex++);
+                PrintOption("CMLeonOS (Desktop)", selIdx == optionIndex++);
             }
             PrintOption("Reboot", selIdx == optionIndex++);
             PrintOption("Shutdown", selIdx == optionIndex++);

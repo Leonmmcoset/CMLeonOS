@@ -330,8 +330,8 @@ namespace CMLeonOS.Gui.UILib
 
         private List<string> lines = new List<string>() { string.Empty };
 
-        private int markedLinesBegin = 0;
-        private int markedLinesEnd = 0;
+        private int markedLinesBegin = -1;
+        private int markedLinesEnd = -1;
 
         private const int fontWidth = 8;
         private const int fontHeight = 16;
@@ -363,14 +363,8 @@ namespace CMLeonOS.Gui.UILib
 
             AutoScroll();
 
-            int startLine = markedLinesBegin;
-            int endLine = markedLinesEnd;
-
-            if (startLine == -1 || endLine == -1)
-            {
-                startLine = (scrollY / fontHeight);
-                endLine = Math.Min(lines.Count - 1, ((scrollY + Height) / fontHeight));
-            }
+            int startLine = (scrollY / fontHeight);
+            int endLine = Math.Min(lines.Count - 1, ((scrollY + Height) / fontHeight));
 
             for (int i = startLine; i <= endLine; i++)
             {

@@ -425,7 +425,7 @@ namespace CMLeonOS
                 "cpass", "hostname", "ipconfig", "setdns", "setgateway", "nslookup",
                 "ping", "wget", "ftp", "tcpserver", "tcpclient", "lua", "lua2cla", "cla",
                 "branswe", "beep", "env", "whoami", "uptime", "alias",
-                "unalias", "base64", "testgui", "ps", "kill", "hex"
+                "unalias", "base64", "testgui", "ps", "kill", "hex", "exportbackground"
             };
         }
 
@@ -1692,6 +1692,11 @@ namespace CMLeonOS
             
             string name = args.Trim();
             Commands.AliasCommand.RemoveAlias(name);
+        }
+
+        public void ProcessExportBackground(string args)
+        {
+            Commands.ExportBackgroundCommand.ExportBackground(args);
         }
 
         public void SetDnsServer(string args)
