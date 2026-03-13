@@ -1,0 +1,6 @@
+"filename", "language", "C#", "comment", "blank", "total"
+"c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Kernel.cs", "C#", -1, 0, 0, -1
+"c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\CommandList.cs", "C#", 3, 0, 0, 3
+"c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Commands\LogsCommand.cs", "C#", 63, 15, 10, 88
+"c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Shell.cs", "C#", 4, 0, 1, 5
+"Total", "-", 69, 15, 11, 95

@@ -191,6 +191,10 @@ namespace CMLeonOS.Gui.UILib
         private void TextBoxKeyPressed(KeyEvent key)
         {
             if (caretLine == -1 || ReadOnly) return;
+
+            cursorBlinkCounter = 0;
+            cursorVisible = true;
+
             switch (key.Key)
             {
                 case ConsoleKeyEx.LeftArrow:
@@ -342,8 +346,20 @@ namespace CMLeonOS.Gui.UILib
         private int scrollX = 0;
         private int scrollY = 0;
 
+        private int cursorBlinkCounter = 0;
+        private bool cursorVisible = true;
+        private const int cursorBlinkInterval = 30;
+
         internal override void Render()
         {
+            cursorBlinkCounter++;
+
+            if (cursorBlinkCounter >= cursorBlinkInterval)
+            {
+                cursorBlinkCounter = 0;
+                cursorVisible = !cursorVisible;
+            }
+
             Clear(_background);
 
             if (Text == string.Empty)
@@ -351,7 +367,7 @@ namespace CMLeonOS.Gui.UILib
                 DrawRectangle(0, 0, Width, Height, Color.Gray);
                 DrawString(PlaceholderText, PlaceholderForeground, 0, 0);
 
-                if (caretLine == 0)
+                if (caretLine == 0 && cursorVisible)
                 {
                     DrawVerticalLine(fontHeight, 1, 0, Foreground);
                 }
@@ -365,7 +381,6 @@ namespace CMLeonOS.Gui.UILib
 
             int startLine = (scrollY / fontHeight);
             int endLine = Math.Min(lines.Count - 1, ((scrollY + Height) / fontHeight));
-
             for (int i = startLine; i <= endLine; i++)
             {
                 int lineY = (i * fontHeight) - scrollY;
@@ -379,7 +394,7 @@ namespace CMLeonOS.Gui.UILib
                     string lineText = Shield ? new string('*', lines[i].Length) : lines[i];
                     RenderLine(i, lineText, lineY, -scrollX);
 
-                    if (caretLine == i)
+                    if (caretLine == i && cursorVisible)
                     {
                         DrawVerticalLine(fontHeight, ((caretCol * fontWidth) - scrollX) + 1, (caretLine * fontHeight) - scrollY, Foreground);
                     }

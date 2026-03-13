@@ -239,6 +239,9 @@ namespace CMLeonOS.shell
                 case "unalias":
                     shell.ProcessUnalias(args);
                     break;
+                case "logs":
+                    shell.ProcessLogs(args);
+                    break;
                 case "exportbackground":
                     shell.ProcessExportBackground(args);
                     break;

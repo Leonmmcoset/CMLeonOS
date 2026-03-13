@@ -88,6 +88,9 @@ namespace CMLeonOS
         
         private void InitializeSystem()
         {
+            // 修改光标样式等
+            Console.CursorSize = 14;
+
             // 注册VFS
             _logger.Info("Kernel", "Starting VFS initialization");
             try
