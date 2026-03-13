@@ -62,7 +62,7 @@ namespace CMLeonOS
 
         public override void Run()
         {
-            CMLeonOS.Logger.Logger.Instance.Info($"Command_{command}", $"Executing command: {command} {args}");
+            CMLeonOS.Logger.Logger.Instance.Debug($"Command_{command}", $"Executing command: {command} {args}");
             
             try
             {
@@ -73,7 +73,7 @@ namespace CMLeonOS
                 CMLeonOS.Logger.Logger.Instance.Error($"Command_{command}", $"Command failed: {e.ToString()}");
             }
             
-            CMLeonOS.Logger.Logger.Instance.Info($"Command_{command}", $"Command completed: {command}");
+            CMLeonOS.Logger.Logger.Instance.Debug($"Command_{command}", $"Command completed: {command}");
         }
     }
 }

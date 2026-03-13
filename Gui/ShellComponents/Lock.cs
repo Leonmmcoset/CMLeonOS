@@ -116,8 +116,6 @@ namespace CMLeonOS.Gui.ShellComponents
             Logger.Logger.Instance.Info("Lock", $"User found: {foundUser.Username}, Admin: {foundUser.Admin}");
 
             string hashedInputPassword = UserSystem.HashPasswordSha256(password);
-            Logger.Logger.Instance.Info("Lock", $"Password hash: {hashedInputPassword}");
-            Logger.Logger.Instance.Info("Lock", $"Stored password hash: {foundUser.Password}");
 
             if (foundUser.Password != hashedInputPassword)
             {

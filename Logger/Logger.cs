@@ -68,6 +68,8 @@ namespace CMLeonOS.Logger
             {
                 WriteToConsole(entry);
             }
+
+            CMLeonOS.Logger.Log.Emit(level, source, message);
         }
 
         public void Debug(string source, string message)

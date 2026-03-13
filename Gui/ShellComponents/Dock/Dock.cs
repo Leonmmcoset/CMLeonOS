@@ -63,7 +63,7 @@ namespace CMLeonOS.Gui.ShellComponents.Dock
                 window.MoveAndResize((int)(wm.ScreenWidth / 2 - newDockWidth / 2), window.Y, newDockWidth, window.Height);
             }
 
-            window.Clear(Color.FromArgb(130, 202, 255));
+            window.Clear(Color.FromArgb(211, 211, 211));
 
             int x = 0;
             foreach (var icon in Icons)
