@@ -20,6 +20,7 @@ using CMLeonOS;
 using CMLeonOS.Gui.ShellComponents;
 using CMLeonOS.Settings;
 using CMLeonOS.Driver;
+using CMLeonOS.Logger;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -183,12 +184,17 @@ namespace CMLeonOS.Gui
 
             Windows.Add(window);
 
+            Logger.Logger.Instance.Debug("WindowManager", $"Added window: {window.GetType().Name}");
+
             UpdateDock();
         }
 
         internal void RemoveWindow(Window window, bool rerender = true)
         {
             Windows.Remove(window);
+
+            Logger.Logger.Instance.Debug("WindowManager", $"Removed window: {window.GetType().Name}");
+
             for (int i = Windows.Count - 1; i >= 0; i--)
             {
                 if (i >= Windows.Count) continue;
@@ -387,22 +393,30 @@ namespace CMLeonOS.Gui
         {
             base.Start();
 
+            Logger.Logger.Instance.Info("WindowManager", "Starting WindowManager service");
+
             SettingsService settingsService = ProcessManager.GetProcess<SettingsService>();
 
             ScreenWidth = (uint)settingsService.Mode.Width;
             ScreenHeight = (uint)settingsService.Mode.Height;
             bytesPerPixel = 4;
 
+            Logger.Logger.Instance.Info("WindowManager", $"Screen resolution: {ScreenWidth}x{ScreenHeight}");
+
             SetupDriver();
             SetupMouse();
             SetupWallpaper();
             RenderWallpaper();
+
+            Logger.Logger.Instance.Info("WindowManager", "Driver, mouse, and wallpaper initialized");
 
             fpsCounter = new Window(this, (int)(ScreenWidth) - 64, (int)(ScreenHeight - 16), 64, 16);
             if (SettingsManager.GUI_ShowFps)
             {
                 AddWindow(fpsCounter);
             }
+
+            Logger.Logger.Instance.Success("WindowManager", "WindowManager started successfully");
         }
 
         public override void Run()

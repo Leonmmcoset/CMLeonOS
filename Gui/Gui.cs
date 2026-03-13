@@ -61,6 +61,10 @@ namespace CMLeonOS.Gui
 
             ProcessManager.AddProcess(windowManager, new Sound.SoundService()).Start();
 
+            ProcessManager.AddProcess(windowManager, new MemService()).Start();
+
+            Logger.Logger.Instance.Info("Gui", "Memory management service started");
+
             Console.WriteLine("Starting lock screen...");
             ProcessManager.AddProcess(windowManager, new ShellComponents.Lock()).Start();
 

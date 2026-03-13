@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using System.Collections.Generic;
+using CMLeonOS.Logger;
 
 namespace CMLeonOS
 {
@@ -43,17 +44,26 @@ namespace CMLeonOS
 
             Processes.Add(process);
 
+            Logger.Logger.Instance.Debug("ProcessManager", $"Added process: {process.Name} (ID: {process.Id})");
+
             return process;
         }
 
         public static void Sweep()
         {
+            int removedCount = 0;
             for (int i = Processes.Count - 1; i >= 0; i--)
             {
                 if (!Processes[i].IsRunning)
                 {
                     Processes.Remove(Processes[i]);
+                    removedCount++;
                 }
+            }
+
+            if (removedCount > 0)
+            {
+                Logger.Logger.Instance.Debug("ProcessManager", $"Swept {removedCount} stopped processes");
             }
         }
 
