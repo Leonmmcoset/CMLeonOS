@@ -192,6 +192,14 @@ namespace CMLeonOS
                         {
                             RenderLuaLine(line, consoleWidth);
                         }
+                        else if (IsIniFile() && settings.EnableSyntaxHighlight)
+                        {
+                            RenderIniLine(line, consoleWidth);
+                        }
+                        else if (IsJsonFile() && settings.EnableSyntaxHighlight)
+                        {
+                            RenderJsonLine(line, consoleWidth);
+                        }
                         else
                         {
                             Console.Write(line + new string(' ', Math.Max(0, consoleWidth - line.Length)));
@@ -211,7 +219,27 @@ namespace CMLeonOS
             if (path != null)
             {
                 string extension = System.IO.Path.GetExtension(path)?.ToLower();
-                return extension == ".lua";
+                return extension == ".lua" || extension == ".los" || extension == ".losb";
+            }
+            return false;
+        }
+
+        private bool IsIniFile()
+        {
+            if (path != null)
+            {
+                string extension = System.IO.Path.GetExtension(path)?.ToLower();
+                return extension == ".ini" || extension == ".cfg" || extension == ".conf" || extension == ".config";
+            }
+            return false;
+        }
+
+        private bool IsJsonFile()
+        {
+            if (path != null)
+            {
+                string extension = System.IO.Path.GetExtension(path)?.ToLower();
+                return extension == ".json";
             }
             return false;
         }
@@ -371,6 +399,219 @@ namespace CMLeonOS
                 Console.Write(new string(' ', consoleWidth - pos));
             }
 
+            Console.ResetColor();
+        }
+
+        private void RenderIniLine(string line, int consoleWidth)
+        {
+            int pos = 0;
+            bool inComment = false;
+            bool inSection = false;
+            bool inKey = false;
+            bool inValue = false;
+            bool inStringValue = false;
+            
+            while (pos < line.Length && pos < consoleWidth)
+            {
+                char c = line[pos];
+                
+                if (inComment)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write(c);
+                    pos++;
+                }
+                else if (pos + 1 < line.Length && line[pos] == ';' && line[pos + 1] == ';')
+                {
+                    inComment = true;
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write(line[pos]);
+                    pos++;
+                    Console.Write(line[pos]);
+                    pos++;
+                }
+                else if (pos + 1 < line.Length && line[pos] == '/' && line[pos + 1] == '/')
+                {
+                    inComment = true;
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write(line[pos]);
+                    pos++;
+                    Console.Write(line[pos]);
+                    pos++;
+                }
+                else if (pos + 1 < line.Length && line[pos] == '#' && line[pos + 1] == '#')
+                {
+                    inComment = true;
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write(line[pos]);
+                    pos++;
+                    Console.Write(line[pos]);
+                    pos++;
+                }
+                else if (inSection)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkCyan;
+                    Console.Write(c);
+                    pos++;
+                }
+                else if (c == '[')
+                {
+                    inSection = true;
+                    inKey = false;
+                    inValue = false;
+                    inStringValue = false;
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.Write(c);
+                    pos++;
+                }
+                else if (c == ']')
+                {
+                    inSection = false;
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.Write(c);
+                    pos++;
+                }
+                else if (inKey)
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write(c);
+                    pos++;
+                }
+                else if (c == '=')
+                {
+                    inKey = false;
+                    inValue = true;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write(c);
+                    pos++;
+                }
+                else if (inStringValue)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write(c);
+                    pos++;
+                }
+                else if (c == '"' || c == '\'')
+                {
+                    inStringValue = true;
+                    inValue = false;
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write(c);
+                    pos++;
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write(c);
+                    pos++;
+                }
+            }
+            
+            if (pos < consoleWidth)
+            {
+                Console.Write(new string(' ', consoleWidth - pos));
+            }
+            
+            Console.ResetColor();
+        }
+
+        private void RenderJsonLine(string line, int consoleWidth)
+        {
+            int pos = 0;
+            bool inString = false;
+            bool inNumber = false;
+            bool inBoolean = false;
+            bool inNull = false;
+            bool inKey = false;
+            bool inColon = false;
+            bool inWhitespace = false;
+            
+            while (pos < line.Length && pos < consoleWidth)
+            {
+                char c = line[pos];
+                
+                if (inString)
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write(c);
+                    pos++;
+                }
+                else if (c == '"')
+                {
+                    inString = true;
+                    inNumber = false;
+                    inBoolean = false;
+                    inNull = false;
+                    inWhitespace = false;
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write(c);
+                    pos++;
+                }
+                else if (inString && (c == '\\' || char.IsControl(c)))
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write(c);
+                    pos++;
+                }
+                else if (inNumber)
+                {
+                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    Console.Write(c);
+                    pos++;
+                }
+                else if (inBoolean)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                    Console.Write(c);
+                    pos++;
+                }
+                else if (inNull)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.Write(c);
+                    pos++;
+                }
+                else if (inKey)
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write(c);
+                    pos++;
+                }
+                else if (c == ':')
+                {
+                    inKey = false;
+                    inColon = false;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write(c);
+                    pos++;
+                }
+                else if (c == ',' || c == '{' || c == '}')
+                {
+                    inWhitespace = false;
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write(c);
+                    pos++;
+                }
+                else if (char.IsWhiteSpace(c))
+                {
+                    inWhitespace = true;
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.Write(c);
+                    pos++;
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write(c);
+                    pos++;
+                }
+            }
+            
+            if (pos < consoleWidth)
+            {
+                Console.Write(new string(' ', consoleWidth - pos));
+            }
+            
             Console.ResetColor();
         }
 
@@ -1365,7 +1606,7 @@ namespace CMLeonOS
                 "2. Auto Complete Brackets (All Files)",
                 "3. Auto Complete Quotes (All Files)",
                 "4. Smart Delete (All Files)",
-                "5. Syntax Highlight (Lua Only)",
+                "5. Syntax Highlight (Lua/Ini/Json)",
                 "6. Save and Exit"
             };
 
@@ -1460,15 +1701,17 @@ namespace CMLeonOS
             switch (option)
             {
                 case 0:
-                    return settings.EnableSmartIndent ? "ON " : "OFF";
+                    return settings.EnableSmartIndent ? "ON" : "OFF";
                 case 1:
-                    return settings.EnableAutoCompleteBrackets ? "ON " : "OFF";
+                    return settings.EnableAutoCompleteBrackets ? "ON" : "OFF";
                 case 2:
-                    return settings.EnableAutoCompleteQuotes ? "ON " : "OFF";
+                    return settings.EnableAutoCompleteQuotes ? "ON" : "OFF";
                 case 3:
-                    return settings.EnableSmartDelete ? "ON " : "OFF";
+                    return settings.EnableSmartDelete ? "ON" : "OFF";
                 case 4:
-                    return settings.EnableSyntaxHighlight ? "ON " : "OFF";
+                    return settings.EnableSyntaxHighlight ? "ON" : "OFF";
+                case 5:
+                    return "SAVE";
                 default:
                     return "";
             }
