@@ -200,6 +200,10 @@ namespace CMLeonOS
                         {
                             RenderJsonLine(line, consoleWidth);
                         }
+                        else if (IsMarkitFile() && settings.EnableSyntaxHighlight)
+                        {
+                            RenderMarkitLine(line, consoleWidth);
+                        }
                         else
                         {
                             Console.Write(line + new string(' ', Math.Max(0, consoleWidth - line.Length)));
@@ -240,6 +244,16 @@ namespace CMLeonOS
             {
                 string extension = System.IO.Path.GetExtension(path)?.ToLower();
                 return extension == ".json";
+            }
+            return false;
+        }
+
+        private bool IsMarkitFile()
+        {
+            if (path != null)
+            {
+                string extension = System.IO.Path.GetExtension(path)?.ToLower();
+                return extension == ".mi";
             }
             return false;
         }
@@ -598,6 +612,96 @@ namespace CMLeonOS
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                     Console.Write(c);
                     pos++;
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write(c);
+                    pos++;
+                }
+            }
+            
+            if (pos < consoleWidth)
+            {
+                Console.Write(new string(' ', consoleWidth - pos));
+            }
+            
+            Console.ResetColor();
+        }
+
+        private void RenderMarkitLine(string line, int consoleWidth)
+        {
+            int pos = 0;
+            bool inTag = false;
+            bool inColorTag = false;
+            bool inBgTag = false;
+            bool inCloseTag = false;
+            bool inColorName = false;
+            bool inBgName = false;
+            
+            while (pos < line.Length && pos < consoleWidth)
+            {
+                char c = line[pos];
+                
+                if (inTag)
+                {
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.Write(c);
+                    pos++;
+                    
+                    if (c == '}')
+                    {
+                        inTag = false;
+                        inColorTag = false;
+                        inBgTag = false;
+                        inCloseTag = false;
+                        inColorName = false;
+                        inBgName = false;
+                    }
+                    else if (c == ':' && (inColorTag || inBgTag))
+                    {
+                        inColorName = inColorTag;
+                        inBgName = inBgTag;
+                    }
+                    else if (inColorName || inBgName)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                    }
+                }
+                else if (c == '{')
+                {
+                    if (pos + 1 < line.Length && line[pos + 1] == '/')
+                    {
+                        inTag = true;
+                        inCloseTag = true;
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.Write(c);
+                        pos++;
+                        Console.Write(line[pos]);
+                        pos++;
+                    }
+                    else if (pos + 6 < line.Length && line.Substring(pos, 7) == "{color:")
+                    {
+                        inTag = true;
+                        inColorTag = true;
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.Write(c);
+                        pos++;
+                    }
+                    else if (pos + 4 < line.Length && line.Substring(pos, 5) == "{bg:")
+                    {
+                        inTag = true;
+                        inBgTag = true;
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.Write(c);
+                        pos++;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.Write(c);
+                        pos++;
+                    }
                 }
                 else
                 {
@@ -1606,7 +1710,7 @@ namespace CMLeonOS
                 "2. Auto Complete Brackets (All Files)",
                 "3. Auto Complete Quotes (All Files)",
                 "4. Smart Delete (All Files)",
-                "5. Syntax Highlight (Lua/Ini/Json)",
+                "5. Syntax Highlight (Lua/Ini/Json/Markit)",
                 "6. Save and Exit"
             };
 

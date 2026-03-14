@@ -51,6 +51,26 @@ date
 uptime
 ```
 
+### ps
+显示当前运行的进程列表。
+
+**用法：**
+```bash
+ps
+```
+
+**输出信息：**
+- ID：进程ID
+- Name：进程名称
+- Type：进程类型
+- Parent：父进程ID
+- Status：运行状态
+
+**示例：**
+```bash
+ps
+```
+
 ### whoami
 显示当前登录的用户名。
 
@@ -71,6 +91,24 @@ sleep <seconds>
 ```bash
 sleep 5
 ```
+
+### kill
+终止指定的进程。
+
+**用法：**
+```bash
+kill <process_id>
+```
+
+**示例：**
+```bash
+kill 123
+```
+
+**说明：**
+- process_id：要终止的进程ID
+- 使用ps命令查看进程列表
+- 无法终止Shell进程（使用exit命令退出）
 
 ## 文件系统命令
 
@@ -327,8 +365,24 @@ nano <file>
 **示例：**
 ```bash
 nano myfile.txt
+nano example.mi
 ```
 
+**说明：**
+- 支持多种文件类型的语法高亮
+- 自动根据文件扩展名应用语法高亮
+- 支持的文件类型：
+  - Lua 文件：.lua, .los, .losb
+  - Ini 配置文件：.ini, .cfg, .conf, .config
+  - Json 文件：.json
+  - Markit 标记文件：.mi
+- 支持智能缩进、自动补全括号和引号、智能删除
+
+**语法高亮颜色方案：**
+- Lua 文件：关键字（青色）、注释（绿色）、字符串（黄色）、数字（洋红色）、函数名（深洋红色）
+- Ini 文件：节（青色）、键（黄色）、值（白色）、注释（绿色）
+- Json 文件：字符串（绿色）、数字（洋红色）、布尔值（深洋红色）、null（深灰色）、键（黄色）
+- Markit 文件：标签（青色）、颜色名称（黄色）、普通文本（白色）
 ### hex
 使用16进制编辑器编辑二进制文件。
 
@@ -382,6 +436,62 @@ Controls:
   S - Save file
   Q - Quit
 ```
+
+### markit
+渲染并显示 Markit 标记语言文件（.mi）。
+
+**用法：**
+```bash
+markit <filename>
+```
+
+**示例：**
+```bash
+markit example.mi
+markit /path/to/file.mi
+```
+
+**说明：**
+- Markit 是一种简单的标记语言，支持文字颜色和背景色
+- 文件扩展名：.mi
+- 支持相对路径和绝对路径
+- 自动根据文件扩展名应用语法高亮
+
+**Markit 语法：**
+```
+{color:颜色名}文字{/color}
+{bg:颜色名}文字{/bg}
+{color:前景色}{bg:背景色}文字{/bg}{/color}
+```
+
+**支持的颜色：**
+- 前景色和背景色：black, darkblue, darkgreen, darkcyan, darkred, darkmagenta, darkyellow, gray, darkgray, blue, green, cyan, red, magenta, yellow, white
+
+**语法示例：**
+```
+{color:red}红色文字{/color}
+{bg:blue}蓝色背景{/bg}
+{color:green}{bg:yellow}绿色文字黄色背景{/bg}{/color}
+{color:white}{bg:black}白色文字黑色背景{/bg}{/color}
+```
+
+**实际应用示例：**
+```
+{color:green}{bg:black}✓ 成功：操作已完成！{/bg}{/color}
+{color:red}{bg:yellow}⚠ 警告：这是一个重要信息！{/bg}{/color}
+{color:white}{bg:blue}ℹ 信息：这是一条普通信息{/bg}{/color}
+```
+
+**控制键：**
+- 无特殊控制键
+- 直接渲染文件内容到控制台
+- 支持所有颜色和背景色组合
+
+**编辑器支持：**
+- Nano 编辑器自动识别 .mi 文件并应用语法高亮
+- 标签显示为青色
+- 颜色名称显示为黄色
+- 普通文本显示为白色
 
 ## 用户管理命令
 
@@ -630,6 +740,28 @@ calc 10*5
 calc (3+5)*2
 ```
 
+### calcgui
+启动图形化计算器界面。
+
+**用法：**
+```bash
+calcgui
+```
+
+**功能：**
+- 图形化计算器界面
+- 支持基本运算：加、减、乘、除
+- 支持键盘和鼠标操作
+- 方向键导航按钮，Enter选择，Esc退出
+
+**快捷键：**
+- 数字键 0-9：输入数字
+- + - * /：选择运算符
+- Enter：计算结果
+- C：清除
+- Backspace：删除
+- Esc/Q：退出
+
 ### history
 显示命令历史记录。
 
@@ -664,6 +796,24 @@ background <hex_color>
 background 000000
 background FF0000
 ```
+
+### exportbackground
+导出当前系统壁纸到指定路径。
+
+**用法：**
+```bash
+exportbackground [output_path]
+```
+
+**示例：**
+```bash
+exportbackground
+exportbackground 0:\mywallpaper.bmp
+```
+
+**说明：**
+- 如果不指定输出路径，默认导出到 0:\background.bmp
+- 导出的壁纸为BMP格式
 
 ### beep
 播放系统提示音。
@@ -946,6 +1096,27 @@ env
 env PATH
 env MYVAR hello
 ```
+
+### logs
+显示系统日志。
+
+**用法：**
+```bash
+logs
+```
+
+**说明：**
+- 显示最近20条日志记录
+- 日志级别：DEBUG、INFO、WARN、ERROR、SUCCESS
+- 不同级别使用不同颜色显示
+- 如果日志超过20条，会显示剩余数量
+
+**日志级别颜色：**
+- DEBUG：灰色
+- INFO：青色
+- WARN：黄色
+- ERROR：红色
+- SUCCESS：绿色
 
 ## 注意事项
 

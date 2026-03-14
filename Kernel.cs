@@ -42,6 +42,14 @@ namespace CMLeonOS
 {
     public class Kernel : Sys.Kernel
     {
+        // fuck Windows
+        // fuck Linux
+        // fuck Unix
+        // fuck macOS
+        // fuck ALL!!!
+
+        // a femboy's operating system :3
+
         private static CMLeonOS.Logger.Logger _logger = CMLeonOS.Logger.Logger.Instance;
 
         // 创建全局CosmosVFS实例
@@ -89,7 +97,7 @@ namespace CMLeonOS
         private void InitializeSystem()
         {
             // 修改光标样式等
-            Console.CursorSize = 14;
+            Console.CursorSize = 100;
 
             // 注册VFS
             _logger.Info("Kernel", "Starting VFS initialization");

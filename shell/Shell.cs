@@ -1087,6 +1087,11 @@ namespace CMLeonOS
             Commands.Utility.HexCommand.EditHexFile(args);
         }
 
+        public void ProcessMarkit(string args)
+        {
+            Commands.MarkitCommand.Execute(args, this, fileSystem);
+        }
+
         public void CreateFTP()
         {
             Console.WriteLine("====================================");

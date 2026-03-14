@@ -233,6 +233,9 @@ namespace CMLeonOS.shell
                 case "hex":
                     shell.EditHexFile(args);
                     break;
+                case "markit":
+                    shell.ProcessMarkit(args);
+                    break;
                 case "alias":
                     shell.ProcessAlias(args);
                     break;
