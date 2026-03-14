@@ -535,7 +535,7 @@ namespace CMLeonOS
         {
             string line = lines[currentLine];
             
-            if (IsLuaFile() && settings.EnableSmartIndent)
+            if (settings.EnableSmartIndent)
             {
                 string currentIndent = GetLineIndent(line);
                 
@@ -549,9 +549,12 @@ namespace CMLeonOS
                     lines[currentLine] = line.Remove(linePos, line.Length - linePos);
                 }
                 
-                if (line.TrimEnd().EndsWith("then") || line.TrimEnd().EndsWith("do") || line.TrimEnd().EndsWith("else") || line.TrimEnd().EndsWith("elseif") || line.TrimEnd().EndsWith("repeat"))
+                if (IsLuaFile())
                 {
-                    lines[currentLine + 1] = lines[currentLine + 1] + "    ";
+                    if (line.TrimEnd().EndsWith("then") || line.TrimEnd().EndsWith("do") || line.TrimEnd().EndsWith("else") || line.TrimEnd().EndsWith("elseif") || line.TrimEnd().EndsWith("repeat"))
+                    {
+                        lines[currentLine + 1] = lines[currentLine + 1] + "    ";
+                    }
                 }
             }
             else
@@ -604,10 +607,7 @@ namespace CMLeonOS
             {
                 char c = text[i];
                 
-                if (IsLuaFile())
-                {
-                    c = HandleLuaAutoComplete(c);
-                }
+                c = HandleAutoComplete(c);
                 
                 lines[currentLine] = lines[currentLine].Insert(linePos, c.ToString());
                 linePos++;
@@ -618,7 +618,7 @@ namespace CMLeonOS
             modified = true;
         }
 
-        private char HandleLuaAutoComplete(char c)
+        private char HandleAutoComplete(char c)
         {
             string line = lines[currentLine];
             
@@ -688,7 +688,7 @@ namespace CMLeonOS
             }
             else
             {
-                if (IsLuaFile() && settings.EnableSmartDelete)
+                if (settings.EnableSmartDelete)
                 {
                     string line = lines[currentLine];
                     char charToDelete = line[linePos - 1];
@@ -1361,11 +1361,11 @@ namespace CMLeonOS
             string title = " Nano Settings";
             string[] options = new string[]
             {
-                "1. Smart Indent",
-                "2. Auto Complete Brackets",
-                "3. Auto Complete Quotes",
-                "4. Smart Delete",
-                "5. Syntax Highlight",
+                "1. Smart Indent (All Files)",
+                "2. Auto Complete Brackets (All Files)",
+                "3. Auto Complete Quotes (All Files)",
+                "4. Smart Delete (All Files)",
+                "5. Syntax Highlight (Lua Only)",
                 "6. Save and Exit"
             };
 
