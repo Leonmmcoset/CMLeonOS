@@ -236,6 +236,9 @@ namespace CMLeonOS.shell
                 case "markit":
                     shell.ProcessMarkit(args);
                     break;
+                case "femboy":
+                    shell.ProcessFemboy();
+                    break;
                 case "alias":
                     shell.ProcessAlias(args);
                     break;
