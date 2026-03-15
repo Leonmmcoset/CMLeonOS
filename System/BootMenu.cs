@@ -113,6 +113,11 @@ namespace CMLeonOS
 
         public static BootMenuAction Show()
         {
+            if (Settings.SettingsManager.SkipToGui && UserDatExists())
+            {
+                return BootMenuAction.GuiBoot;
+            }
+            
             Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.White;
 

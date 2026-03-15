@@ -144,6 +144,8 @@ ls /system
 - 文本文件：.txt, .md, .rtf
 - 图片文件：.bmp, .png, .jpg, .jpeg, .gif
 - 压缩文件：.zip, .rar, .7z, .tar, .gz
+- Markit文件：.mi
+- 数据文件：.dat
 
 ### cd
 切换当前工作目录。

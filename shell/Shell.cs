@@ -151,6 +151,7 @@ namespace CMLeonOS
                 // 如果需要退出，返回到登录页面
                 if (shouldExit)
                 {
+                    Commands.AliasCommand.SaveAliases();
                     return;
                 }
             }

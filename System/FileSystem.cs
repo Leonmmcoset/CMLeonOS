@@ -143,7 +143,7 @@ namespace CMLeonOS
                 if (Directory.Exists(fullPath))
                 {
                     string displayPath = path == "." ? CurrentDirectory : path;
-                    Console.WriteLine($"Contents of {displayPath}:");
+                    Console.WriteLine($"Contents of {fullPath}:");
                     
                     try
                     {

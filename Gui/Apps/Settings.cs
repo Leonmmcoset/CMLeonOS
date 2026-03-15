@@ -87,6 +87,11 @@ namespace CMLeonOS.Gui.Apps
             SettingsManager.GUI_ShowFps = @checked;
         }
 
+        private void SkipToGuiChanged(bool @checked)
+        {
+            SettingsManager.SkipToGui = @checked;
+        }
+
         private void MouseSensitivityChanged(float value)
         {
             SettingsManager.GUI_MouseSensitivity = value;
@@ -114,6 +119,12 @@ namespace CMLeonOS.Gui.Apps
             showFps.Checked = SettingsManager.GUI_ShowFps;
             showFps.CheckBoxChanged = ShowFpsChanged;
             wm.AddWindow(showFps);
+
+            Switch skipToGui = new Switch(appearance, 12, 96, 244, 16);
+            skipToGui.Text = "Skip to GUI on boot";
+            skipToGui.Checked = SettingsManager.SkipToGui;
+            skipToGui.CheckBoxChanged = SkipToGuiChanged;
+            wm.AddWindow(skipToGui);
 
             wm.Update(window);
         }

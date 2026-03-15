@@ -89,6 +89,7 @@ namespace CMLeonOS.Gui.Apps
         private readonly (string Name, string Path)[] shortcuts = new (string, string)[]
         {
             ("CMLeonOS (0:)", @"0:\"),
+            ("ISO (1:)", @"1:\"),
             ("My Home", @$"0:\user\{UserSystem.CurrentLoggedInUser.Username}"),
             ("Users", @"0:\user"),
         };
@@ -116,6 +117,8 @@ namespace CMLeonOS.Gui.Apps
             switch (path)
             {
                 case @"0:\":
+                    return Icons.Icon_Drive;
+                case @"1:\":
                     return Icons.Icon_Drive;
                 default:
                     return Icons.Icon_Directory;

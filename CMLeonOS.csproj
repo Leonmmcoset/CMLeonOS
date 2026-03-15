@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
@@ -30,7 +30,7 @@
 		<VBEResolution>800x600x32</VBEResolution>
 		<RunPostBuildEvent>Always</RunPostBuildEvent>
 		<Timeout>0</Timeout>
-		<UseUEFI>False</UseUEFI>
+		<UseUEFI>True</UseUEFI>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

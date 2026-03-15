@@ -96,7 +96,8 @@ namespace CMLeonOS
         
         private void InitializeSystem()
         {
-            // 修改光标样式等
+            // 修改光标样式
+            _logger.Info("Kernel", "Setting cursor size to 100");
             Console.CursorSize = 100;
 
             // 注册VFS

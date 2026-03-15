@@ -38,7 +38,8 @@ namespace CMLeonOS.Settings
             { "GUI_MouseSensitivity", "1.0" },
             { "GUI_ScreenWidth", "1280" },
             { "GUI_ScreenHeight", "800" },
-            { "GUI_DarkNotepad", "false" }
+            { "GUI_DarkNotepad", "false" },
+            { "SkipToGui", "false" }
         };
 
         public static bool LoggerEnabled
@@ -202,6 +203,23 @@ namespace CMLeonOS.Settings
             set
             {
                 settings["GUI_DarkNotepad"] = value ? "true" : "false";
+                SaveSettings();
+            }
+        }
+
+        public static bool SkipToGui
+        {
+            get
+            {
+                if (settings.TryGetValue("SkipToGui", out string value))
+                {
+                    return value.ToLower() == "true";
+                }
+                return false;
+            }
+            set
+            {
+                settings["SkipToGui"] = value ? "true" : "false";
                 SaveSettings();
             }
         }

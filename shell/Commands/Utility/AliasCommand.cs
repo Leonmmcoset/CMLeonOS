@@ -24,10 +24,12 @@ namespace CMLeonOS.Commands
     {
         private static string aliasFilePath = @"0:\system\alias.dat";
         private static Dictionary<string, string> aliases = new Dictionary<string, string>();
+        private static bool hasUnsavedChanges = false;
 
         public static void LoadAliases()
         {
             aliases.Clear();
+            hasUnsavedChanges = false;
             
             try
             {
@@ -57,6 +59,11 @@ namespace CMLeonOS.Commands
 
         public static void SaveAliases()
         {
+            if (!hasUnsavedChanges)
+            {
+                return;
+            }
+            
             try
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(aliasFilePath));
@@ -87,6 +94,8 @@ namespace CMLeonOS.Commands
                         writer.WriteLine($"{key}={aliases[key]}");
                     }
                 }
+                
+                hasUnsavedChanges = false;
             }
             catch (Exception e)
             {
@@ -103,7 +112,7 @@ namespace CMLeonOS.Commands
             }
 
             aliases[name] = command;
-            SaveAliases();
+            hasUnsavedChanges = true;
             Console.WriteLine($"Alias '{name}' added successfully");
         }
 
@@ -111,7 +120,7 @@ namespace CMLeonOS.Commands
         {
             if (aliases.Remove(name))
             {
-                SaveAliases();
+                hasUnsavedChanges = true;
                 Console.WriteLine($"Alias '{name}' removed successfully");
             }
             else
