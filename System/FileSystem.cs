@@ -166,7 +166,11 @@ namespace CMLeonOS
                         foreach (var file in files)
                         {
                             string fileName = Path.GetFileName(file);
-                            Console.ForegroundColor = ConsoleColor.White;
+                            string extension = Path.GetExtension(fileName)?.ToLower();
+                            
+                            ConsoleColor fileColor = GetFileColor(extension);
+                            
+                            Console.ForegroundColor = fileColor;
                             Console.WriteLine($"[FILE] {fileName}");
                             Console.ResetColor();
                         }
@@ -188,6 +192,47 @@ namespace CMLeonOS
                 Console.WriteLine($"Error listing files: {ex.Message}");
                 Console.ResetColor();
             }
+        }
+
+        private ConsoleColor GetFileColor(string extension)
+        {
+            if (string.IsNullOrEmpty(extension))
+                return ConsoleColor.Gray;
+            
+            return extension switch
+            {
+                // 这是一堆后缀名的颜色标注，但是许多后缀名还不支持，先保留
+                ".exe" => ConsoleColor.Green,
+                ".cla" => ConsoleColor.Green,
+                ".lua" => ConsoleColor.Cyan,
+                ".js" => ConsoleColor.Cyan,
+                ".py" => ConsoleColor.Cyan,
+                ".sh" => ConsoleColor.Cyan,
+                ".bat" => ConsoleColor.Cyan,
+                ".cmd" => ConsoleColor.Cyan,
+                ".ps1" => ConsoleColor.Cyan,
+                ".json" => ConsoleColor.Magenta,
+                ".xml" => ConsoleColor.Magenta,
+                ".ini" => ConsoleColor.Magenta,
+                ".cfg" => ConsoleColor.Magenta,
+                ".conf" => ConsoleColor.Magenta,
+                ".txt" => ConsoleColor.White,
+                ".md" => ConsoleColor.White,
+                ".rtf" => ConsoleColor.White,
+                ".bmp" => ConsoleColor.Blue,
+                ".png" => ConsoleColor.Blue,
+                ".jpg" => ConsoleColor.Blue,
+                ".jpeg" => ConsoleColor.Blue,
+                ".gif" => ConsoleColor.Blue,
+                ".zip" => ConsoleColor.Red,
+                ".rar" => ConsoleColor.Red,
+                ".7z" => ConsoleColor.Red,
+                ".tar" => ConsoleColor.Red,
+                ".gz" => ConsoleColor.Red,
+                ".mi" => ConsoleColor.DarkYellow,
+                ".dat" => ConsoleColor.DarkBlue,
+                _ => ConsoleColor.Gray
+            };
         }
 
         public List<string> GetFileList(string path = ".")
