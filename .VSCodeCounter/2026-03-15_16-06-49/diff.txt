@@ -1,0 +1,60 @@
+Date : 2026-03-15 16:06:49
+Directory : c:\Users\leon\source\repos\CMLeonOS\CMLeonOS
+Total : 20 files,  695 codes, 22 comments, 76 blanks, all 793 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| C#       |         19 |        536 |         22 |         43 |        601 |
+| Markdown |          1 |        159 |          0 |         33 |        192 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++--------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                 | files      | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                    |         20 |        695 |         22 |         76 |        793 |
+| . (Files)                                                                            |          5 |       -265 |        -54 |        -52 |       -371 |
+| Editor                                                                               |          1 |        328 |          0 |         19 |        347 |
+| Gui                                                                                  |          2 |         12 |          0 |          2 |         14 |
+| Gui\Apps                                                                             |          2 |         12 |          0 |          2 |         14 |
+| Settings                                                                             |          1 |         17 |          0 |          1 |         18 |
+| Shell                                                                                |          5 |        134 |         15 |         14 |        163 |
+| Shell (Files)                                                                        |          2 |         15 |          0 |          2 |         17 |
+| Shell\Commands                                                                       |          3 |        119 |         15 |         12 |        146 |
+| Shell\Commands (Files)                                                               |          1 |        100 |          0 |          7 |        107 |
+| Shell\Commands\Utility                                                               |          2 |         19 |         15 |          5 |         39 |
+| System                                                                               |          3 |        275 |         31 |         51 |        357 |
+| Utils                                                                                |          2 |         35 |         30 |          8 |         73 |
+| docs                                                                                 |          1 |        159 |          0 |         33 |        192 |
+| docs\cmleonos                                                                        |          1 |        159 |          0 |         33 |        192 |
+| docs\cmleonos\docs                                                                   |          1 |        159 |          0 |         33 |        192 |
++--------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++--------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                             | language | code       | comment    | blank      | total      |
++--------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\BootMenu.cs                             | C#       |       -152 |        -15 |        -30 |       -197 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Editor\Nano.cs                          | C#       |        328 |          0 |         19 |        347 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Gui\Apps\Files.cs                       | C#       |          3 |          0 |          0 |          3 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Gui\Apps\Settings.cs                    | C#       |          9 |          0 |          2 |         11 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Kernel.cs                               | C#       |          1 |          6 |          2 |          9 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\LuaApps.cs                              | C#       |        -13 |        -15 |         -4 |        -32 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Power.cs                                | C#       |        -22 |        -15 |         -4 |        -41 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Settings\Settings.cs                    | C#       |         17 |          0 |          1 |         18 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\CommandList.cs                    | C#       |          6 |          0 |          0 |          6 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Commands\MarkitCommand.cs         | C#       |        100 |          0 |          7 |        107 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Commands\Utility\AliasCommand.cs  | C#       |          7 |          0 |          2 |          9 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Commands\Utility\FemboyCommand.cs | C#       |         12 |         15 |          3 |         30 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Shell\Shell.cs                          | C#       |          9 |          0 |          2 |         11 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\System\BootMenu.cs                      | C#       |        156 |         15 |         31 |        202 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\System\FileSystem.cs                    | C#       |         40 |          1 |          4 |         45 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\System\UserManager.cs                   | C#       |         79 |         15 |         16 |        110 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\UserManager.cs                          | C#       |        -79 |        -15 |        -16 |       -110 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Utils\LuaApps.cs                        | C#       |         13 |         15 |          4 |         32 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\Utils\Power.cs                          | C#       |         22 |         15 |          4 |         41 |
+| c:\Users\leon\source\repos\CMLeonOS\CMLeonOS\docs\cmleonos\docs\commands.md          | Markdown |        159 |          0 |         33 |        192 |
+| Total                                                                                |          |        695 |         22 |         76 |        793 |
++--------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
