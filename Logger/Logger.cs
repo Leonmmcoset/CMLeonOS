@@ -15,6 +15,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using System;
+using System.Security.Cryptography;
+using XSharp.Assembler.x86.SSE;
 
 namespace CMLeonOS.Logger
 {
@@ -100,8 +102,11 @@ namespace CMLeonOS.Logger
         private void WriteToConsole(LogEntry entry)
         {
             if (Settings.SettingsManager.LoggerEnabled) {
-                ConsoleColor originalColor = Console.ForegroundColor;
+                ConsoleColor originalBackgroundColor = Console.BackgroundColor;
+                ConsoleColor originalForegroundColor = Console.ForegroundColor;
                 
+                // 日志等级
+                Console.Write("[ ");
                 switch (entry.Level)
                 {
                     case LogLevel.Debug:
@@ -121,8 +126,44 @@ namespace CMLeonOS.Logger
                         break;
                 }
 
-                Console.WriteLine(entry.ToString());
-                Console.ForegroundColor = originalColor;
+                // 我的审美就是依托
+                // // 日志等级
+                // Console.ForegroundColor = ConsoleColor.White;
+                // Console.Write(entry.ToStringLevelStr());
+
+                // // 空格
+                // // Console.BackgroundColor = originalBackgroundColor;
+                // // Console.Write(" ");
+
+                // // 日志来源
+                // Console.BackgroundColor = ConsoleColor.Gray;
+                // Console.ForegroundColor = ConsoleColor.White;
+                // Console.Write(entry.ToStringSource());
+
+                // // 日志内容
+                // Console.BackgroundColor = originalBackgroundColor;
+                // Console.ForegroundColor = ConsoleColor.White;
+                // // 空格
+                // Console.Write(" ");
+                // Console.Write(entry.ToStringMessage());
+                // // 换行
+                // Console.WriteLine();
+
+                Console.Write(entry.ToStringLevelStr());
+                Console.ForegroundColor = originalForegroundColor;
+                Console.Write(" ] ");
+                
+                // 日志来源
+                Console.Write($"( {entry.Source} ) ");
+
+                // 日志内容
+                Console.Write(entry.ToStringMessage());
+
+                // 换行
+                Console.WriteLine();
+
+                Console.ForegroundColor = originalForegroundColor;
+                Console.BackgroundColor = originalBackgroundColor;
             }
         }
     }

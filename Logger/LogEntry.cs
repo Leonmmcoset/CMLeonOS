@@ -45,11 +45,25 @@ namespace CMLeonOS.Logger
 
         public override string ToString()
         {
-            string levelStr = GetLevelString(Level);
-            return "[" + levelStr + "] [" + Source + "] " + Message;
+            return $"[{GetLevelString(Level)}] [{Source}] {Message}";
         }
 
-        private string GetLevelString(LogLevel level)
+        public string ToStringLevelStr()
+        {
+            return GetLevelString(Level);
+        }
+
+        public string ToStringSource()
+        {
+            return Source;
+        }
+
+        public string ToStringMessage()
+        {
+            return Message;
+        }
+
+        public string GetLevelString(LogLevel level)
         {
             switch (level)
             {
