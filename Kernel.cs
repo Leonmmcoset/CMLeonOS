@@ -204,7 +204,7 @@ namespace CMLeonOS
                     
                     using var dhcp = new DHCPClient();
                     if (NetworkDevice.Ready == true) {
-                        _logger.Success("Kernel", "Network device ready.");
+                        _logger.Success("Kernel", "Network device ready");
                     }
                     else
                     {
