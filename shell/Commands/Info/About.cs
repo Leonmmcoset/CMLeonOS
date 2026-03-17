@@ -22,6 +22,12 @@ namespace CMLeonOS.Commands
     {
         public static void ProcessAbout()
         {
+            Console.WriteLine(@"   ____ __  __ _                      ___  ____  ");
+            Console.WriteLine(@"  / ___|  \/  | |    ___  ___  _ __  / _ \/ ___| ");
+            Console.WriteLine(@" | |   | |\/| | |   / _ \/ _ \| '_ \| | | \___ \ ");
+            Console.WriteLine(@" | |___| |  | | |__|  __/ (_) | | | | |_| |___) |");
+            Console.WriteLine(@"  \____|_|  |_|_____\___|\___/|_| |_|____/|____/ ");
+            Console.WriteLine();
             Console.WriteLine("CMLeonOS Project");
             Console.WriteLine("By LeonOS 2 Developer Team");
         }
