@@ -154,7 +154,7 @@ namespace CMLeonOS.Logger
                 Console.Write(" ] ");
                 
                 // 日志来源
-                Console.Write($"( {entry.Source} ) ");
+                Console.Write($"{entry.Source}: ");
 
                 // 日志内容
                 Console.Write(entry.ToStringMessage());
