@@ -26,7 +26,6 @@ namespace CMLeonOS.Commands
             try
             {
                 var logs = Log.Logs;
-
                 if (logs == null || logs.Count == 0)
                 {
                     Console.WriteLine("No logs available.");
@@ -35,29 +34,13 @@ namespace CMLeonOS.Commands
 
                 Console.WriteLine($"Total logs: {logs.Count}");
                 Console.WriteLine();
-
                 int countToShow = Math.Min(logs.Count, 20);
                 int startIndex = logs.Count - countToShow;
 
                 for (int i = startIndex; i < logs.Count; i++)
                 {
                     LogEntry entry = logs[i];
-                    string level = entry.Level switch
-                    {
-                        LogLevel.Debug => "DEBUG",
-                        LogLevel.Info => "INFO ",
-                        LogLevel.Warning => "WARN ",
-                        LogLevel.Error => "ERROR",
-                        LogLevel.Success => "SUCCESS",
-                        _ => "UNKNOWN"
-                    };
-
-                    string time = entry.Date.ToString("HH:mm:ss");
-                    string message = entry.Message.Length > 50 ? entry.Message.Substring(0, 50) + "..." : entry.Message;
-
-                    Console.ForegroundColor = GetLevelColor(entry.Level);
-                    Console.WriteLine($"[{time}] [{level}] [{entry.Source}] {message}");
-                    Console.ResetColor();
+                    WriteToConsole(entry);
                 }
 
                 if (logs.Count > 20)
@@ -72,17 +55,47 @@ namespace CMLeonOS.Commands
             }
         }
 
-        private static ConsoleColor GetLevelColor(LogLevel level)
+        private static void WriteToConsole(LogEntry entry)
         {
-            return level switch
-            {
-                LogLevel.Debug => ConsoleColor.Gray,
-                LogLevel.Info => ConsoleColor.Cyan,
-                LogLevel.Warning => ConsoleColor.Yellow,
-                LogLevel.Error => ConsoleColor.Red,
-                LogLevel.Success => ConsoleColor.Green,
-                _ => ConsoleColor.White
-            };
+                ConsoleColor originalBackgroundColor = Console.BackgroundColor;
+                ConsoleColor originalForegroundColor = Console.ForegroundColor;
+                
+                // 日志等级
+                Console.Write("[ ");
+                switch (entry.Level)
+                {
+                    case LogLevel.Debug:
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                        break;
+                    case LogLevel.Info:
+                        Console.ForegroundColor = ConsoleColor.DarkCyan;
+                        break;
+                    case LogLevel.Warning:
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        break;
+                    case LogLevel.Error:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        break;
+                    case LogLevel.Success:
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        break;
+                }
+
+                Console.Write(entry.ToStringLevelStr());
+                Console.ForegroundColor = originalForegroundColor;
+                Console.Write(" ] ");
+                
+                // 日志来源
+                Console.Write($"{entry.Source}: ");
+
+                // 日志内容
+                Console.Write(entry.ToStringMessage());
+
+                // 换行
+                Console.WriteLine();
+
+                Console.ForegroundColor = originalForegroundColor;
+                Console.BackgroundColor = originalBackgroundColor;
         }
     }
 }
