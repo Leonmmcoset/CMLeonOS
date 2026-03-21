@@ -239,6 +239,9 @@ namespace CMLeonOS.shell
                 case "femboy":
                     shell.ProcessFemboy();
                     break;
+                case "boom":
+                    shell.ProcessBoom();
+                    break;
                 case "alias":
                     shell.ProcessAlias(args);
                     break;

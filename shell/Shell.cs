@@ -632,6 +632,11 @@ namespace CMLeonOS
             Commands.Utility.FemboyCommand.ProcessFemboy();
         }
 
+        public void ProcessBoom()
+        {
+            Commands.Utility.BoomCommand.ProcessBoom();
+        }
+
         public void ChangePrompt(string args)
         {
             Commands.Utility.PromptCommand.ChangePrompt(args, ref prompt);

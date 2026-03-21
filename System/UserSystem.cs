@@ -74,8 +74,11 @@ namespace CMLeonOS
         {
             // 清空用户列表并重新加载
             users = null;
+            _logger.Info("UserSystem", "Initializing user system...");
             var tempUserSystem = new UserSystem();
+            _logger.Info("UserSystem", "Loading user data...");
             tempUserSystem.LoadUsers();
+            _logger.Info("UserSystem", "User data loaded successfully.");
             initialized = true;
             _logger.Info("UserSystem", $"User system initialized. Loaded {users?.Count ?? 0} users.");
         }

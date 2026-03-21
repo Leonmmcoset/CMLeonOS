@@ -844,6 +844,18 @@ exportbackground 0:\mywallpaper.bmp
 beep
 ```
 
+### boom
+触发系统崩溃（用于测试）。
+
+**用法：**
+```bash
+boom
+```
+
+**说明：**
+- 此命令会抛出BoomCommandCrash异常
+- 仅用于测试和调试目的
+
 ### cal
 显示日历。
 

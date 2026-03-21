@@ -112,6 +112,8 @@ namespace CMLeonOS
                 
                 // 显示可用空间（动态单位）
                 var available_space = fs.GetAvailableFreeSpace(@"0:\");
+                _logger.Info("Kernel", "Getting available free space");
+
                 string spaceWithUnit = FormatBytes(available_space);
                 _logger.Info("Kernel", $"Available Free Space: {spaceWithUnit}");
                 
@@ -121,6 +123,7 @@ namespace CMLeonOS
                 
                 // 检查并创建system文件夹
                 string systemFolderPath = @"0:\system";
+                _logger.Info("Kernel", $"Checking for system folder at {systemFolderPath}");
                 if (!System.IO.Directory.Exists(systemFolderPath))
                 {
                     System.IO.Directory.CreateDirectory(systemFolderPath);
@@ -129,6 +132,7 @@ namespace CMLeonOS
                 
                 // 检查并创建apps文件夹
                 string appsFolderPath = @"0:\apps";
+                _logger.Info("Kernel", $"Checking for apps folder at {appsFolderPath}");
                 if (!System.IO.Directory.Exists(appsFolderPath))
                 {
                     System.IO.Directory.CreateDirectory(appsFolderPath);
