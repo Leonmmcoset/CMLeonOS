@@ -143,6 +143,9 @@ namespace CMLeonOS.shell
                 case "tree":
                     shell.ShowTree(args);
                     break;
+                case "tuitree":
+                    shell.ShowTUITree(args);
+                    break;
                 case "getdisk":
                     shell.GetDiskInfo();
                     break;

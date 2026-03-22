@@ -300,6 +300,26 @@ tree
 tree /system
 ```
 
+### tuitree
+以树形结构显示目录内容（TUI界面）。
+
+**用法：**
+```bash
+tuitree [path]
+```
+
+**示例：**
+```bash
+tuitree
+tuitree /system
+```
+
+**说明：**
+- 使用TUI TreeView组件显示文件和文件夹
+- 支持键盘导航（上下箭头、PageUp/PageDown）
+- 按ESC键退出
+- 默认显示当前目录
+
 ### head
 显示文件的前几行。
 

@@ -920,6 +920,11 @@ namespace CMLeonOS
             Commands.FileSystem.TreeCommand.ShowTree(fileSystem, args, ShowError);
         }
 
+        public void ShowTUITree(string args)
+        {
+            Commands.FileSystem.TUITreeCommand.ShowTUITree(fileSystem, args, ShowError);
+        }
+
         public void GetDiskInfo()
         {
             Commands.FileSystem.DiskInfoCommand.GetDiskInfo(ShowError);
