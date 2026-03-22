@@ -164,9 +164,12 @@ namespace CMLeonOS.Gui.ShellComponents
 
             RenderBackground();
 
-            int boxesStartY = (int)(padding + Images.Icon_Key.Height + padding);
+            int contentHeight = 110;
+            int contentWidth = 160;
+            int startX = (width - contentWidth) / 2;
+            int startY = (height - contentHeight) / 2;
             
-            userTable = new Table(window, padding, boxesStartY, 160, 80);
+            userTable = new Table(window, startX, startY, contentWidth, 80);
             userTable.CellHeight = 25;
             userTable.Background = Color.White;
             userTable.Foreground = Color.Black;
@@ -190,7 +193,7 @@ namespace CMLeonOS.Gui.ShellComponents
             
             wm.AddWindow(userTable);
 
-            passwordBox = new TextBox(window, padding, boxesStartY + 90, 160, 20);
+            passwordBox = new TextBox(window, startX, startY + 90, contentWidth, 20);
             passwordBox.Shield = true;
             passwordBox.PlaceholderText = "Password";
             passwordBox.Submitted = LogOn;
