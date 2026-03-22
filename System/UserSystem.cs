@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -648,52 +649,52 @@ namespace CMLeonOS
             CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
             global::System.Console.Clear();
 
-            var loginBox = new CMLeonOS.UI.Window(new CMLeonOS.UI.Rect(15, 8, 50, 10), "Login", () => { }, true);
+            var loginBox = new CMLeonOS.UI.Window(new CMLeonOS.UI.Rect(15, 8, 50, 15), "Login", () => { }, true);
             loginBox.Render();
 
             CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
             global::System.Console.SetCursorPosition(17, 10);
-            global::System.Console.Write("Username: ");
-            string username = global::System.Console.ReadLine();
+            global::System.Console.Write("Select User:");
 
-            if (string.IsNullOrWhiteSpace(username))
-            {
-                CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Red, global::System.ConsoleColor.Black);
-                global::System.Console.SetCursorPosition(17, 24);
-                global::System.Console.Write("Username cannot be empty.                   ");
-                global::System.Threading.Thread.Sleep(1000);
-                return false;
-            }
-
-            CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
-            global::System.Console.SetCursorPosition(17, 11);
-            global::System.Console.Write("Password: ");
-            string password = ReadPassword();
-
-            User foundUser = null;
+            var userMenu = new CMLeonOS.UI.Menu(new CMLeonOS.UI.Rect(17, 11, 46, 8));
             foreach (User user in users)
             {
-                if (user.Username.ToLower() == username.ToLower())
+                userMenu.Items.Add(new CMLeonOS.UI.MenuItem(user.Username));
+            }
+            userMenu.Render();
+
+            User selectedUser = null;
+            while (selectedUser == null)
+            {
+                var key = global::System.Console.ReadKey(true);
+                
+                if (key.Key == global::System.ConsoleKey.Enter)
                 {
-                    foundUser = user;
-                    break;
+                    if (userMenu.SelectedIndex >= 0 && userMenu.SelectedIndex < users.Count)
+                    {
+                        selectedUser = users[userMenu.SelectedIndex];
+                    }
+                }
+                else if (key.Key == global::System.ConsoleKey.Escape)
+                {
+                    return false;
+                }
+                else if (userMenu.HandleKey(key))
+                {
+                    userMenu.Render();
                 }
             }
 
-            if (foundUser == null)
-            {
-                CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Red, global::System.ConsoleColor.Black);
-                global::System.Console.SetCursorPosition(17, 24);
-                global::System.Console.Write("User not found.                             ");
-                global::System.Threading.Thread.Sleep(1000);
-                return false;
-            }
+            CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+            global::System.Console.SetCursorPosition(17, 20);
+            global::System.Console.Write("Password: ");
+            string password = ReadPassword();
 
             string hashedInputPassword = HashPasswordSha256(password);
 
-            if (foundUser.Password != hashedInputPassword)
+            if (selectedUser.Password != hashedInputPassword)
             {
-                string usernameLower = username.ToLower();
+                string usernameLower = selectedUser.Username.ToLower();
                 
                 if (!loginAttempts.ContainsKey(usernameLower))
                 {
@@ -722,20 +723,19 @@ namespace CMLeonOS
                 return false;
             }
 
-            loginAttempts.Remove(username.ToLower());
+            loginAttempts.Remove(selectedUser.Username.ToLower());
 
             CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Green, global::System.ConsoleColor.Black);
             global::System.Console.SetCursorPosition(17, 24);
             global::System.Console.Write("Login successful!                           ");
-            // global::System.Console.WriteLine("Please wait...                           ");
             global::System.Threading.Thread.Sleep(1500);
             global::System.Console.ResetColor();
             global::System.Console.Clear();
 
             global::System.Console.Beep();
 
-            currentLoggedInUser = foundUser;
-            CreateUserFolder(foundUser.Username);
+            currentLoggedInUser = selectedUser;
+            CreateUserFolder(selectedUser.Username);
 
             return true;
         }

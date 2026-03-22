@@ -30,8 +30,8 @@ namespace CMLeonOS.Gui.ShellComponents
 
         AppWindow window;
 
-        TextBox usernameBox;
-
+        Table userTable;
+        
         TextBox passwordBox;
 
         WindowManager wm = ProcessManager.GetProcess<WindowManager>();
@@ -46,7 +46,7 @@ namespace CMLeonOS.Gui.ShellComponents
         }
 
         private const int width = 352;
-        private const int height = 128;
+        private const int height = 200;
         private const int padding = 12;
 
         private double shakiness = 0;
@@ -57,7 +57,7 @@ namespace CMLeonOS.Gui.ShellComponents
 
             window.DrawImageAlpha(Images.Icon_Key, padding, padding);
 
-            window.DrawString("Enter your username and password,\nthen press Enter to log on", Color.Black, (int)(padding + Images.Icon_Key.Width + padding), padding);
+            window.DrawString("Select a user and enter password,\nthen press Enter to log on", Color.Black, (int)(padding + Images.Icon_Key.Width + padding), padding);
         }
 
         private void ShowError(string text)
@@ -73,17 +73,21 @@ namespace CMLeonOS.Gui.ShellComponents
 
         private void LogOn()
         {
-            if (usernameBox.Text.Trim() == string.Empty || passwordBox.Text.Trim() == string.Empty)
+            if (userTable.SelectedCellIndex < 0 || passwordBox.Text.Trim() == string.Empty)
             {
                 return;
             }
 
-            string username = usernameBox.Text.Trim();
-            string password = passwordBox.Text.Trim();
-
-            Logger.Logger.Instance.Info("Lock", $"Attempting login for user: {username}");
+            if (userTable.SelectedCellIndex >= UserSystem.GetUsers().Count)
+            {
+                return;
+            }
 
             var users = UserSystem.GetUsers();
+            User selectedUser = users[userTable.SelectedCellIndex];
+            string password = passwordBox.Text.Trim();
+
+            Logger.Logger.Instance.Info("Lock", $"Attempting login for user: {selectedUser.Username}");
             Logger.Logger.Instance.Info("Lock", $"UserSystem.GetUsers() returned: {(users == null ? "null" : users.Count.ToString())}");
 
             if (users == null || users.Count == 0)
@@ -94,37 +98,17 @@ namespace CMLeonOS.Gui.ShellComponents
                 return;
             }
 
-            User foundUser = null;
-            foreach (User user in users)
-            {
-                Logger.Logger.Instance.Info("Lock", $"Checking user: {user.Username} (lower: {user.Username.ToLower()})");
-                if (user.Username.ToLower() == username.ToLower())
-                {
-                    foundUser = user;
-                    Logger.Logger.Instance.Info("Lock", $"User matched: {foundUser.Username}");
-                    break;
-                }
-            }
-
-            if (foundUser == null)
-            {
-                Logger.Logger.Instance.Warning("Lock", $"User not found: {username}");
-                Shake();
-                return;
-            }
-
-            Logger.Logger.Instance.Info("Lock", $"User found: {foundUser.Username}, Admin: {foundUser.Admin}");
-
+            Logger.Logger.Instance.Info("Lock", $"User found: {selectedUser.Username}, Admin: {selectedUser.Admin}");
             string hashedInputPassword = UserSystem.HashPasswordSha256(password);
 
-            if (foundUser.Password != hashedInputPassword)
+            if (selectedUser.Password != hashedInputPassword)
             {
-                Logger.Logger.Instance.Warning("Lock", $"Authentication failed for user: {foundUser.Username}");
+                Logger.Logger.Instance.Warning("Lock", $"Authentication failed for user: {selectedUser.Username}");
                 passwordBox.Text = string.Empty;
 
-                if (foundUser.LockedOut)
+                if (selectedUser.LockedOut)
                 {
-                    TimeSpan remaining = foundUser.LockoutEnd - DateTime.Now;
+                    TimeSpan remaining = selectedUser.LockoutEnd - DateTime.Now;
                     if (remaining.Minutes > 0)
                     {
                         ShowError($"Try again in {remaining.Minutes}m, {remaining.Seconds}s.");
@@ -141,15 +125,14 @@ namespace CMLeonOS.Gui.ShellComponents
                 return;
             }
 
-            Logger.Logger.Instance.Info("Lock", $"Authentication successful for user: {foundUser.Username}");
-
+            Logger.Logger.Instance.Info("Lock", $"Authentication successful for user: {selectedUser.Username}");
             TryStop();
-            UserSystem.SetCurrentLoggedInUser(foundUser);
+            UserSystem.SetCurrentLoggedInUser(selectedUser);
             ProcessManager.AddProcess(wm, new ShellComponents.Taskbar()).Start();
             ProcessManager.AddProcess(wm, new ShellComponents.Dock.Dock()).Start();
             soundService.PlaySystemSound(Sound.SystemSound.Login);
 
-            Logger.Logger.Instance.Info("Lock", $"{foundUser.Username} logged on to the GUI.");
+            Logger.Logger.Instance.Info("Lock", $"{selectedUser.Username} logged on to GUI.");
         }
 
         private void LogOnClick(int x, int y)
@@ -182,13 +165,32 @@ namespace CMLeonOS.Gui.ShellComponents
             RenderBackground();
 
             int boxesStartY = (int)(padding + Images.Icon_Key.Height + padding);
+            
+            userTable = new Table(window, padding, boxesStartY, 160, 80);
+            userTable.CellHeight = 25;
+            userTable.Background = Color.White;
+            userTable.Foreground = Color.Black;
+            userTable.Border = Color.Gray;
+            userTable.SelectedBackground = Color.FromArgb(221, 246, 255);
+            userTable.SelectedForeground = Color.Black;
+            userTable.SelectedBorder = Color.FromArgb(126, 205, 234);
+            userTable.AllowSelection = true;
+            userTable.AllowDeselection = false;
+            
+            foreach (var user in users)
+            {
+                var cell = new TableCell(user.Username);
+                userTable.Cells.Add(cell);
+            }
+            
+            if (userTable.Cells.Count > 0)
+            {
+                userTable.SelectedCellIndex = 0;
+            }
+            
+            wm.AddWindow(userTable);
 
-            usernameBox = new TextBox(window, padding, boxesStartY, 160, 20);
-            usernameBox.PlaceholderText = "Username";
-            usernameBox.Submitted = LogOn;
-            wm.AddWindow(usernameBox);
-
-            passwordBox = new TextBox(window, padding, boxesStartY + padding + 20, 160, 20);
+            passwordBox = new TextBox(window, padding, boxesStartY + 90, 160, 20);
             passwordBox.Shield = true;
             passwordBox.PlaceholderText = "Password";
             passwordBox.Submitted = LogOn;
