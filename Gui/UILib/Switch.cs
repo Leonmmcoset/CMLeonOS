@@ -15,8 +15,8 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using Cosmos.System;
-using Cosmos.System.Graphics;
 using System;
+using System.Drawing;
 
 namespace CMLeonOS.Gui.UILib
 {
@@ -28,19 +28,10 @@ namespace CMLeonOS.Gui.UILib
             OnClick = null;
         }
 
-        [IL2CPU.API.Attribs.ManifestResourceStream(ResourceName = "CMLeonOS.Gui.Resources.SwitchOff.bmp")]
-        private static byte[] offBytes;
-        private static Bitmap offBitmap = new Bitmap(offBytes);
-
-        [IL2CPU.API.Attribs.ManifestResourceStream(ResourceName = "CMLeonOS.Gui.Resources.SwitchOn.bmp")]
-        private static byte[] onBytes;
-        private static Bitmap onBitmap = new Bitmap(onBytes);
-
-        [IL2CPU.API.Attribs.ManifestResourceStream(ResourceName = "CMLeonOS.Gui.Resources.SwitchKnob.bmp")]
-        private static byte[] knobBytes;
-        private static Bitmap knobBitmap = new Bitmap(knobBytes);
-
         private const int maximumToggleDrag = 4;
+        private const int switchWidth = 34;
+        private const int switchHeight = 18;
+        private const int knobSize = 14;
 
         private int lastMouseX = 0;
         private int totalDragged = 0;
@@ -67,7 +58,7 @@ namespace CMLeonOS.Gui.UILib
                 // Interpret as a drag rather than a toggle,
                 // setting the Checked state based on where
                 // the switch knob is.
-                Checked = knobX >= (offBitmap.Width / 2) - (knobBitmap.Width / 2);
+                Checked = knobX >= (switchWidth - knobSize) / 2d;
             }
         }
 
@@ -76,7 +67,7 @@ namespace CMLeonOS.Gui.UILib
 
         internal override void Render()
         {
-            knobGoal = (int)(Checked ? offBitmap.Width - knobBitmap.Width : 0);
+            knobGoal = Checked ? switchWidth - knobSize : 0;
 
             if (held && MouseManager.MouseState != MouseState.Left)
             {
@@ -88,7 +79,7 @@ namespace CMLeonOS.Gui.UILib
                 int diff = (int)(MouseManager.X - lastMouseX);
                 lastMouseX = (int)MouseManager.X;
                 totalDragged += Math.Abs(diff);
-                knobX = Math.Clamp(knobX + diff, 0, offBitmap.Width - knobBitmap.Width);
+                knobX = Math.Clamp(knobX + diff, 0, switchWidth - knobSize);
 
                 WM.UpdateQueue.Enqueue(this);
             }
@@ -118,13 +109,17 @@ namespace CMLeonOS.Gui.UILib
             Clear(Background);
 
             int switchX = 0;
-            int switchY = (Height / 2) - ((int)offBitmap.Height / 2);
+            int switchY = (Height / 2) - (switchHeight / 2);
 
-            int textX = (int)(offBitmap.Width + 8);
+            int textX = switchWidth + 8;
             int textY = (Height / 2) - (16 / 2);
 
-            DrawImageAlpha(Checked ? onBitmap : offBitmap, switchX, switchY);
-            DrawImageAlpha(knobBitmap, (int)knobX, switchY);
+            DrawFilledRectangle(switchX, switchY, switchWidth, switchHeight, Checked ? UITheme.Accent : UITheme.SurfaceMuted);
+            DrawRectangle(switchX, switchY, switchWidth, switchHeight, Checked ? UITheme.AccentDark : UITheme.SurfaceBorder);
+
+            int knobY = switchY + ((switchHeight - knobSize) / 2);
+            DrawFilledRectangle((int)knobX + 1, knobY, knobSize, knobSize, Color.White);
+            DrawRectangle((int)knobX + 1, knobY, knobSize, knobSize, UITheme.SurfaceBorder);
 
             DrawString(Text, Foreground, textX, textY);
 

@@ -41,7 +41,7 @@ namespace CMLeonOS.Gui.UILib
             Render();
         }
 
-        private Color _background = Color.White;
+        private Color _background = UITheme.Surface;
         internal Color Background
         {
             get
@@ -55,7 +55,7 @@ namespace CMLeonOS.Gui.UILib
             }
         }
 
-        private Color _foreground = Color.Gray;
+        private Color _foreground = UITheme.TextSecondary;
         internal Color Foreground
         {
             get
@@ -143,9 +143,9 @@ namespace CMLeonOS.Gui.UILib
 
         private bool held = false;
 
-        private static int slotHeight = 3;
-        private static int sliderHeight = 15;
-        private static int sliderWidth = 5;
+        private static int slotHeight = 4;
+        private static int sliderHeight = 16;
+        private static int sliderWidth = 8;
 
         private void RangeSliderDown(int x, int y)
         {
@@ -187,7 +187,9 @@ namespace CMLeonOS.Gui.UILib
             }
 
             // Slot
-            DrawFilledRectangle(0, slotY, Width, slotHeight, Color.FromArgb(168, 168, 168));
+            DrawFilledRectangle(0, slotY, Width, slotHeight, UITheme.SurfaceBorder);
+            int fillWidth = (int)(_value.Map((float)_minimum, (float)_maximum, 0, Width - sliderWidth)) + (sliderWidth / 2);
+            DrawFilledRectangle(0, slotY, Math.Max(0, fillWidth), slotHeight, UITheme.AccentLight);
 
             // Slider
             DrawFilledRectangle(
@@ -195,7 +197,14 @@ namespace CMLeonOS.Gui.UILib
                 sliderY,
                 sliderWidth,
                 sliderHeight,
-                held ? Color.FromArgb(0, 71, 112) : Color.FromArgb(0, 115, 186)
+                held ? UITheme.AccentDark : UITheme.Accent
+            );
+            DrawRectangle(
+                (int)(_value.Map((float)_minimum, (float)_maximum, 0, Width - sliderWidth)),
+                sliderY,
+                sliderWidth,
+                sliderHeight,
+                UITheme.AccentDark
             );
 
             if (_rangeLabels)

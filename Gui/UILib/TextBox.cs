@@ -87,7 +87,7 @@ namespace CMLeonOS.Gui.UILib
 
         internal bool Shield { get; set; } = false;
 
-        private Color _background = Color.White;
+        private Color _background = UITheme.Surface;
         internal Color Background
         {
             get
@@ -103,7 +103,7 @@ namespace CMLeonOS.Gui.UILib
             }
         }
 
-        private Color _foreground = Color.Black;
+        private Color _foreground = UITheme.TextPrimary;
         internal Color Foreground
         {
             get
@@ -118,7 +118,7 @@ namespace CMLeonOS.Gui.UILib
             }
         }
 
-        private Color _placeholderForeground = Color.Gray;
+        private Color _placeholderForeground = UITheme.TextSecondary;
         internal Color PlaceholderForeground
         {
             get
@@ -339,6 +339,7 @@ namespace CMLeonOS.Gui.UILib
 
         private const int fontWidth = 8;
         private const int fontHeight = 16;
+        private const int horizontalPadding = 4;
 
         private int caretLine = -1;
         private int caretCol = 0;
@@ -364,12 +365,12 @@ namespace CMLeonOS.Gui.UILib
 
             if (Text == string.Empty)
             {
-                DrawRectangle(0, 0, Width, Height, Color.Gray);
-                DrawString(PlaceholderText, PlaceholderForeground, 0, 0);
+                DrawRectangle(0, 0, Width, Height, caretLine == -1 ? UITheme.SurfaceBorder : UITheme.AccentDark);
+                DrawString(PlaceholderText, PlaceholderForeground, horizontalPadding, 2);
 
                 if (caretLine == 0 && cursorVisible)
                 {
-                    DrawVerticalLine(fontHeight, 1, 0, Foreground);
+                    DrawVerticalLine(fontHeight, horizontalPadding, 2, Foreground);
                 }
 
                 WM.Update(this);
@@ -392,11 +393,11 @@ namespace CMLeonOS.Gui.UILib
                 if (i < lines.Count)
                 {
                     string lineText = Shield ? new string('*', lines[i].Length) : lines[i];
-                    RenderLine(i, lineText, lineY, -scrollX);
+                    RenderLine(i, lineText, lineY + 2, horizontalPadding - scrollX);
 
                     if (caretLine == i && cursorVisible)
                     {
-                        DrawVerticalLine(fontHeight, ((caretCol * fontWidth) - scrollX) + 1, (caretLine * fontHeight) - scrollY, Foreground);
+                        DrawVerticalLine(fontHeight, ((caretCol * fontWidth) - scrollX) + horizontalPadding, ((caretLine * fontHeight) - scrollY) + 2, Foreground);
                     }
                 }
             }
@@ -404,7 +405,7 @@ namespace CMLeonOS.Gui.UILib
             markedLinesBegin = -1;
             markedLinesEnd = -1;
 
-            DrawRectangle(0, 0, Width, Height, Color.Gray);
+            DrawRectangle(0, 0, Width, Height, caretLine == -1 ? UITheme.SurfaceBorder : UITheme.AccentDark);
 
             WM.Update(this);
         }

@@ -82,7 +82,7 @@ namespace CMLeonOS.Gui.UILib
             }
         }
 
-        private Color _background = Color.LightGray;
+        private Color _background = UITheme.Surface;
         internal Color Background
         {
             get
@@ -96,7 +96,7 @@ namespace CMLeonOS.Gui.UILib
             }
         }
 
-        private Color _foreground = Color.Black;
+        private Color _foreground = UITheme.TextPrimary;
         internal Color Foreground
         {
             get
@@ -110,7 +110,7 @@ namespace CMLeonOS.Gui.UILib
             }
         }
 
-        private Color _border = Color.Gray;
+        private Color _border = UITheme.SurfaceBorder;
         internal Color Border
         {
             get
@@ -124,7 +124,7 @@ namespace CMLeonOS.Gui.UILib
             }
         }
 
-        private Color _selectedBackground = Color.FromArgb(221, 246, 255);
+        private Color _selectedBackground = UITheme.AccentLight;
         internal Color SelectedBackground
         {
             get
@@ -138,7 +138,7 @@ namespace CMLeonOS.Gui.UILib
             }
         }
 
-        private Color _selectedForeground = Color.Black;
+        private Color _selectedForeground = UITheme.TextPrimary;
         internal Color SelectedForeground
         {
             get
@@ -152,7 +152,7 @@ namespace CMLeonOS.Gui.UILib
             }
         }
 
-        private Color _selectedBorder = Color.FromArgb(126, 205, 234);
+        private Color _selectedBorder = UITheme.Accent;
         internal Color SelectedBorder
         {
             get
@@ -258,7 +258,7 @@ namespace CMLeonOS.Gui.UILib
             if (CanScrollUp || CanScrollDown)
             {
                 /* Background */
-                DrawFilledRectangle(Width - _scrollbarThickness, 0, _scrollbarThickness, Height, _border);
+                DrawFilledRectangle(Width - _scrollbarThickness, 0, _scrollbarThickness, Height, UITheme.SurfaceMuted);
 
                 /* Track */
                 int trackAvailableHeight = Height - (ScrollbarThickness * 2);
@@ -266,22 +266,22 @@ namespace CMLeonOS.Gui.UILib
                 double trackProgress = (double)scrollY / (double)((Cells.Count * CellHeight) - Height);
                 int trackY = (int)(_scrollbarThickness + (((double)trackAvailableHeight - ((double)trackAvailableHeight * trackSize)) * trackProgress));
                 // Border
-                DrawFilledRectangle(Width - _scrollbarThickness, 0, _scrollbarThickness, Height, _border);
+                DrawFilledRectangle(Width - _scrollbarThickness, 0, _scrollbarThickness, Height, UITheme.SurfaceBorder);
                 // Background
-                DrawFilledRectangle(Width - _scrollbarThickness + 1, trackY + 1, _scrollbarThickness - 2, (int)(trackSize * trackAvailableHeight) - 2, _background);
+                DrawFilledRectangle(Width - _scrollbarThickness + 1, trackY + 1, _scrollbarThickness - 2, (int)(trackSize * trackAvailableHeight) - 2, UITheme.AccentLight);
 
                 /* Up arrow */
                 // Border
-                DrawFilledRectangle(Width - _scrollbarThickness, 0, _scrollbarThickness, _scrollbarThickness, _border);
+                DrawFilledRectangle(Width - _scrollbarThickness, 0, _scrollbarThickness, _scrollbarThickness, UITheme.SurfaceBorder);
                 // Background
-                DrawFilledRectangle(Width - _scrollbarThickness + 1, 1, _scrollbarThickness - 2, _scrollbarThickness - 2, CanScrollUp ? _background : _border);
+                DrawFilledRectangle(Width - _scrollbarThickness + 1, 1, _scrollbarThickness - 2, _scrollbarThickness - 2, CanScrollUp ? UITheme.Surface : UITheme.SurfaceMuted);
                 DrawImageAlpha(scrollbarUpBitmap, (int)((Width - _scrollbarThickness) + ((_scrollbarThickness / 2) - (scrollbarUpBitmap.Width / 2))), (int)((_scrollbarThickness / 2) - (scrollbarUpBitmap.Height / 2)));
 
                 /* Down arrow */
                 // Border
-                DrawFilledRectangle(Width - _scrollbarThickness, Height - _scrollbarThickness, _scrollbarThickness, _scrollbarThickness, _border);
+                DrawFilledRectangle(Width - _scrollbarThickness, Height - _scrollbarThickness, _scrollbarThickness, _scrollbarThickness, UITheme.SurfaceBorder);
                 // Background
-                DrawFilledRectangle(Width - _scrollbarThickness + 1, Height - _scrollbarThickness + 1, _scrollbarThickness - 2, _scrollbarThickness - 2, CanScrollDown ? _background : _border);
+                DrawFilledRectangle(Width - _scrollbarThickness + 1, Height - _scrollbarThickness + 1, _scrollbarThickness - 2, _scrollbarThickness - 2, CanScrollDown ? UITheme.Surface : UITheme.SurfaceMuted);
                 DrawImageAlpha(scrollbarDownBitmap, (int)((Width - _scrollbarThickness) + ((_scrollbarThickness / 2) - (scrollbarUpBitmap.Width / 2))), (int)((Height - _scrollbarThickness) + ((_scrollbarThickness / 2) - (scrollbarUpBitmap.Height / 2))));
             }
         }
@@ -344,7 +344,8 @@ namespace CMLeonOS.Gui.UILib
             {
                 TableCell cell = Cells[i];
                 bool selected = _selectedCellIndex == i;
-                Rectangle cellRect = new Rectangle(0, (int)((i * _cellHeight) - scrollY), Width, _cellHeight);
+                int contentWidth = Width - ((CanScrollUp || CanScrollDown) ? _scrollbarThickness : 0);
+                Rectangle cellRect = new Rectangle(0, (int)((i * _cellHeight) - scrollY), contentWidth, _cellHeight);
 
                 if (cellRect.Y < -cellRect.Height || cellRect.Y > Height)
                 {
@@ -368,7 +369,7 @@ namespace CMLeonOS.Gui.UILib
                 switch (_textAlignment)
                 {
                     case Alignment.Start:
-                        textX = cellRect.X + (cell.Image != null ? (CellHeight - FontData.Height) / 2 : 0);
+                        textX = cellRect.X + 6 + (cell.Image != null ? (CellHeight - FontData.Height) / 2 : 0);
                         break;
                     case Alignment.Middle:
                         textX = cellRect.X + (cellRect.Width / 2) - (cell.Text.Length * FontData.Width / 2);
@@ -385,8 +386,8 @@ namespace CMLeonOS.Gui.UILib
 
                 if (cell.Image != null)
                 {
-                    textX += (int)cell.Image.Width;
-                    DrawImageAlpha(cell.Image, cellRect.X, (int)(cellRect.Y + (cellRect.Height / 2) - (cell.Image.Height / 2)));
+                    textX += (int)cell.Image.Width + 6;
+                    DrawImageAlpha(cell.Image, cellRect.X + 4, (int)(cellRect.Y + (cellRect.Height / 2) - (cell.Image.Height / 2)));
                 }
 
                 if (cell.ForegroundColourOverride != null)
@@ -397,6 +398,8 @@ namespace CMLeonOS.Gui.UILib
                 {
                     DrawString(cell.Text, selected ? SelectedForeground : Foreground, textX, textY);
                 }
+
+                DrawHorizontalLine(cellRect.Width - 2, 1, cellRect.Y + cellRect.Height - 1, UITheme.SurfaceBorder);
             }
 
             //DrawString($"{scrollY.ToString()} {dragging.ToString()} {scrollMax.ToString()}", Color.Red, 0, 0);

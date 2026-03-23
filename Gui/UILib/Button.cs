@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using Cosmos.System.Graphics;
+using Cosmos.System;
 using System;
 using System.Drawing;
 
@@ -24,6 +25,11 @@ namespace CMLeonOS.Gui.UILib
     {
         public Button(Window parent, int x, int y, int width, int height) : base(parent, x, y, width, height)
         {
+            OnDown = (_, _) =>
+            {
+                held = true;
+                Render();
+            };
         }
 
         internal enum ButtonImageLocation
@@ -60,7 +66,7 @@ namespace CMLeonOS.Gui.UILib
             }
         }
 
-        private Color _background = Color.FromArgb(48, 48, 48);
+        private Color _background = UITheme.Accent;
         internal Color Background
         {
             get
@@ -88,7 +94,7 @@ namespace CMLeonOS.Gui.UILib
             }
         }
 
-        private Color _border = Color.Black;
+        private Color _border = UITheme.AccentDark;
         internal Color Border
         {
             get
@@ -116,29 +122,58 @@ namespace CMLeonOS.Gui.UILib
             }
         }
 
+        private bool held = false;
+
         internal override void Render()
         {
-            Clear(Background);
+            if (held && MouseManager.MouseState != MouseState.Left)
+            {
+                held = false;
+            }
+
+            Color buttonBackground = held
+                ? Color.FromArgb(Math.Max(0, Background.R - 24), Math.Max(0, Background.G - 24), Math.Max(0, Background.B - 24))
+                : Background;
+
+            Clear(UITheme.Surface);
+            DrawFilledRectangle(0, 0, Width, Height, buttonBackground);
+            DrawHorizontalLine(Width - 2, 1, 1, Color.FromArgb(
+                Math.Min(255, buttonBackground.R + 20),
+                Math.Min(255, buttonBackground.G + 20),
+                Math.Min(255, buttonBackground.B + 20)));
 
             if (_image != null)
             {
                 switch (_imageLocation)
                 {
                     case ButtonImageLocation.Left:
-                        DrawImageAlpha(_image, (int)((Width / 2) - ((8 / 2) * Text.Length) - 8 - _image.Width), (int)((Height / 2) - (_image.Height / 2)));
-                        DrawString(Text, Foreground, (Width / 2) - ((8 / 2) * Text.Length), (Height / 2) - (16 / 2));
+                    {
+                        int imageWidth = (int)_image.Width;
+                        int imageHeight = (int)_image.Height;
+                        int textWidth = 8 * Text.Length;
+                        int contentWidth = imageWidth + 6 + textWidth;
+                        int imageX = Math.Max(4, (Width / 2) - (contentWidth / 2));
+                        int imageY = (Height / 2) - (imageHeight / 2);
+                        int textXLeft = imageX + imageWidth + 6;
+                        int textYLeft = (Height / 2) - (16 / 2);
+
+                        DrawImageAlpha(_image, imageX, imageY);
+                        DrawString(Text, Foreground, textXLeft, textYLeft);
                         break;
+                    }
                     case ButtonImageLocation.AboveText:
-                        DrawImageAlpha(_image, (int)((Width / 2) - (_image.Width / 2)), (int)((Height / 2) - (_image.Height / 2)));
-                        DrawString(Text, Foreground, (Width / 2) - (4 * Text.Length), Height - 16);
+                    {
+                        DrawImageAlpha(_image, (int)((Width / 2) - (_image.Width / 2)), Math.Max(1, (int)((Height / 2) - (_image.Height / 2) - 4)));
+                        DrawString(Text, Foreground, (Width / 2) - (4 * Text.Length), Height - 17);
                         break;
+                    }
                     default:
                         throw new Exception("Unrecognised image location in button.");
                 }
             }
             else
             {
-                DrawString(Text, Foreground, (Width / 2) - (4 * Text.Length), (Height / 2) - 8);
+                DrawString(Text, Foreground, (Width / 2) - (4 * Text.Length), (Height / 2) - 8 + (held ? 1 : 0));
             }
 
             DrawRectangle(0, 0, Width, Height, Border);

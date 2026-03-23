@@ -236,14 +236,36 @@ namespace CMLeonOS.Gui.UILib
 
         private void RenderDecoration()
         {
-            decorationWindow.Clear(Color.FromArgb(56, 56, 71));
+            decorationWindow.Clear(UITheme.WindowTitleBackground);
+            decorationWindow.DrawHorizontalLine(Width, 0, 0, UITheme.WindowTitleTopHighlight);
+            decorationWindow.DrawHorizontalLine(Width, 0, titlebarHeight - 1, UITheme.WindowTitleBottomBorder);
+
+            int buttonSpace = 0;
+            if (_canClose)
+            {
+                buttonSpace += titlebarHeight;
+            }
+            if (_canResize)
+            {
+                buttonSpace += titlebarHeight;
+            }
+            if (buttonSpace > 0)
+            {
+                decorationWindow.DrawFilledRectangle(Width - buttonSpace, 1, buttonSpace, titlebarHeight - 2, UITheme.WindowButtonBackground);
+            }
 
             if (_smallIcon != null)
             {
-                decorationWindow.DrawImageAlpha(_smallIcon, 2, 2);
+                decorationWindow.DrawImageAlpha(_smallIcon, 3, 2);
             }
 
-            decorationWindow.DrawString(Title, Color.White, (Width / 2) - ((FontData.Width * Title.Length) / 2), 4);
+            int maxTitleChars = Math.Max(4, (Width - buttonSpace - 42) / FontData.Width);
+            string displayTitle = Title;
+            if (displayTitle.Length > maxTitleChars)
+            {
+                displayTitle = displayTitle.Substring(0, Math.Max(1, maxTitleChars - 1)) + "~";
+            }
+            decorationWindow.DrawString(displayTitle, UITheme.WindowTitleText, 28, 4);
 
             if (_canClose)
             {

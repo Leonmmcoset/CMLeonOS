@@ -74,7 +74,7 @@ namespace CMLeonOS.Gui.UILib
             }
         }
 
-        private Color _background = Color.White;
+        private Color _background = UITheme.Surface;
         internal Color Background
         {
             get
@@ -88,7 +88,7 @@ namespace CMLeonOS.Gui.UILib
             }
         }
 
-        private Color _foreground = Color.Black;
+        private Color _foreground = UITheme.TextPrimary;
         internal Color Foreground
         {
             get
@@ -117,7 +117,8 @@ namespace CMLeonOS.Gui.UILib
             int textX = iconSize + 8;
             int textY = (Height / 2) - (16 / 2);
 
-            DrawFilledRectangle(iconX, iconY, iconSize, iconSize, Color.LightGray);
+            DrawFilledRectangle(iconX, iconY, iconSize, iconSize, _checked ? UITheme.AccentLight : UITheme.SurfaceMuted);
+            DrawRectangle(iconX, iconY, iconSize, iconSize, _checked ? UITheme.Accent : UITheme.SurfaceBorder);
             if (_checked)
             {
                 DrawImageAlpha(checkBitmap, iconX, iconY);

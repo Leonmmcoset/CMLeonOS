@@ -20,6 +20,7 @@ using CMLeonOS.Gui.UILib;
 using CMLeonOS.Logger;
 
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace CMLeonOS.Gui.ShellComponents
@@ -33,6 +34,7 @@ namespace CMLeonOS.Gui.ShellComponents
         Table userTable;
         
         TextBox passwordBox;
+        Button logOnButton;
 
         WindowManager wm = ProcessManager.GetProcess<WindowManager>();
 
@@ -43,21 +45,122 @@ namespace CMLeonOS.Gui.ShellComponents
             [IL2CPU.API.Attribs.ManifestResourceStream(ResourceName = "CMLeonOS.Gui.Resources.Lock.Key.bmp")]
             private static byte[] _iconBytes_Key;
             internal static Bitmap Icon_Key = new Bitmap(_iconBytes_Key);
+
+            [IL2CPU.API.Attribs.ManifestResourceStream(ResourceName = "CMLeonOS.Gui.Resources.Lock.User.bmp")]
+            private static byte[] _iconBytes_User;
+            internal static Bitmap Icon_User = new Bitmap(_iconBytes_User);
+
+            [IL2CPU.API.Attribs.ManifestResourceStream(ResourceName = "CMLeonOS.Gui.Resources.Lock.UserArrow.bmp")]
+            private static byte[] _iconBytes_UserArrow;
+            internal static Bitmap Icon_UserArrow = new Bitmap(_iconBytes_UserArrow);
         }
 
-        private const int width = 352;
-        private const int height = 200;
-        private const int padding = 12;
+        private const int width = 700;
+        private const int height = 420;
+        private const int leftPanelWidth = 240;
+        private const int rightContentPadding = 28;
+        private const int rightContentBottomPadding = 30;
+        private const int accountsLabelY = 102;
+        private const int tableY = 124;
+        private const int tableHeight = 140;
+        private const int passwordLabelY = tableY + tableHeight + 18;
+        private const int passwordY = passwordLabelY + 22;
+        private const int passwordHeight = 30;
+        private const int logOnButtonY = passwordY + 44;
+        private const int logOnButtonHeight = 38;
+
+        private readonly Color windowBackground = Color.FromArgb(232, 238, 246);
+        private readonly Color outerBorder = Color.FromArgb(169, 181, 198);
+        private readonly Color leftPanel = Color.FromArgb(34, 53, 84);
+        private readonly Color leftPanelAccent = Color.FromArgb(74, 124, 201);
+        private readonly Color leftPanelSoft = Color.FromArgb(53, 77, 116);
+        private readonly Color rightPanel = Color.FromArgb(247, 250, 253);
+        private readonly Color titleColor = Color.FromArgb(28, 39, 56);
+        private readonly Color bodyColor = Color.FromArgb(92, 103, 119);
+        private readonly Color hintColor = Color.FromArgb(132, 142, 156);
+        private readonly Color inputBackground = Color.White;
+        private readonly Color inputForeground = Color.FromArgb(31, 42, 55);
+        private readonly Color selectionBackground = Color.FromArgb(223, 236, 255);
+        private readonly Color selectionBorder = Color.FromArgb(91, 140, 223);
+        private readonly Color primaryButton = Color.FromArgb(53, 111, 214);
+        private readonly Color primaryButtonBorder = Color.FromArgb(33, 83, 171);
+        private readonly Color primaryButtonText = Color.White;
 
         private double shakiness = 0;
 
+        private List<User> users = new List<User>();
+
         private void RenderBackground()
         {
-            window.Clear(Color.LightGray);
+            window.Clear(windowBackground);
+            window.DrawRectangle(0, 0, width, height, outerBorder);
 
-            window.DrawImageAlpha(Images.Icon_Key, padding, padding);
+            int leftWidth = leftPanelWidth;
+            int rightX = leftWidth + 1;
+            int rightWidth = width - rightX;
 
-            window.DrawString("Select a user and enter password,\nthen press Enter to log on", Color.Black, (int)(padding + Images.Icon_Key.Width + padding), padding);
+            window.DrawFilledRectangle(0, 0, leftWidth, height, leftPanel);
+            window.DrawFilledRectangle(leftWidth - 6, 0, 6, height, leftPanelAccent);
+            window.DrawFilledRectangle(rightX, 0, rightWidth, height, rightPanel);
+
+            window.DrawFilledRectangle(20, 22, 56, 56, leftPanelSoft);
+            window.DrawRectangle(20, 22, 56, 56, Color.FromArgb(109, 149, 214));
+            window.DrawImageAlpha(Images.Icon_Key, 32, 34);
+
+            window.DrawString("Welcome Back", Color.White, 20, 96);
+            window.DrawString("CMLeonOS Desktop", Color.FromArgb(190, 208, 233), 20, 120);
+
+            string selectedUserName = GetSelectedUser()?.Username ?? "Guest";
+            window.DrawString("Selected account", Color.FromArgb(171, 190, 217), 20, 168);
+            window.DrawString(selectedUserName, Color.White, 20, 190);
+            window.DrawString(GetSelectedUserSubtitle(), Color.FromArgb(176, 197, 224), 20, 214);
+
+            window.DrawFilledRectangle(20, height - 72, leftWidth - 40, 44, leftPanelSoft);
+            window.DrawRectangle(20, height - 72, leftWidth - 40, 44, Color.FromArgb(88, 118, 171));
+            window.DrawString("Tip: type password.", Color.White, 32, height - 62);
+            window.DrawString("Press Enter to sign in.", Color.FromArgb(190, 208, 233), 32, height - 44);
+
+            int rightContentX = leftWidth + rightContentPadding;
+            window.DrawString("Sign in", titleColor, rightContentX, 28);
+            window.DrawString("Choose an account, then enter your password.", bodyColor, rightContentX, 54);
+            window.DrawString("Continue to the desktop when ready.", bodyColor, rightContentX, 72);
+
+            window.DrawString("Accounts", hintColor, rightContentX, accountsLabelY);
+            window.DrawString("Password", hintColor, rightContentX, passwordLabelY);
+            window.DrawString("Secure local session", Color.FromArgb(118, 128, 141), rightContentX, height - rightContentBottomPadding);
+
+        }
+
+        private User GetSelectedUser()
+        {
+            if (userTable == null || users == null || users.Count == 0)
+            {
+                return null;
+            }
+
+            if (userTable.SelectedCellIndex < 0 || userTable.SelectedCellIndex >= users.Count)
+            {
+                return null;
+            }
+
+            return users[userTable.SelectedCellIndex];
+        }
+
+        private string GetSelectedUserSubtitle()
+        {
+            User selectedUser = GetSelectedUser();
+            if (selectedUser == null)
+            {
+                return "No local users available";
+            }
+
+            return selectedUser.Admin ? "Administrator account" : "Standard local account";
+        }
+
+        private void RefreshLayout()
+        {
+            RenderBackground();
+            wm.Update(window);
         }
 
         private void ShowError(string text)
@@ -78,12 +181,11 @@ namespace CMLeonOS.Gui.ShellComponents
                 return;
             }
 
-            if (userTable.SelectedCellIndex >= UserSystem.GetUsers().Count)
+            if (userTable.SelectedCellIndex >= users.Count)
             {
                 return;
             }
 
-            var users = UserSystem.GetUsers();
             User selectedUser = users[userTable.SelectedCellIndex];
             string password = passwordBox.Text.Trim();
 
@@ -145,7 +247,7 @@ namespace CMLeonOS.Gui.ShellComponents
         {
             base.Start();
             
-            var users = UserSystem.GetUsers();
+            users = UserSystem.GetUsers() ?? new List<User>();
             Logger.Logger.Instance.Info("Lock", $"Lock started. Total users: {users?.Count ?? 0}");
             if (users != null)
             {
@@ -164,21 +266,21 @@ namespace CMLeonOS.Gui.ShellComponents
 
             RenderBackground();
 
-            int contentHeight = 110;
-            int contentWidth = 160;
-            int startX = (width - contentWidth) / 2;
-            int startY = (height - contentHeight) / 2;
+            int contentX = leftPanelWidth + rightContentPadding;
+            int contentWidth = width - contentX - rightContentPadding;
             
-            userTable = new Table(window, startX, startY, contentWidth, 80);
-            userTable.CellHeight = 25;
-            userTable.Background = Color.White;
-            userTable.Foreground = Color.Black;
-            userTable.Border = Color.Gray;
-            userTable.SelectedBackground = Color.FromArgb(221, 246, 255);
-            userTable.SelectedForeground = Color.Black;
-            userTable.SelectedBorder = Color.FromArgb(126, 205, 234);
+            userTable = new Table(window, contentX, tableY, contentWidth, tableHeight);
+            userTable.CellHeight = 40;
+            userTable.Background = inputBackground;
+            userTable.Foreground = inputForeground;
+            userTable.Border = Color.FromArgb(203, 212, 224);
+            userTable.SelectedBackground = selectionBackground;
+            userTable.SelectedForeground = inputForeground;
+            userTable.SelectedBorder = selectionBorder;
             userTable.AllowSelection = true;
             userTable.AllowDeselection = false;
+            userTable.ScrollbarThickness = 18;
+            userTable.TableCellSelected = _ => RefreshLayout();
             
             foreach (var user in users)
             {
@@ -193,13 +295,27 @@ namespace CMLeonOS.Gui.ShellComponents
             
             wm.AddWindow(userTable);
 
-            passwordBox = new TextBox(window, startX, startY + 90, contentWidth, 20);
+            passwordBox = new TextBox(window, contentX, passwordY, contentWidth, passwordHeight);
             passwordBox.Shield = true;
-            passwordBox.PlaceholderText = "Password";
+            passwordBox.PlaceholderText = "Enter password";
+            passwordBox.Background = inputBackground;
+            passwordBox.Foreground = inputForeground;
+            passwordBox.PlaceholderForeground = hintColor;
+            passwordBox.Changed = RefreshLayout;
             passwordBox.Submitted = LogOn;
             wm.AddWindow(passwordBox);
 
-            wm.Update(window);
+            logOnButton = new Button(window, contentX, logOnButtonY, contentWidth, logOnButtonHeight);
+            logOnButton.Text = "Log On";
+            logOnButton.Background = primaryButton;
+            logOnButton.Border = primaryButtonBorder;
+            logOnButton.Foreground = primaryButtonText;
+            logOnButton.Image = Images.Icon_UserArrow;
+            logOnButton.ImageLocation = Button.ButtonImageLocation.Left;
+            logOnButton.OnClick = LogOnClick;
+            wm.AddWindow(logOnButton);
+
+            RefreshLayout();
         }
 
         public override void Run()

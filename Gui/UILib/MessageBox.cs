@@ -44,16 +44,19 @@ namespace CMLeonOS.Gui.UILib
             int width = Math.Max(192, (Padding * 2) + (8 * longestLineLength));
             int height = 128 + ((Message.Split('\n').Length - 1) * 16);
 
-            AppWindow window = new AppWindow(Process, (int)((wm.ScreenWidth / 2) - (height / 2)), (int)((wm.ScreenWidth / 2) - (width / 2)), width, height);
+            AppWindow window = new AppWindow(Process, (int)((wm.ScreenWidth / 2) - (width / 2)), (int)((wm.ScreenHeight / 2) - (height / 2)), width, height);
             window.Title = Title;
             wm.AddWindow(window);
 
-            window.Clear(Color.LightGray);
-            window.DrawFilledRectangle(0, window.Height - (Padding * 2) - 20, window.Width, (Padding * 2) + 20, Color.Gray);
-            window.DrawString(Message, Color.Black, Padding, Padding);
+            window.Clear(UITheme.Surface);
+            window.DrawRectangle(0, 0, window.Width, window.Height, UITheme.SurfaceBorder);
+            window.DrawFilledRectangle(0, window.Height - (Padding * 2) - 20, window.Width, (Padding * 2) + 20, UITheme.SurfaceMuted);
+            window.DrawString(Message, UITheme.TextPrimary, Padding, Padding);
 
             Button ok = new Button(window, window.Width - 80 - Padding, window.Height - 20 - Padding, 80, 20);
             ok.Text = "OK";
+            ok.Background = UITheme.Accent;
+            ok.Border = UITheme.AccentDark;
             ok.OnClick = (int x, int y) =>
             {
                 wm.RemoveWindow(window);
