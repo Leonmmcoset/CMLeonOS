@@ -18,8 +18,10 @@ using Cosmos.System.Graphics;
 using CMLeonOS;
 using CMLeonOS.Gui.UILib;
 using CMLeonOS.Settings;
-
+using CMLeonOS.Utils;
+using System;
 using System.Drawing;
+using System.IO;
 
 namespace CMLeonOS.Gui.Apps
 {
@@ -30,6 +32,7 @@ namespace CMLeonOS.Gui.Apps
         AppWindow window;
 
         Window currentCategoryWindow;
+        private FileBrowser wallpaperBrowser;
 
         WindowManager wm = ProcessManager.GetProcess<WindowManager>();
 
@@ -92,6 +95,70 @@ namespace CMLeonOS.Gui.Apps
             SettingsManager.SkipToGui = @checked;
         }
 
+        private void ShowMessage(string title, string text)
+        {
+            MessageBox messageBox = new MessageBox(this, title, text);
+            messageBox.Show();
+        }
+
+        private string GetWallpaperLabel()
+        {
+            string path = SettingsManager.GUI_WallpaperPath;
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return "Current wallpaper: Default";
+            }
+
+            string fileName = Path.GetFileName(path);
+            if (string.IsNullOrWhiteSpace(fileName))
+            {
+                fileName = path;
+            }
+
+            return $"Current wallpaper: {fileName}";
+        }
+
+        private void ApplyWallpaper(string path)
+        {
+            string sanitizedPath = string.IsNullOrWhiteSpace(path) ? string.Empty : PathUtil.Sanitize(path.Trim());
+
+            if (!string.IsNullOrWhiteSpace(sanitizedPath))
+            {
+                if (!File.Exists(sanitizedPath))
+                {
+                    ShowMessage("Wallpaper", "File not found.");
+                    return;
+                }
+
+                if (!Path.GetExtension(sanitizedPath).Equals(".bmp", StringComparison.OrdinalIgnoreCase))
+                {
+                    ShowMessage("Wallpaper", "Only BMP wallpapers are supported.");
+                    return;
+                }
+            }
+
+            if (!wm.ApplyWallpaper(sanitizedPath))
+            {
+                ShowMessage("Wallpaper", "Failed to apply wallpaper.");
+                return;
+            }
+
+            SettingsManager.GUI_WallpaperPath = sanitizedPath;
+            ShowAppearanceCategory();
+        }
+
+        private void OpenWallpaperBrowser()
+        {
+            wallpaperBrowser = new FileBrowser(this, wm, (string selectedPath) =>
+            {
+                if (!string.IsNullOrWhiteSpace(selectedPath))
+                {
+                    ApplyWallpaper(selectedPath);
+                }
+            }, selectDirectoryOnly: false);
+            wallpaperBrowser.Show();
+        }
+
         private void MouseSensitivityChanged(float value)
         {
             SettingsManager.GUI_MouseSensitivity = value;
@@ -125,6 +192,20 @@ namespace CMLeonOS.Gui.Apps
             skipToGui.Checked = SettingsManager.SkipToGui;
             skipToGui.CheckBoxChanged = SkipToGuiChanged;
             wm.AddWindow(skipToGui);
+
+            appearance.DrawString("Wallpaper", Color.Gray, 12, 132);
+            appearance.DrawString(GetWallpaperLabel(), Color.Black, 12, 152);
+            appearance.DrawString("Choose a BMP file or restore the embedded default wallpaper.", Color.Gray, 12, 172);
+
+            Button chooseWallpaper = new Button(appearance, 12, 198, 132, 24);
+            chooseWallpaper.Text = "Choose BMP";
+            chooseWallpaper.OnClick = (_, _) => OpenWallpaperBrowser();
+            wm.AddWindow(chooseWallpaper);
+
+            Button defaultWallpaper = new Button(appearance, 154, 198, 132, 24);
+            defaultWallpaper.Text = "Use Default";
+            defaultWallpaper.OnClick = (_, _) => ApplyWallpaper(string.Empty);
+            wm.AddWindow(defaultWallpaper);
 
             wm.Update(window);
         }

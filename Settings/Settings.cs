@@ -38,6 +38,7 @@ namespace CMLeonOS.Settings
             { "GUI_MouseSensitivity", "1.0" },
             { "GUI_ScreenWidth", "1280" },
             { "GUI_ScreenHeight", "800" },
+            { "GUI_WallpaperPath", "" },
             { "GUI_DarkNotepad", "false" },
             { "SkipToGui", "false" }
         };
@@ -186,6 +187,23 @@ namespace CMLeonOS.Settings
             set
             {
                 settings["GUI_ScreenHeight"] = value.ToString();
+                SaveSettings();
+            }
+        }
+
+        public static string GUI_WallpaperPath
+        {
+            get
+            {
+                if (settings.TryGetValue("GUI_WallpaperPath", out string value))
+                {
+                    return value;
+                }
+                return string.Empty;
+            }
+            set
+            {
+                settings["GUI_WallpaperPath"] = value ?? string.Empty;
                 SaveSettings();
             }
         }

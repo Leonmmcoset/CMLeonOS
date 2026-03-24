@@ -21,9 +21,11 @@ using CMLeonOS.Gui.ShellComponents;
 using CMLeonOS.Settings;
 using CMLeonOS.Driver;
 using CMLeonOS.Logger;
+using CMLeonOS.Utils;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 
 namespace CMLeonOS.Gui
 {
@@ -78,6 +80,8 @@ namespace CMLeonOS.Gui
         private int sweepCounter = 0;
 
         private Bitmap wallpaperResized;
+
+        internal string CurrentWallpaperPath { get; private set; } = string.Empty;
 
         internal int Fps
         {
@@ -357,7 +361,51 @@ namespace CMLeonOS.Gui
 
         private void SetupWallpaper()
         {
-            wallpaperResized = wallpaperBitmap.Resize(ScreenWidth, ScreenHeight);
+            if (!ApplyWallpaper(SettingsManager.GUI_WallpaperPath, rerender: false))
+            {
+                ApplyWallpaper(string.Empty, rerender: false);
+            }
+        }
+
+        internal bool ApplyWallpaper(string path, bool rerender = true)
+        {
+            try
+            {
+                Bitmap sourceBitmap = wallpaperBitmap;
+                string sanitizedPath = string.Empty;
+
+                if (!string.IsNullOrWhiteSpace(path))
+                {
+                    sanitizedPath = PathUtil.Sanitize(path.Trim());
+
+                    if (!File.Exists(sanitizedPath))
+                    {
+                        return false;
+                    }
+
+                    if (!Path.GetExtension(sanitizedPath).Equals(".bmp", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return false;
+                    }
+
+                    sourceBitmap = new Bitmap(File.ReadAllBytes(sanitizedPath));
+                }
+
+                wallpaperResized = sourceBitmap.Resize(ScreenWidth, ScreenHeight);
+                CurrentWallpaperPath = sanitizedPath;
+
+                if (rerender)
+                {
+                    RerenderAll();
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Logger.Instance.Error("WindowManager", $"Failed to apply wallpaper: {ex.Message}");
+                return false;
+            }
         }
 
         private void UpdateCursor()
