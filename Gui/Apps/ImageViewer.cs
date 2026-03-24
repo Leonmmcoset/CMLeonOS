@@ -36,9 +36,7 @@ namespace CMLeonOS.Gui.Apps
 
         private AppWindow window;
         private Window canvas;
-        private TextBox pathBox;
         private Button openButton;
-        private Button loadButton;
         private Button clearButton;
 
         private WindowManager wm = ProcessManager.GetProcess<WindowManager>();
@@ -63,12 +61,10 @@ namespace CMLeonOS.Gui.Apps
             int y = padding;
             int buttonY = y;
 
-            openButton.MoveAndResize(window.Width - (buttonWidth * 3 + padding * 3), buttonY, buttonWidth, toolbarHeight);
-            loadButton.MoveAndResize(window.Width - (buttonWidth * 2 + padding * 2), buttonY, buttonWidth, toolbarHeight);
+            openButton.MoveAndResize(window.Width - (buttonWidth * 2 + padding * 2), buttonY, buttonWidth, toolbarHeight);
             clearButton.MoveAndResize(window.Width - (buttonWidth + padding), buttonY, buttonWidth, toolbarHeight);
-
-            int pathWidth = window.Width - (buttonWidth * 3 + padding * 5);
-            pathBox.MoveAndResize(padding, y + 3, pathWidth, toolbarHeight - 6);
+            openButton.Render();
+            clearButton.Render();
 
             int canvasY = toolbarHeight + (padding * 2);
             int canvasHeight = window.Height - canvasY - padding;
@@ -181,7 +177,6 @@ namespace CMLeonOS.Gui.Apps
                 byte[] bmpBytes = File.ReadAllBytes(sanitizedPath);
                 currentBitmap = new Bitmap(bmpBytes);
                 currentPath = sanitizedPath;
-                pathBox.Text = sanitizedPath;
                 window.Title = $"Image Viewer - {Path.GetFileName(sanitizedPath)}";
                 RenderCanvas();
                 return true;
@@ -209,11 +204,6 @@ namespace CMLeonOS.Gui.Apps
             fileBrowser.Show();
         }
 
-        private void LoadFromPath()
-        {
-            LoadImage(pathBox.Text);
-        }
-
         private void ClearImage()
         {
             currentBitmap = null;
@@ -234,20 +224,10 @@ namespace CMLeonOS.Gui.Apps
             window.Closing = TryStop;
             wm.AddWindow(window);
 
-            pathBox = new TextBox(window, 0, 0, 1, 1);
-            pathBox.PlaceholderText = @"0:\path\image.bmp";
-            pathBox.Submitted = LoadFromPath;
-            wm.AddWindow(pathBox);
-
             openButton = new Button(window, 0, 0, 1, 1);
             openButton.Text = "Open";
             openButton.OnClick = (_, _) => OpenDialog();
             wm.AddWindow(openButton);
-
-            loadButton = new Button(window, 0, 0, 1, 1);
-            loadButton.Text = "Load";
-            loadButton.OnClick = (_, _) => LoadFromPath();
-            wm.AddWindow(loadButton);
 
             clearButton = new Button(window, 0, 0, 1, 1);
             clearButton.Text = "Clear";

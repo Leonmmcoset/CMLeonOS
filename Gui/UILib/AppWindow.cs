@@ -19,6 +19,7 @@ using Cosmos.System.Graphics;
 using CMLeonOS;
 using CMLeonOS.Gui.ShellComponents.Dock;
 using CMLeonOS.Gui.SmoothMono;
+using CMLeonOS.UILib.Animations;
 using System;
 using System.Drawing;
 
@@ -41,6 +42,7 @@ namespace CMLeonOS.Gui.UILib
             Icon = defaultAppIconBitmap;
 
             RenderDecoration();
+            StartOpenAnimation();
         }
 
         [IL2CPU.API.Attribs.ManifestResourceStream(ResourceName = "CMLeonOS.Gui.Resources.Close.bmp")]
@@ -147,18 +149,73 @@ namespace CMLeonOS.Gui.UILib
         private WindowManager wm;
 
         private bool maximised = false;
+        private bool closeAnimationRunning = false;
         private int originalX;
         private int originalY;
         private int originalWidth;
         private int originalHeight;
 
+        private void StartOpenAnimation()
+        {
+            int targetY = Y;
+            int offsetY = Math.Min(18, Math.Max(8, Height / 12));
+
+            Move(X, targetY + offsetY, sendWMEvent: false);
+
+            MovementAnimation animation = new MovementAnimation(this)
+            {
+                From = new Rectangle(X, Y, Width, Height),
+                To = new Rectangle(X, targetY, Width, Height),
+                Duration = 12,
+                EasingType = EasingType.Sine,
+                EasingDirection = EasingDirection.Out
+            };
+            animation.Start();
+        }
+
+        private void StartCloseAnimation()
+        {
+            if (closeAnimationRunning)
+            {
+                return;
+            }
+
+            closeAnimationRunning = true;
+
+            int offsetY = Math.Min(18, Math.Max(8, Height / 12));
+            int startX = X;
+            int startY = Y;
+            int startWidth = Width;
+            int startHeight = Height;
+
+            MovementAnimation animation = new MovementAnimation(this)
+            {
+                From = new Rectangle(startX, startY, startWidth, startHeight),
+                To = new Rectangle(startX, startY + offsetY, startWidth, startHeight),
+                Duration = 10,
+                EasingType = EasingType.Sine,
+                EasingDirection = EasingDirection.In
+            };
+            animation.Completed = () =>
+            {
+                Closing?.Invoke();
+                wm.RemoveWindow(this);
+                closeAnimationRunning = false;
+            };
+            animation.Start();
+        }
+
         private void DecorationClicked(int x, int y)
         {
+            if (closeAnimationRunning)
+            {
+                return;
+            }
+
             if (x >= Width - titlebarHeight && _canClose)
             {
                 // Close.
-                Closing?.Invoke();
-                wm.RemoveWindow(this);
+                StartCloseAnimation();
             }
             else if (x >= Width - (titlebarHeight * (_canClose ? 2 : 1)) && _canResize)
             {
@@ -218,6 +275,7 @@ namespace CMLeonOS.Gui.UILib
                 buttonSpace += titlebarHeight;
             }
             if (x >= Width - buttonSpace || maximised || !_canMove) return;
+            if (closeAnimationRunning) return;
 
             uint startMouseX = MouseManager.X;
             uint startMouseY = MouseManager.Y;

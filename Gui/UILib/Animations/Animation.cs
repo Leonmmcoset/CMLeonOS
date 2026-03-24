@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 using CMLeonOS.Gui;
+using System;
 
 namespace CMLeonOS.UILib.Animations
 {
@@ -23,6 +24,7 @@ namespace CMLeonOS.UILib.Animations
     /// </summary>
     internal abstract class Animation
     {
+        internal Action Completed { get; set; }
         /// <summary>
         /// The easing type of the animation.
         /// </summary>
@@ -80,6 +82,7 @@ namespace CMLeonOS.UILib.Animations
                     if (Finished)
                     {
                         Stop();
+                        Completed?.Invoke();
                     }
                 }, (ulong)((1000d /* ms */ / 60d) * 1e+6d /* ms -> ns */ ), true));
             }
