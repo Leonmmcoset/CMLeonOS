@@ -155,6 +155,27 @@ namespace CMLeonOS.Gui.UILib
         private int originalWidth;
         private int originalHeight;
 
+        private void RefreshWindowTree()
+        {
+            wm.Update(this);
+            RenderDecoration();
+
+            foreach (Window child in wm.Windows)
+            {
+                if (child.RelativeTo == this)
+                {
+                    if (child is Control control)
+                    {
+                        control.Render();
+                    }
+                    else
+                    {
+                        wm.Update(child);
+                    }
+                }
+            }
+        }
+
         private void StartOpenAnimation()
         {
             int targetY = Y;
@@ -170,6 +191,7 @@ namespace CMLeonOS.Gui.UILib
                 EasingType = EasingType.Sine,
                 EasingDirection = EasingDirection.Out
             };
+            animation.Completed = RefreshWindowTree;
             animation.Start();
         }
 

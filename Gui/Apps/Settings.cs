@@ -195,14 +195,14 @@ namespace CMLeonOS.Gui.Apps
 
             appearance.DrawString("Wallpaper", Color.Gray, 12, 132);
             appearance.DrawString(GetWallpaperLabel(), Color.Black, 12, 152);
-            appearance.DrawString("Choose a BMP file or restore the embedded default wallpaper.", Color.Gray, 12, 172);
+            appearance.DrawString("Use a BMP file or restore the default wallpaper.", Color.Gray, 12, 170);
 
-            Button chooseWallpaper = new Button(appearance, 12, 198, 132, 24);
+            Button chooseWallpaper = new Button(appearance, 12, 192, 132, 24);
             chooseWallpaper.Text = "Choose BMP";
             chooseWallpaper.OnClick = (_, _) => OpenWallpaperBrowser();
             wm.AddWindow(chooseWallpaper);
 
-            Button defaultWallpaper = new Button(appearance, 154, 198, 132, 24);
+            Button defaultWallpaper = new Button(appearance, 154, 192, 132, 24);
             defaultWallpaper.Text = "Use Default";
             defaultWallpaper.OnClick = (_, _) => ApplyWallpaper(string.Empty);
             wm.AddWindow(defaultWallpaper);

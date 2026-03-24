@@ -35,14 +35,16 @@ namespace CMLeonOS.Gui.UILib
         {
             WindowManager wm = ProcessManager.GetProcess<WindowManager>();
 
+            string[] lines = Message.Split('\n');
             int longestLineLength = 0;
-            foreach (string line in Message.Split('\n'))
+            foreach (string line in lines)
             {
                 longestLineLength = Math.Max(longestLineLength, line.Length);
             }
 
-            int width = Math.Max(192, (Padding * 2) + (8 * longestLineLength));
-            int height = 128 + ((Message.Split('\n').Length - 1) * 16);
+            int width = Math.Max(208, (Padding * 2) + (8 * longestLineLength));
+            int textHeight = lines.Length * 16;
+            int height = Math.Max(112, Padding + textHeight + 16 + 20 + Padding * 2);
 
             AppWindow window = new AppWindow(Process, (int)((wm.ScreenWidth / 2) - (width / 2)), (int)((wm.ScreenHeight / 2) - (height / 2)), width, height);
             window.Title = Title;
@@ -51,7 +53,13 @@ namespace CMLeonOS.Gui.UILib
             window.Clear(UITheme.Surface);
             window.DrawRectangle(0, 0, window.Width, window.Height, UITheme.SurfaceBorder);
             window.DrawFilledRectangle(0, window.Height - (Padding * 2) - 20, window.Width, (Padding * 2) + 20, UITheme.SurfaceMuted);
-            window.DrawString(Message, UITheme.TextPrimary, Padding, Padding);
+
+            int textY = Padding;
+            foreach (string line in lines)
+            {
+                window.DrawString(line, UITheme.TextPrimary, Padding, textY);
+                textY += 16;
+            }
 
             Button ok = new Button(window, window.Width - 80 - Padding, window.Height - 20 - Padding, 80, 20);
             ok.Text = "OK";
@@ -64,6 +72,7 @@ namespace CMLeonOS.Gui.UILib
             wm.AddWindow(ok);
 
             wm.Update(window);
+            ok.Render();
 
             ProcessManager.GetProcess<Sound.SoundService>().PlaySystemSound(Sound.SystemSound.Alert);
         }

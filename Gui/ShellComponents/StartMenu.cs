@@ -18,6 +18,7 @@ using Cosmos.System.Graphics;
 using CMLeonOS;
 using CMLeonOS.Gui.UILib;
 using CMLeonOS.UILib.Animations;
+using System;
 using System.Drawing;
 
 namespace CMLeonOS.Gui.ShellComponents
@@ -27,6 +28,27 @@ namespace CMLeonOS.Gui.ShellComponents
         internal StartMenu() : base("StartMenu", ProcessType.Application)
         {
         }
+
+        private const int menuWidth = 456;
+        private const int menuHeight = 320;
+        private const int outerPadding = 16;
+        private const int searchHeight = 28;
+        private const int footerHeight = 72;
+        private const int actionButtonWidth = 104;
+        private const int actionButtonHeight = 24;
+
+        private static readonly Color MenuBackground = Color.FromArgb(24, 31, 43);
+        private static readonly Color PanelBackground = Color.FromArgb(35, 44, 58);
+        private static readonly Color PanelBorder = Color.FromArgb(58, 70, 89);
+        private static readonly Color HeaderText = Color.White;
+        private static readonly Color SubText = Color.FromArgb(178, 190, 210);
+        private static readonly Color SearchBackground = Color.FromArgb(245, 247, 250);
+        private static readonly Color SearchForeground = Color.FromArgb(28, 34, 45);
+        private static readonly Color SearchPlaceholder = Color.FromArgb(126, 136, 149);
+        private static readonly Color NeutralButton = Color.FromArgb(70, 83, 104);
+        private static readonly Color NeutralButtonBorder = Color.FromArgb(90, 105, 127);
+        private static readonly Color SearchResultsBackground = Color.FromArgb(31, 39, 52);
+        private static readonly Color SearchResultsBorder = Color.FromArgb(54, 66, 84);
 
         internal static StartMenu CurrentStartMenu
         {
@@ -57,16 +79,18 @@ namespace CMLeonOS.Gui.ShellComponents
 
         private Button shutdownButton;
         private Button rebootButton;
+        private Button logOutButton;
         private Button allAppsButton;
 
-        private const int buttonsPadding = 12;
-        private const int buttonsWidth = 96;
-        private const int buttonsHeight = 20;
-        private const int userHeight = 56;
-        private const int userPadding = 12;
-        private const int searchWidth = 128;
-
         private bool isOpen = false;
+
+        private void StyleActionButton(Button button, string text)
+        {
+            button.Text = text;
+            button.Background = NeutralButton;
+            button.Border = NeutralButtonBorder;
+            button.Foreground = Color.White;
+        }
 
         internal void ShowStartMenu(bool focusSearch = false)
         {
@@ -74,77 +98,78 @@ namespace CMLeonOS.Gui.ShellComponents
 
             bool leftHandStartButton = settingsService.LeftHandStartButton;
 
-            window = new Window(this, leftHandStartButton ? 0 : (int)(wm.ScreenWidth / 2 - 408 / 2), 24, 408, 222);
+            int menuX = leftHandStartButton ? 0 : (int)(wm.ScreenWidth / 2 - menuWidth / 2);
+            window = new Window(this, menuX, 24, menuWidth, menuHeight);
 
-            window.Clear(Color.FromArgb(56, 56, 71));
+            window.Clear(MenuBackground);
+            window.DrawRectangle(0, 0, window.Width, window.Height, PanelBorder);
 
-            window.DrawString($"Start", Color.White, 12, 12);
+            window.DrawString("Start", HeaderText, outerPadding, outerPadding - 2);
+            window.DrawString("Apps, search, and quick actions", SubText, outerPadding, outerPadding + 18);
 
-            Rectangle userRect = new Rectangle(userPadding, window.Height - userHeight + userPadding, window.Width - (userPadding * 2), userHeight - (userPadding * 2));
-            window.DrawImageAlpha(Icons.Icon_User, userRect.X, (int)(userRect.Y + (userRect.Height / 2) - (Icons.Icon_User.Height / 2)));
-            window.DrawString(UserSystem.CurrentLoggedInUser.Username, Color.White, (int)(userRect.X + Icons.Icon_User.Width + userPadding), (int)(userRect.Y + (userRect.Height / 2) - (16 / 2)));
+            int searchY = outerPadding + 40;
+            int searchWidth = window.Width - (outerPadding * 2);
+            window.DrawFilledRectangle(outerPadding, searchY, searchWidth, searchHeight, SearchBackground);
+            window.DrawRectangle(outerPadding, searchY, searchWidth, searchHeight, Color.FromArgb(207, 214, 224));
+
+            int footerY = window.Height - footerHeight - outerPadding;
+            window.DrawFilledRectangle(outerPadding, footerY, window.Width - (outerPadding * 2), footerHeight, PanelBackground);
+            window.DrawRectangle(outerPadding, footerY, window.Width - (outerPadding * 2), footerHeight, PanelBorder);
+
+            Rectangle userRect = new Rectangle(outerPadding + 10, footerY + 10, 180, footerHeight - 20);
+            window.DrawFilledRectangle(userRect.X, userRect.Y, userRect.Width, userRect.Height, Color.FromArgb(44, 55, 73));
+            window.DrawRectangle(userRect.X, userRect.Y, userRect.Width, userRect.Height, Color.FromArgb(71, 86, 109));
+            window.DrawImageAlpha(Icons.Icon_User, userRect.X + 10, (int)(userRect.Y + (userRect.Height / 2) - (Icons.Icon_User.Height / 2)));
+            window.DrawString(UserSystem.CurrentLoggedInUser.Username, Color.White, userRect.X + 38, userRect.Y + 10);
+            window.DrawString("Local session", SubText, userRect.X + 38, userRect.Y + 28);
 
             wm.AddWindow(window);
 
-            int x = 12;
-            int y = 44;
-            for (int i = 0; i < 4; i++)
-            {
-                AppMetadata app = AppManager.AppMetadatas[i];
-
-                Button appButton = new Button(window, x, y, 90, 90);
-
-                appButton.Background = app.ThemeColor;
-                appButton.Foreground = app.ThemeColor.GetForegroundColour();
-
-                appButton.Text = app.Name;
-                appButton.Image = app.Icon;
-
-                appButton.OnClick = (x, y) =>
-                {
-                    app.Start(this);
-                    HideStartMenu();
-                };
-
-                wm.AddWindow(appButton);
-
-                x += appButton.Width + 8;
-                if (x > window.Width - 90)
-                {
-                    x = 12;
-                    y += 90 + 8;
-                }
-            }
-
-            shutdownButton = new Button(window, window.Width - buttonsWidth - buttonsPadding, window.Height - buttonsHeight - ((userHeight / 2) - (buttonsHeight / 2)), buttonsWidth, buttonsHeight);
-            shutdownButton.Text = "Shut down";
+            int topActionY = footerY + 10;
+            int bottomActionY = footerY + footerHeight - actionButtonHeight - 10;
+            shutdownButton = new Button(window, window.Width - outerPadding - actionButtonWidth, bottomActionY, actionButtonWidth, actionButtonHeight);
+            StyleActionButton(shutdownButton, "Shut down");
             shutdownButton.OnClick = ShutdownClicked;
             wm.AddWindow(shutdownButton);
 
-            rebootButton = new Button(window, window.Width - (buttonsPadding * 2 + buttonsWidth * 2), window.Height - buttonsHeight - ((userHeight / 2) - (buttonsHeight / 2)), buttonsWidth, buttonsHeight);
-            rebootButton.Text = "Restart";
+            rebootButton = new Button(window, window.Width - outerPadding - actionButtonWidth * 2 - 8, bottomActionY, actionButtonWidth, actionButtonHeight);
+            StyleActionButton(rebootButton, "Restart");
             rebootButton.OnClick = RebootClicked;
             wm.AddWindow(rebootButton);
 
-            allAppsButton = new Button(window, window.Width - buttonsWidth - buttonsPadding, window.Height - buttonsHeight - userHeight, buttonsWidth, buttonsHeight);
-            allAppsButton.Text = "All apps >";
+            logOutButton = new Button(window, window.Width - outerPadding - actionButtonWidth * 2 - 8, topActionY, actionButtonWidth, actionButtonHeight);
+            StyleActionButton(logOutButton, "Log out");
+            logOutButton.OnClick = LogOutClicked;
+            wm.AddWindow(logOutButton);
+
+            allAppsButton = new Button(window, window.Width - outerPadding - actionButtonWidth, topActionY, actionButtonWidth, actionButtonHeight);
+            StyleActionButton(allAppsButton, "All apps");
             allAppsButton.OnClick = AllAppsClicked;
             wm.AddWindow(allAppsButton);
 
             Table searchResults = null;
-            TextBox searchBox = new TextBox(window, (window.Width / 2) - (searchWidth / 2), 12, searchWidth, 20);
+            TextBox searchBox = new TextBox(window, outerPadding + 6, searchY + 4, searchWidth - 12, searchHeight - 8);
             if (focusSearch)
             {
                 wm.Focus = searchBox;
             }
             searchBox.PlaceholderText = "Search";
+            searchBox.Background = SearchBackground;
+            searchBox.Foreground = SearchForeground;
+            searchBox.PlaceholderForeground = SearchPlaceholder;
             searchBox.Changed = () =>
             {
                 if (searchResults == null)
                 {
-                    searchResults = new Table(searchBox, 0, searchBox.Height, searchBox.Width, 0);
+                    searchResults = new Table(searchBox, 0, searchBox.Height + 4, searchBox.Width, 0);
 
                     searchResults.CellHeight = 24;
+                    searchResults.Background = SearchResultsBackground;
+                    searchResults.Foreground = Color.White;
+                    searchResults.Border = SearchResultsBorder;
+                    searchResults.SelectedBackground = Color.FromArgb(62, 84, 120);
+                    searchResults.SelectedBorder = Color.FromArgb(88, 117, 164);
+                    searchResults.SelectedForeground = Color.White;
 
                     searchResults.TableCellSelected = (int index) =>
                     {
@@ -162,12 +187,12 @@ namespace CMLeonOS.Gui.ShellComponents
                 {
                     foreach (AppMetadata app in AppManager.AppMetadatas)
                     {
-                        if (app.Name.ToLower().StartsWith(searchBox.Text.ToLower()))
+                        if (app.Name.ToLower().Contains(searchBox.Text.ToLower()))
                         {
                             string name = app.Name;
-                            if (name.Length > 8)
+                            if (name.Length > 22)
                             {
-                                name = name.Substring(0, 8).Trim() + "...";
+                                name = name.Substring(0, 22).Trim() + "...";
                             }
                             searchResults.Cells.Add(new TableCell(app.Icon.Resize(20, 20), name, tag: app));
                         }
@@ -225,21 +250,28 @@ namespace CMLeonOS.Gui.ShellComponents
             Power.Shutdown(reboot: true);
         }
 
+        private void LogOutClicked(int x, int y)
+        {
+            HideStartMenu();
+            ProcessManager.GetProcess<WindowManager>()?.ClearAllWindows();
+            ProcessManager.AddProcess(wm, new Lock()).Start();
+        }
+
         private void AllAppsClicked(int x, int y)
         {
             Table allAppsTable = new Table(window, 0, 0, window.Width, window.Height);
 
             allAppsTable.CellHeight = 32;
 
-            allAppsTable.Background = Color.FromArgb(56, 56, 71);
+            allAppsTable.Background = MenuBackground;
             allAppsTable.Foreground = Color.White;
-            allAppsTable.Border = Color.FromArgb(36, 36, 51);
+            allAppsTable.Border = PanelBorder;
+            allAppsTable.SelectedBackground = Color.FromArgb(57, 76, 108);
+            allAppsTable.SelectedBorder = Color.FromArgb(86, 109, 146);
 
             foreach (AppMetadata app in AppManager.AppMetadatas)
             {
                 TableCell cell = new TableCell(app.Icon.Resize(20, 20), app.Name);
-                /*cell.BackgroundColourOverride = app.ThemeColor;
-                cell.ForegroundColourOverride = app.ThemeColor.GetForegroundColour();*/
                 allAppsTable.Cells.Add(cell);
             }
             allAppsTable.Render();
