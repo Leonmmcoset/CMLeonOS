@@ -294,10 +294,84 @@ namespace CMLeonOS.Gui.Apps
             currentCategoryWindow = users;
             users.DrawString("Users", Color.DarkBlue, 12, 12);
             users.DrawImageAlpha(Icons.Icon_Info, 12, window.Height - 16 - 12);
-            users.DrawString("Double-click on a user for info.", Color.Gray, 36, window.Height - 16 - 12);
+            users.DrawString("Double-click a user for details.", Color.Gray, 36, window.Height - 16 - 12);
             wm.AddWindow(users);
 
-            Table usersTable = new Table(users, 12, 40, users.Width - 24, users.Height - 40 - 12 - 16 - 12);
+            bool canManageUsers = UserSystem.CurrentLoggedInUser != null && UserSystem.CurrentLoggedInUser.Admin;
+            Table usersTable = null;
+
+            if (canManageUsers)
+            {
+                Button createUser = new Button(users, 12, 40, 108, 22);
+                createUser.Text = "Create User";
+                createUser.OnClick = (_, _) =>
+                {
+                    PromptBox promptBox = new PromptBox(this, "Create User", "Enter username and password.\nFormat: username password", "newuser password", (string value) =>
+                    {
+                        string[] parts = (value ?? string.Empty).Trim().Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        if (parts.Length < 2)
+                        {
+                            ShowMessage("Users", "Use the format: username password");
+                            return;
+                        }
+
+                        bool created = UserManager.AddUser(parts[0], parts[1], false);
+                        if (!created)
+                        {
+                            ShowMessage("Users", "Failed to create user.");
+                            return;
+                        }
+
+                        ShowMessage("Users", $"User '{parts[0]}' created.");
+                        ShowUsersCategory();
+                    });
+                    promptBox.Show();
+                };
+                wm.AddWindow(createUser);
+
+                Button deleteUser = new Button(users, 130, 40, 108, 22);
+                deleteUser.Text = "Delete User";
+                deleteUser.OnClick = (_, _) =>
+                {
+                    if (usersTable.SelectedCellIndex == -1)
+                    {
+                        ShowMessage("Users", "Select a user first.");
+                        return;
+                    }
+
+                    User selectedUser = (User)usersTable.Cells[usersTable.SelectedCellIndex].Tag;
+                    if (selectedUser == null)
+                    {
+                        ShowMessage("Users", "Select a valid user first.");
+                        return;
+                    }
+
+                    if (UserSystem.CurrentLoggedInUser != null
+                        && selectedUser.Username.Equals(UserSystem.CurrentLoggedInUser.Username, StringComparison.OrdinalIgnoreCase))
+                    {
+                        ShowMessage("Users", "You cannot delete the current logged in user.");
+                        return;
+                    }
+
+                    bool deleted = UserManager.RemoveUser(selectedUser.Username);
+                    if (!deleted)
+                    {
+                        ShowMessage("Users", "Failed to delete user.");
+                        return;
+                    }
+
+                    ShowMessage("Users", $"User '{selectedUser.Username}' deleted.");
+                    ShowUsersCategory();
+                };
+                wm.AddWindow(deleteUser);
+            }
+            else
+            {
+                users.DrawString("Only administrators can create or delete users.", Color.Gray, 12, 44);
+            }
+
+            int tableY = canManageUsers ? 74 : 40;
+            usersTable = new Table(users, 12, tableY, users.Width - 24, users.Height - tableY - 12 - 16 - 12);
             foreach (User user in UserSystem.GetUsers())
             {
                 usersTable.Cells.Add(new TableCell(user.Admin ? Icons.Icon_Admin : Icons.Icon_User, user.Username, tag: user));

@@ -236,13 +236,19 @@ namespace CMLeonOS.Gui.Apps
                         string extension = Path.GetExtension(path).ToLower();
                         if (extension == ".txt" || extension == ".md")
                         {
-                            var notepad = new Notepad(path);
-                            var metadata = AppManager.GetAppMetadata("Notepad");
-                            metadata.Start();
+                            ProcessManager.AddProcess(this, new Notepad(path)).Start();
+                        }
+                        else if (extension == ".lua")
+                        {
+                            ProcessManager.AddProcess(this, new CodeStudio.CodeStudio(path)).Start();
+                        }
+                        else if (extension == ".bmp")
+                        {
+                            ProcessManager.AddProcess(this, new ImageViewer(path)).Start();
                         }
                         else
                         {
-                            Logger.Logger.Instance.Warning("Files", $"Cannot open file: {path}");
+                            ShowOpenWithPrompt(path);
                         }
                     }
                     catch (Exception ex)
@@ -251,6 +257,75 @@ namespace CMLeonOS.Gui.Apps
                     }
                 }
             }
+        }
+
+        private void OpenWithApp(string path, string appName)
+        {
+            switch (appName)
+            {
+                case "Notepad":
+                    ProcessManager.AddProcess(this, new Notepad(path)).Start();
+                    break;
+                case "CodeStudio":
+                    ProcessManager.AddProcess(this, new CodeStudio.CodeStudio(path)).Start();
+                    break;
+                case "Image Viewer":
+                    ProcessManager.AddProcess(this, new ImageViewer(path)).Start();
+                    break;
+                default:
+                    Logger.Logger.Instance.Warning("Files", $"Unsupported open-with app: {appName}");
+                    break;
+            }
+        }
+
+        private void ShowOpenWithPrompt(string path)
+        {
+            AppWindow openWithWindow = new AppWindow(this, 320, 240, 300, 176);
+            openWithWindow.Title = "Open With";
+            openWithWindow.Icon = AppManager.DefaultAppIcon;
+            wm.AddWindow(openWithWindow);
+
+            openWithWindow.Clear(UITheme.Surface);
+            openWithWindow.DrawRectangle(0, 0, openWithWindow.Width, openWithWindow.Height, UITheme.SurfaceBorder);
+            openWithWindow.DrawString("Open this file with:", UITheme.TextPrimary, 12, 12);
+            openWithWindow.DrawString(Path.GetFileName(path), UITheme.TextSecondary, 12, 32);
+
+            Button notepadButton = new Button(openWithWindow, 12, 68, 84, 24);
+            notepadButton.Text = "Notepad";
+            notepadButton.OnClick = (_, _) =>
+            {
+                wm.RemoveWindow(openWithWindow);
+                OpenWithApp(path, "Notepad");
+            };
+            wm.AddWindow(notepadButton);
+
+            Button codeStudioButton = new Button(openWithWindow, 108, 68, 84, 24);
+            codeStudioButton.Text = "CodeStudio";
+            codeStudioButton.OnClick = (_, _) =>
+            {
+                wm.RemoveWindow(openWithWindow);
+                OpenWithApp(path, "CodeStudio");
+            };
+            wm.AddWindow(codeStudioButton);
+
+            Button imageViewerButton = new Button(openWithWindow, 204, 68, 84, 24);
+            imageViewerButton.Text = "Image";
+            imageViewerButton.OnClick = (_, _) =>
+            {
+                wm.RemoveWindow(openWithWindow);
+                OpenWithApp(path, "Image Viewer");
+            };
+            wm.AddWindow(imageViewerButton);
+
+            Button cancelButton = new Button(openWithWindow, openWithWindow.Width - 80 - 12, openWithWindow.Height - 20 - 12, 80, 20);
+            cancelButton.Text = "Cancel";
+            cancelButton.OnClick = (_, _) =>
+            {
+                wm.RemoveWindow(openWithWindow);
+            };
+            wm.AddWindow(cancelButton);
+
+            wm.Update(openWithWindow);
         }
 
         private void ShortcutsTableCellSelected(int index)

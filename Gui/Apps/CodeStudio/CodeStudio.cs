@@ -24,6 +24,11 @@ namespace CMLeonOS.Gui.Apps.CodeStudio
     internal class CodeStudio : Process
     {
         internal CodeStudio() : base("CodeStudio", ProcessType.Application) { }
+        
+        internal CodeStudio(string path) : base("CodeStudio", ProcessType.Application)
+        {
+            initialPath = path;
+        }
 
         Window splash;
 
@@ -34,6 +39,7 @@ namespace CMLeonOS.Gui.Apps.CodeStudio
         private static Bitmap splashBitmap = new Bitmap(_splashBytes);
 
         private Ide ide;
+        private string initialPath = null;
 
         private bool ideCreated = false;
 
@@ -55,6 +61,10 @@ namespace CMLeonOS.Gui.Apps.CodeStudio
             {
                 ide = new Ide(this, wm);
                 ide.Start();
+                if (!string.IsNullOrWhiteSpace(initialPath))
+                {
+                    ide.Open(initialPath);
+                }
                 wm.RemoveWindow(splash);
                 ideCreated = true;
             }
