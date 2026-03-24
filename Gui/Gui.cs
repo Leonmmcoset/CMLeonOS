@@ -17,7 +17,6 @@
 using CMLeonOS;
 using CMLeonOS.Logger;
 using System;
-using System.Threading;
 
 namespace CMLeonOS.Gui
 {
@@ -50,7 +49,6 @@ namespace CMLeonOS.Gui
             }
 
             Console.WriteLine("Loading apps...");
-            Thread.Sleep(1000);
             AppManager.LoadAllApps();
 
             ProcessManager.AddProcess(windowManager);
@@ -81,7 +79,6 @@ namespace CMLeonOS.Gui
             while (guiRunning)
             {
                 ProcessManager.Yield();
-                System.Threading.Thread.Sleep(1);
             }
         }
 

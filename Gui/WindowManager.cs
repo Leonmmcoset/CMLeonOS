@@ -444,6 +444,7 @@ namespace CMLeonOS.Gui
             if (bufferModified)
             {
                 driver.DoubleBufferUpdate();
+                bufferModified = false;
             }
 
             UpdateCursor();
