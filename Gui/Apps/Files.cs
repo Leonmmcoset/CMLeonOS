@@ -104,7 +104,7 @@ namespace CMLeonOS.Gui.Apps
 
             return extension switch
             {
-                ".txt" or ".md" or ".log" => Icons.Icon_File_Text,
+                ".txt" or ".md" or ".log" or ".mi" => Icons.Icon_File_Text,
                 ".rs" => Icons.Icon_File_Rs,
                 ".ini" or ".cfg" => Icons.Icon_File_Config,
                 _ => Icons.Icon_File
@@ -246,6 +246,10 @@ namespace CMLeonOS.Gui.Apps
                         {
                             ProcessManager.AddProcess(this, new ImageViewer(path)).Start();
                         }
+                        else if (extension == ".mi")
+                        {
+                            ProcessManager.AddProcess(this, new MarkItViewer(path)).Start();
+                        }
                         else
                         {
                             ShowOpenWithPrompt(path);
@@ -272,6 +276,9 @@ namespace CMLeonOS.Gui.Apps
                 case "Image Viewer":
                     ProcessManager.AddProcess(this, new ImageViewer(path)).Start();
                     break;
+                case "MarkIt Viewer":
+                    ProcessManager.AddProcess(this, new MarkItViewer(path)).Start();
+                    break;
                 default:
                     Logger.Logger.Instance.Warning("Files", $"Unsupported open-with app: {appName}");
                     break;
@@ -280,7 +287,7 @@ namespace CMLeonOS.Gui.Apps
 
         private void ShowOpenWithPrompt(string path)
         {
-            AppWindow openWithWindow = new AppWindow(this, 320, 240, 300, 176);
+            AppWindow openWithWindow = new AppWindow(this, 320, 240, 300, 206);
             openWithWindow.Title = "Open With";
             openWithWindow.Icon = AppManager.DefaultAppIcon;
             wm.AddWindow(openWithWindow);
@@ -316,6 +323,15 @@ namespace CMLeonOS.Gui.Apps
                 OpenWithApp(path, "Image Viewer");
             };
             wm.AddWindow(imageViewerButton);
+
+            Button markItButton = new Button(openWithWindow, 12, 98, 84, 24);
+            markItButton.Text = "MarkIt";
+            markItButton.OnClick = (_, _) =>
+            {
+                wm.RemoveWindow(openWithWindow);
+                OpenWithApp(path, "MarkIt Viewer");
+            };
+            wm.AddWindow(markItButton);
 
             Button cancelButton = new Button(openWithWindow, openWithWindow.Width - 80 - 12, openWithWindow.Height - 20 - 12, 80, 20);
             cancelButton.Text = "Cancel";
