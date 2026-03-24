@@ -35,6 +35,8 @@ namespace CMLeonOS.Gui.Apps
         Table shortcutsTable;
 
         ImageBlock up;
+        Button newFileButton;
+        Button newFolderButton;
 
         TextBox pathBox;
 
@@ -82,7 +84,9 @@ namespace CMLeonOS.Gui.Apps
         private const int pathBoxMargin = 4;
         private const int pathBoxHeight = 24;
         private const int shortcutsWidth = 128;
-        private const int headerHeight = 32;
+        private const int headerHeight = 56;
+        private const int toolbarButtonWidth = 80;
+        private const int toolbarButtonGap = 4;
 
         private const string dirEmptyMessage = "This folder is empty.";
 
@@ -152,6 +156,13 @@ namespace CMLeonOS.Gui.Apps
             {
                 entryTable.Render();
             }
+        }
+
+        private void RefreshCurrentDirectory()
+        {
+            PopulateEntryTable();
+            RenderHeader();
+            wm.Update(window);
         }
 
         private void PopulateShortcutTable()
@@ -272,6 +283,68 @@ namespace CMLeonOS.Gui.Apps
             }
         }
 
+        private void PromptCreateFile()
+        {
+            PromptBox promptBox = new PromptBox(this, "New File", "Create an empty file in the current folder.", "NewFile.txt", (string name) =>
+            {
+                try
+                {
+                    string sanitizedName = Path.GetFileName(PathUtil.Sanitize((name ?? string.Empty).Trim()));
+                    if (string.IsNullOrWhiteSpace(sanitizedName))
+                    {
+                        return;
+                    }
+
+                    string path = Path.Combine(currentDir, sanitizedName);
+                    if (File.Exists(path) || Directory.Exists(path))
+                    {
+                        new MessageBox(this, "Files", "A file or folder with that name already exists.").Show();
+                        return;
+                    }
+
+                    File.WriteAllText(path, string.Empty);
+                    RefreshCurrentDirectory();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Logger.Instance.Error("Files", $"Error creating file: {ex.Message}");
+                    new MessageBox(this, "Files", "Unable to create the file.").Show();
+                }
+            });
+            promptBox.Show();
+        }
+
+        private void PromptCreateFolder()
+        {
+            PromptBox promptBox = new PromptBox(this, "New Folder", "Create a folder in the current directory.", "NewFolder", (string name) =>
+            {
+                try
+                {
+                    string sanitizedName = Path.GetFileName(PathUtil.Sanitize((name ?? string.Empty).Trim()));
+                    if (string.IsNullOrWhiteSpace(sanitizedName))
+                    {
+                        return;
+                    }
+
+                    string path = Path.Combine(currentDir, sanitizedName);
+                    if (File.Exists(path) || Directory.Exists(path))
+                    {
+                        new MessageBox(this, "Files", "A file or folder with that name already exists.").Show();
+                        return;
+                    }
+
+                    Directory.CreateDirectory(path);
+                    RefreshCurrentDirectory();
+                }
+                catch (Exception ex)
+                {
+                    Logger.Logger.Instance.Error("Files", $"Error creating folder: {ex.Message}");
+                    new MessageBox(this, "Files", "Unable to create the folder.").Show();
+                }
+            });
+            promptBox.Show();
+        }
+
         private void RenderHeader(bool updateWindow = true)
         {
             header.Clear(Color.DarkBlue);
@@ -320,6 +393,9 @@ namespace CMLeonOS.Gui.Apps
             pathBox.Submitted = PathBoxSubmitted;
             wm.AddWindow(pathBox);
 
+            int buttonY = pathBoxHeight + 28;
+            int buttonX = shortcutsWidth + 8;
+
             entryTable = new Table(window, shortcutsWidth, pathBoxHeight + headerHeight, window.Width - shortcutsWidth, window.Height - pathBoxHeight - headerHeight);
             entryTable.OnDoubleClick = EntryTableDoubleClicked;
             PopulateEntryTable();
@@ -328,6 +404,16 @@ namespace CMLeonOS.Gui.Apps
             header = new Window(this, window, shortcutsWidth, pathBoxHeight, window.Width - shortcutsWidth, headerHeight);
             wm.AddWindow(header);
             RenderHeader(updateWindow: false);
+
+            newFileButton = new Button(window, buttonX, buttonY, toolbarButtonWidth, 20);
+            newFileButton.Text = "New File";
+            newFileButton.OnClick = (_, _) => PromptCreateFile();
+            wm.AddWindow(newFileButton);
+
+            newFolderButton = new Button(window, buttonX + toolbarButtonWidth + toolbarButtonGap, buttonY, toolbarButtonWidth, 20);
+            newFolderButton.Text = "New Folder";
+            newFolderButton.OnClick = (_, _) => PromptCreateFolder();
+            wm.AddWindow(newFolderButton);
 
             shortcutsTable = new Table(window, 0, pathBoxHeight, shortcutsWidth, window.Height - pathBoxHeight);
             shortcutsTable.AllowDeselection = false;

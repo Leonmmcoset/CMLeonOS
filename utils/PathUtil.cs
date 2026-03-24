@@ -50,6 +50,11 @@ namespace CMLeonOS.Utils
             rest = rest.TrimEnd('/');
             rest = rest.TrimEnd('\\');
 
+            if (hasDrive && string.IsNullOrWhiteSpace(rest))
+            {
+                return drive + @"\";
+            }
+
             return drive + rest;
         }
 
