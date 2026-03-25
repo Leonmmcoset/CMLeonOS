@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using CMLeonOS.UILib.Animations;
 
 namespace CMLeonOS.Gui.UILib
 {
@@ -16,6 +17,7 @@ namespace CMLeonOS.Gui.UILib
         private readonly Window hostWindow;
         private Window popupWindow;
         private Table popupTable;
+        private bool closeAnimationRunning = false;
 
         internal Action<int, string> SelectionChanged;
 
@@ -173,25 +175,47 @@ namespace CMLeonOS.Gui.UILib
 
         internal void Collapse()
         {
-            if (!Expanded)
+            if (!Expanded || closeAnimationRunning)
             {
                 return;
             }
 
-            Expanded = false;
-
-            if (popupTable != null)
+            if (popupWindow == null)
             {
-                WM.RemoveWindow(popupTable);
-                popupTable = null;
-            }
-            if (popupWindow != null)
-            {
-                WM.RemoveWindow(popupWindow);
-                popupWindow = null;
+                Expanded = false;
+                Render();
+                return;
             }
 
-            Render();
+            closeAnimationRunning = true;
+
+            int currentHeight = popupWindow.Height;
+            MovementAnimation animation = new MovementAnimation(popupWindow)
+            {
+                From = new Rectangle(popupWindow.X, popupWindow.Y, popupWindow.Width, currentHeight),
+                To = new Rectangle(popupWindow.X, popupWindow.Y, popupWindow.Width, 1),
+                Duration = 8,
+                EasingType = EasingType.Sine,
+                EasingDirection = EasingDirection.In
+            };
+            animation.Completed = () =>
+            {
+                if (popupTable != null)
+                {
+                    WM.RemoveWindow(popupTable);
+                    popupTable = null;
+                }
+                if (popupWindow != null)
+                {
+                    WM.RemoveWindow(popupWindow);
+                    popupWindow = null;
+                }
+
+                Expanded = false;
+                closeAnimationRunning = false;
+                Render();
+            };
+            animation.Start();
         }
 
         private void PopupSelected(int index)
@@ -236,12 +260,11 @@ namespace CMLeonOS.Gui.UILib
             int visibleItems = Math.Max(1, Math.Min(MaxVisibleItems, Math.Max(1, Items.Count)));
             int popupHeight = Math.Max(24, visibleItems * 22);
 
-            popupWindow = new Window(Process, hostWindow, X, Y + Height, Width, popupHeight);
+            popupWindow = new Window(Process, hostWindow, X, Y + Height, Width, 1);
             popupWindow.Clear(UITheme.Surface);
-            popupWindow.DrawRectangle(0, 0, popupWindow.Width, popupWindow.Height, Border);
             WM.AddWindow(popupWindow);
 
-            popupTable = new Table(popupWindow, 0, 0, popupWindow.Width, popupWindow.Height);
+            popupTable = new Table(popupWindow, 0, 0, popupWindow.Width, popupHeight);
             popupTable.AllowDeselection = false;
             popupTable.CellHeight = 22;
             popupTable.Background = UITheme.Surface;
@@ -260,6 +283,30 @@ namespace CMLeonOS.Gui.UILib
             popupTable.SelectedCellIndex = _selectedIndex;
             popupTable.Render();
             WM.AddWindow(popupTable);
+
+            MovementAnimation animation = new MovementAnimation(popupWindow)
+            {
+                From = new Rectangle(popupWindow.X, popupWindow.Y, popupWindow.Width, 1),
+                To = new Rectangle(popupWindow.X, popupWindow.Y, popupWindow.Width, popupHeight),
+                Duration = 8,
+                EasingType = EasingType.Sine,
+                EasingDirection = EasingDirection.Out
+            };
+            animation.Completed = () =>
+            {
+                if (popupWindow != null)
+                {
+                    popupWindow.Clear(UITheme.Surface);
+                    popupWindow.DrawRectangle(0, 0, popupWindow.Width, popupWindow.Height, Border);
+                    WM.Update(popupWindow);
+                }
+                if (popupTable != null)
+                {
+                    popupTable.MoveAndResize(0, 0, popupWindow.Width, popupWindow.Height, sendWMEvent: false);
+                    popupTable.Render();
+                }
+            };
+            animation.Start();
         }
 
         internal override void Render()
