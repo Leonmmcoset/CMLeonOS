@@ -1,0 +1,323 @@
+using CMLeonOS;
+using CMLeonOS.Gui.UILib;
+using System.Collections.Generic;
+using System.Drawing;
+
+namespace CMLeonOS.Gui.Apps
+{
+    internal class UILibGallery : Process
+    {
+        internal UILibGallery() : base("UILib Gallery", ProcessType.Application) { }
+
+        private AppWindow window;
+        private Table categoryTable;
+        private Window previewHost;
+        private Window header;
+
+        private readonly WindowManager wm = ProcessManager.GetProcess<WindowManager>();
+        private readonly List<Window> demoWindows = new List<Window>();
+
+        private FileBrowser fileBrowser;
+        private string headerTitle = "UILib Gallery";
+        private string headerDescription = "Browse and test the current UILib controls.";
+
+        private const int sidebarWidth = 164;
+        private const int headerHeight = 58;
+
+        private void SetHeader(string title, string description)
+        {
+            headerTitle = title;
+            headerDescription = description;
+            RenderHeader();
+        }
+
+        private void RenderHeader()
+        {
+            header.Clear(Color.FromArgb(235, 241, 248));
+            header.DrawRectangle(0, 0, header.Width, header.Height, Color.FromArgb(180, 192, 208));
+            header.DrawString(headerTitle, Color.FromArgb(28, 38, 52), 12, 10);
+            header.DrawString(headerDescription, Color.FromArgb(97, 110, 126), 12, 30);
+            wm.Update(header);
+        }
+
+        private void ClearPreview()
+        {
+            for (int i = 0; i < demoWindows.Count; i++)
+            {
+                wm.RemoveWindow(demoWindows[i]);
+            }
+            demoWindows.Clear();
+
+            previewHost.Clear(Color.FromArgb(250, 252, 255));
+            previewHost.DrawRectangle(0, 0, previewHost.Width, previewHost.Height, Color.FromArgb(192, 204, 221));
+            wm.Update(previewHost);
+        }
+
+        private void AddDemo(Window control)
+        {
+            demoWindows.Add(control);
+            wm.AddWindow(control);
+        }
+
+        private void ShowButtonsDemo()
+        {
+            ClearPreview();
+            SetHeader("Button", "Standard action buttons with theme colours and icon support.");
+
+            TextBlock label = new TextBlock(previewHost, 20, 18, 360, 20);
+            label.Text = "Buttons";
+            label.Foreground = UITheme.TextPrimary;
+            AddDemo(label);
+
+            Button primary = new Button(previewHost, 20, 48, 120, 28);
+            primary.Text = "Primary";
+            primary.OnClick = (_, _) => SetHeader("Button", "Primary button clicked.");
+            AddDemo(primary);
+
+            Button success = new Button(previewHost, 152, 48, 120, 28);
+            success.Text = "Success";
+            success.Background = UITheme.Success;
+            success.Border = Color.FromArgb(31, 110, 72);
+            success.OnClick = (_, _) => SetHeader("Button", "Success button clicked.");
+            AddDemo(success);
+
+            Button neutral = new Button(previewHost, 284, 48, 120, 28);
+            neutral.Text = "Neutral";
+            neutral.Background = UITheme.SurfaceMuted;
+            neutral.Border = UITheme.SurfaceBorder;
+            neutral.Foreground = UITheme.TextPrimary;
+            neutral.OnClick = (_, _) => SetHeader("Button", "Neutral button clicked.");
+            AddDemo(neutral);
+
+            ImageBlock iconPreview = new ImageBlock(previewHost, 20, 92, 32, 32);
+            iconPreview.Image = AppManager.DefaultAppIcon.Resize(32, 32);
+            AddDemo(iconPreview);
+        }
+
+        private void ShowInputsDemo()
+        {
+            ClearPreview();
+            SetHeader("Input Controls", "Text input, checkbox, switch and slider controls.");
+
+            TextBox textBox = new TextBox(previewHost, 20, 24, 220, 24);
+            textBox.PlaceholderText = "Type something";
+            textBox.Changed = () => SetHeader("Input Controls", "TextBox value changed.");
+            AddDemo(textBox);
+
+            TextBox multi = new TextBox(previewHost, 20, 58, 300, 86);
+            multi.MultiLine = true;
+            multi.Text = "Multi-line TextBox\nUILib demo";
+            AddDemo(multi);
+
+            CheckBox checkBox = new CheckBox(previewHost, 340, 24, 180, 20);
+            checkBox.Text = "Enable feature";
+            checkBox.CheckBoxChanged = (value) => SetHeader("Input Controls", value ? "CheckBox checked." : "CheckBox unchecked.");
+            AddDemo(checkBox);
+
+            Switch toggle = new Switch(previewHost, 340, 58, 180, 20);
+            toggle.Text = "Animated switch";
+            toggle.CheckBoxChanged = (value) => SetHeader("Input Controls", value ? "Switch enabled." : "Switch disabled.");
+            AddDemo(toggle);
+
+            RangeSlider slider = new RangeSlider(previewHost, 340, 96, 220, 30, 0f, 30f, 100f);
+            slider.Changed = (value) => SetHeader("Input Controls", "RangeSlider value: " + ((int)value).ToString());
+            AddDemo(slider);
+        }
+
+        private void ShowDropdownDemo()
+        {
+            ClearPreview();
+            SetHeader("Dropdown", "Single-select dropdown list built on top of Table.");
+
+            Dropdown dropdown = new Dropdown(previewHost, 20, 28, 200, 24);
+            dropdown.PlaceholderText = "Choose a theme";
+            dropdown.Items.Add("Ocean");
+            dropdown.Items.Add("Sunrise");
+            dropdown.Items.Add("Forest");
+            dropdown.Items.Add("Mono");
+            dropdown.RefreshItems();
+            dropdown.SelectionChanged = (index, text) => SetHeader("Dropdown", "Selected item: " + text);
+            AddDemo(dropdown);
+
+            TextBlock info = new TextBlock(previewHost, 20, 66, 360, 20);
+            info.Text = "Click the field to expand the dropdown.";
+            info.Foreground = UITheme.TextSecondary;
+            AddDemo(info);
+        }
+
+        private void ShowTableDemo()
+        {
+            ClearPreview();
+            SetHeader("Table", "Selectable list/table control with scrolling and icons.");
+
+            Table table = new Table(previewHost, 20, 24, 360, 180);
+            table.CellHeight = 24;
+            table.Cells.Add(new TableCell(AppManager.DefaultAppIcon.Resize(20, 20), "First Item", "First"));
+            table.Cells.Add(new TableCell(AppManager.DefaultAppIcon.Resize(20, 20), "Second Item", "Second"));
+            table.Cells.Add(new TableCell(AppManager.DefaultAppIcon.Resize(20, 20), "Third Item", "Third"));
+            table.Cells.Add(new TableCell("Text-only row", "Text"));
+            table.TableCellSelected = (index) =>
+            {
+                if (index >= 0 && index < table.Cells.Count)
+                {
+                    SetHeader("Table", "Selected row: " + table.Cells[index].Text);
+                }
+            };
+            table.Render();
+            AddDemo(table);
+        }
+
+        private void ShowBarsDemo()
+        {
+            ClearPreview();
+            SetHeader("Bars And Blocks", "ShortcutBar, TextBlock and ImageBlock examples.");
+
+            ShortcutBar shortcutBar = new ShortcutBar(previewHost, 20, 20, 360, 24);
+            shortcutBar.Background = UITheme.SurfaceMuted;
+            shortcutBar.Foreground = UITheme.TextPrimary;
+            shortcutBar.Cells.Add(new ShortcutBarCell("File", () => SetHeader("Bars And Blocks", "ShortcutBar: File")));
+            shortcutBar.Cells.Add(new ShortcutBarCell("Edit", () => SetHeader("Bars And Blocks", "ShortcutBar: Edit")));
+            shortcutBar.Cells.Add(new ShortcutBarCell("View", () => SetHeader("Bars And Blocks", "ShortcutBar: View")));
+            shortcutBar.Render();
+            AddDemo(shortcutBar);
+
+            TextBlock centered = new TextBlock(previewHost, 20, 62, 220, 48);
+            centered.Text = "Centered TextBlock";
+            centered.Background = UITheme.AccentLight;
+            centered.Foreground = UITheme.TextPrimary;
+            centered.HorizontalAlignment = Alignment.Middle;
+            centered.VerticalAlignment = Alignment.Middle;
+            AddDemo(centered);
+
+            ImageBlock image = new ImageBlock(previewHost, 260, 62, 48, 48);
+            image.Image = AppManager.DefaultAppIcon.Resize(48, 48);
+            image.Alpha = true;
+            AddDemo(image);
+        }
+
+        private void ShowDialogsDemo()
+        {
+            ClearPreview();
+            SetHeader("Dialogs", "Dialog-style components that open in separate windows.");
+
+            Button messageButton = new Button(previewHost, 20, 28, 140, 28);
+            messageButton.Text = "MessageBox";
+            messageButton.OnClick = (_, _) =>
+            {
+                new MessageBox(this, "UILib Gallery", "This is a MessageBox demo.").Show();
+            };
+            AddDemo(messageButton);
+
+            Button promptButton = new Button(previewHost, 172, 28, 140, 28);
+            promptButton.Text = "PromptBox";
+            promptButton.OnClick = (_, _) =>
+            {
+                PromptBox prompt = new PromptBox(this, "UILib Gallery", "Enter sample text.", "Hello", (value) =>
+                {
+                    SetHeader("Dialogs", "Prompt result: " + (string.IsNullOrWhiteSpace(value) ? "(empty)" : value));
+                });
+                prompt.Show();
+            };
+            AddDemo(promptButton);
+
+            Button fileBrowserButton = new Button(previewHost, 324, 28, 140, 28);
+            fileBrowserButton.Text = "FileBrowser";
+            fileBrowserButton.OnClick = (_, _) =>
+            {
+                fileBrowser = new FileBrowser(this, wm, (selectedPath) =>
+                {
+                    SetHeader("Dialogs", "FileBrowser selected: " + (string.IsNullOrWhiteSpace(selectedPath) ? "(cancelled)" : selectedPath));
+                });
+                fileBrowser.Show();
+            };
+            AddDemo(fileBrowserButton);
+        }
+
+        private void CategorySelected(int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    ShowButtonsDemo();
+                    break;
+                case 1:
+                    ShowInputsDemo();
+                    break;
+                case 2:
+                    ShowDropdownDemo();
+                    break;
+                case 3:
+                    ShowTableDemo();
+                    break;
+                case 4:
+                    ShowBarsDemo();
+                    break;
+                case 5:
+                    ShowDialogsDemo();
+                    break;
+            }
+        }
+
+        private void Relayout()
+        {
+            categoryTable.MoveAndResize(0, 0, sidebarWidth, window.Height);
+            header.MoveAndResize(sidebarWidth, 0, window.Width - sidebarWidth, headerHeight);
+            previewHost.MoveAndResize(sidebarWidth, headerHeight, window.Width - sidebarWidth, window.Height - headerHeight);
+
+            categoryTable.Render();
+            RenderHeader();
+            ClearPreview();
+
+            if (categoryTable.SelectedCellIndex < 0)
+            {
+                categoryTable.SelectedCellIndex = 0;
+            }
+            CategorySelected(categoryTable.SelectedCellIndex);
+        }
+
+        public override void Start()
+        {
+            base.Start();
+
+            window = new AppWindow(this, 180, 110, 860, 520);
+            window.Title = "UILib Gallery";
+            window.Icon = AppManager.DefaultAppIcon;
+            window.CanResize = true;
+            window.UserResized = Relayout;
+            window.Closing = TryStop;
+            wm.AddWindow(window);
+
+            categoryTable = new Table(window, 0, 0, sidebarWidth, window.Height);
+            categoryTable.AllowDeselection = false;
+            categoryTable.CellHeight = 26;
+            categoryTable.TextAlignment = Alignment.Middle;
+            categoryTable.Background = Color.FromArgb(242, 246, 252);
+            categoryTable.Border = Color.FromArgb(182, 194, 210);
+            categoryTable.SelectedBackground = Color.FromArgb(216, 231, 255);
+            categoryTable.SelectedBorder = UITheme.Accent;
+            categoryTable.SelectedForeground = UITheme.TextPrimary;
+            categoryTable.TableCellSelected = CategorySelected;
+            categoryTable.Cells.Add(new TableCell("Buttons"));
+            categoryTable.Cells.Add(new TableCell("Inputs"));
+            categoryTable.Cells.Add(new TableCell("Dropdown"));
+            categoryTable.Cells.Add(new TableCell("Table"));
+            categoryTable.Cells.Add(new TableCell("Bars && Blocks"));
+            categoryTable.Cells.Add(new TableCell("Dialogs"));
+            wm.AddWindow(categoryTable);
+
+            header = new Window(this, window, sidebarWidth, 0, window.Width - sidebarWidth, headerHeight);
+            wm.AddWindow(header);
+
+            previewHost = new Window(this, window, sidebarWidth, headerHeight, window.Width - sidebarWidth, window.Height - headerHeight);
+            wm.AddWindow(previewHost);
+
+            categoryTable.SelectedCellIndex = 0;
+            Relayout();
+            wm.Update(window);
+        }
+
+        public override void Run()
+        {
+        }
+    }
+}
