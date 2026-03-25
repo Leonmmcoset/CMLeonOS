@@ -184,5 +184,27 @@ namespace CMLeonOS
                 return false;
             }
         }
+
+        public Dictionary<string, string> GetAllVariables()
+        {
+            Dictionary<string, string> copy = new Dictionary<string, string>();
+            foreach (KeyValuePair<string, string> kvp in environmentVariables)
+            {
+                copy[kvp.Key] = kvp.Value;
+            }
+            return copy;
+        }
+
+        public string[] GetAllVariablesAsLines()
+        {
+            string[] lines = new string[environmentVariables.Count];
+            int index = 0;
+            foreach (KeyValuePair<string, string> kvp in environmentVariables)
+            {
+                lines[index] = kvp.Key + "=" + kvp.Value;
+                index++;
+            }
+            return lines;
+        }
     }
 }

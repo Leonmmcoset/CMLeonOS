@@ -31,7 +31,12 @@ namespace CMLeonOS.Gui.Apps.Paint
         internal readonly List<Tool> Tools = new List<Tool>()
         {
             new Tools.Pencil(),
-            new Tools.CircleBrush()
+            new Tools.CircleBrush(),
+            new Tools.Eraser(),
+            new Tools.LineTool(),
+            new Tools.RectangleTool(),
+            new Tools.FilledRectangleTool(),
+            new Tools.FilledCircleTool()
         };
 
         private void TableClicked(int x, int y)
