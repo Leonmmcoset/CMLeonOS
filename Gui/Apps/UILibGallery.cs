@@ -145,6 +145,47 @@ namespace CMLeonOS.Gui.Apps
             AddDemo(info);
         }
 
+        private void ShowTabsDemo()
+        {
+            ClearPreview();
+            SetHeader("Tabs", "Tab strip control for switching between sections.");
+
+            Tabs tabs = new Tabs(previewHost, 20, 24, 360, 28);
+            tabs.Items.Add("General");
+            tabs.Items.Add("Appearance");
+            tabs.Items.Add("Advanced");
+            tabs.RefreshItems();
+            tabs.SelectionChanged = (index, text) => SetHeader("Tabs", "Selected tab: " + text);
+            AddDemo(tabs);
+
+            TextBlock block = new TextBlock(previewHost, 20, 70, 360, 48);
+            block.Text = "Tabs are ideal for settings and editors.";
+            block.Background = UITheme.AccentLight;
+            block.Foreground = UITheme.TextPrimary;
+            block.HorizontalAlignment = Alignment.Middle;
+            block.VerticalAlignment = Alignment.Middle;
+            AddDemo(block);
+        }
+
+        private void ShowNumericDemo()
+        {
+            ClearPreview();
+            SetHeader("NumericUpDown", "Increment and decrement integer values without typing.");
+
+            NumericUpDown numeric = new NumericUpDown(previewHost, 20, 24, 120, 32);
+            numeric.Minimum = 0;
+            numeric.Maximum = 256;
+            numeric.Step = 8;
+            numeric.Value = 64;
+            numeric.Changed = (value) => SetHeader("NumericUpDown", "Value changed to " + value.ToString());
+            AddDemo(numeric);
+
+            TextBlock hint = new TextBlock(previewHost, 160, 28, 320, 24);
+            hint.Text = "Click + / - to change the value.";
+            hint.Foreground = UITheme.TextSecondary;
+            AddDemo(hint);
+        }
+
         private void ShowTableDemo()
         {
             ClearPreview();
@@ -193,6 +234,11 @@ namespace CMLeonOS.Gui.Apps
             image.Image = AppManager.DefaultAppIcon.Resize(48, 48);
             image.Alpha = true;
             AddDemo(image);
+
+            StatusBar statusBar = new StatusBar(previewHost, 20, 132, 360, 24);
+            statusBar.Text = "Ready";
+            statusBar.DetailText = "UILib Demo";
+            AddDemo(statusBar);
         }
 
         private void ShowDialogsDemo()
@@ -231,6 +277,15 @@ namespace CMLeonOS.Gui.Apps
                 fileBrowser.Show();
             };
             AddDemo(fileBrowserButton);
+
+            Button notificationButton = new Button(previewHost, 20, 68, 140, 28);
+            notificationButton.Text = "Notification";
+            notificationButton.OnClick = (_, _) =>
+            {
+                Notification notification = new Notification(this, "UILib Gallery", "This is a toast notification.");
+                notification.Show();
+            };
+            AddDemo(notificationButton);
         }
 
         private void CategorySelected(int index)
@@ -247,12 +302,18 @@ namespace CMLeonOS.Gui.Apps
                     ShowDropdownDemo();
                     break;
                 case 3:
-                    ShowTableDemo();
+                    ShowTabsDemo();
                     break;
                 case 4:
-                    ShowBarsDemo();
+                    ShowNumericDemo();
                     break;
                 case 5:
+                    ShowTableDemo();
+                    break;
+                case 6:
+                    ShowBarsDemo();
+                    break;
+                case 7:
                     ShowDialogsDemo();
                     break;
             }
@@ -300,6 +361,8 @@ namespace CMLeonOS.Gui.Apps
             categoryTable.Cells.Add(new TableCell("Buttons"));
             categoryTable.Cells.Add(new TableCell("Inputs"));
             categoryTable.Cells.Add(new TableCell("Dropdown"));
+            categoryTable.Cells.Add(new TableCell("Tabs"));
+            categoryTable.Cells.Add(new TableCell("Numeric"));
             categoryTable.Cells.Add(new TableCell("Table"));
             categoryTable.Cells.Add(new TableCell("Bars && Blocks"));
             categoryTable.Cells.Add(new TableCell("Dialogs"));
