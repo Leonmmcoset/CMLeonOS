@@ -190,7 +190,7 @@ namespace CMLeonOS.Gui.UILib
             closeAnimationRunning = true;
 
             int currentHeight = popupWindow.Height;
-            MovementAnimation animation = new MovementAnimation(popupWindow)
+            MovementAnimation windowAnimation = new MovementAnimation(popupWindow)
             {
                 From = new Rectangle(popupWindow.X, popupWindow.Y, popupWindow.Width, currentHeight),
                 To = new Rectangle(popupWindow.X, popupWindow.Y, popupWindow.Width, 1),
@@ -198,7 +198,20 @@ namespace CMLeonOS.Gui.UILib
                 EasingType = EasingType.Sine,
                 EasingDirection = EasingDirection.In
             };
-            animation.Completed = () =>
+            MovementAnimation tableAnimation = null;
+            if (popupTable != null)
+            {
+                tableAnimation = new MovementAnimation(popupTable)
+                {
+                    From = new Rectangle(popupTable.X, popupTable.Y, popupTable.Width, currentHeight),
+                    To = new Rectangle(popupTable.X, popupTable.Y, popupTable.Width, 1),
+                    Duration = 8,
+                    EasingType = EasingType.Sine,
+                    EasingDirection = EasingDirection.In
+                };
+            }
+
+            windowAnimation.Completed = () =>
             {
                 if (popupTable != null)
                 {
@@ -215,7 +228,8 @@ namespace CMLeonOS.Gui.UILib
                 closeAnimationRunning = false;
                 Render();
             };
-            animation.Start();
+            windowAnimation.Start();
+            tableAnimation?.Start();
         }
 
         private void PopupSelected(int index)
@@ -284,7 +298,7 @@ namespace CMLeonOS.Gui.UILib
             popupTable.Render();
             WM.AddWindow(popupTable);
 
-            MovementAnimation animation = new MovementAnimation(popupWindow)
+            MovementAnimation windowAnimation = new MovementAnimation(popupWindow)
             {
                 From = new Rectangle(popupWindow.X, popupWindow.Y, popupWindow.Width, 1),
                 To = new Rectangle(popupWindow.X, popupWindow.Y, popupWindow.Width, popupHeight),
@@ -292,7 +306,16 @@ namespace CMLeonOS.Gui.UILib
                 EasingType = EasingType.Sine,
                 EasingDirection = EasingDirection.Out
             };
-            animation.Completed = () =>
+            MovementAnimation tableAnimation = new MovementAnimation(popupTable)
+            {
+                From = new Rectangle(popupTable.X, popupTable.Y, popupTable.Width, 1),
+                To = new Rectangle(popupTable.X, popupTable.Y, popupTable.Width, popupHeight),
+                Duration = 8,
+                EasingType = EasingType.Sine,
+                EasingDirection = EasingDirection.Out
+            };
+
+            windowAnimation.Completed = () =>
             {
                 if (popupWindow != null)
                 {
@@ -306,7 +329,8 @@ namespace CMLeonOS.Gui.UILib
                     popupTable.Render();
                 }
             };
-            animation.Start();
+            windowAnimation.Start();
+            tableAnimation.Start();
         }
 
         internal override void Render()
