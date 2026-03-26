@@ -43,7 +43,7 @@ namespace CMLeonOS.Gui.UILib
 
         internal static string[] GetThemeNames()
         {
-            return new string[] { "Default", "Graphite", "Forest" };
+            return new string[] { "Default", "Graphite", "Forest", "Sunset", "Rose", "Terminal" };
         }
 
         internal static void ApplyTheme(string themeName)
@@ -94,6 +94,72 @@ namespace CMLeonOS.Gui.UILib
                     Success = Color.FromArgb(42, 153, 92);
                     Warning = Color.FromArgb(191, 137, 55);
                     CurrentThemeName = "Forest";
+                    break;
+
+                case "Sunset":
+                    WindowTitleBackground = Color.FromArgb(74, 39, 32);
+                    WindowTitleTopHighlight = Color.FromArgb(126, 75, 63);
+                    WindowTitleBottomBorder = Color.FromArgb(42, 22, 18);
+                    WindowTitleText = Color.FromArgb(252, 241, 236);
+                    WindowButtonBackground = Color.FromArgb(101, 57, 48);
+
+                    Surface = Color.FromArgb(252, 245, 240);
+                    SurfaceMuted = Color.FromArgb(240, 226, 217);
+                    SurfaceBorder = Color.FromArgb(184, 151, 135);
+                    TextPrimary = Color.FromArgb(77, 48, 38);
+                    TextSecondary = Color.FromArgb(127, 97, 86);
+
+                    Accent = Color.FromArgb(220, 110, 68);
+                    AccentDark = Color.FromArgb(181, 82, 46);
+                    AccentLight = Color.FromArgb(252, 215, 196);
+
+                    Success = Color.FromArgb(69, 153, 103);
+                    Warning = Color.FromArgb(214, 136, 50);
+                    CurrentThemeName = "Sunset";
+                    break;
+
+                case "Rose":
+                    WindowTitleBackground = Color.FromArgb(70, 34, 54);
+                    WindowTitleTopHighlight = Color.FromArgb(118, 66, 94);
+                    WindowTitleBottomBorder = Color.FromArgb(34, 17, 27);
+                    WindowTitleText = Color.FromArgb(251, 242, 247);
+                    WindowButtonBackground = Color.FromArgb(94, 51, 76);
+
+                    Surface = Color.FromArgb(251, 245, 248);
+                    SurfaceMuted = Color.FromArgb(238, 225, 232);
+                    SurfaceBorder = Color.FromArgb(182, 156, 170);
+                    TextPrimary = Color.FromArgb(77, 44, 61);
+                    TextSecondary = Color.FromArgb(124, 97, 111);
+
+                    Accent = Color.FromArgb(201, 82, 132);
+                    AccentDark = Color.FromArgb(161, 57, 103);
+                    AccentLight = Color.FromArgb(245, 210, 226);
+
+                    Success = Color.FromArgb(72, 151, 105);
+                    Warning = Color.FromArgb(214, 145, 61);
+                    CurrentThemeName = "Rose";
+                    break;
+
+                case "Terminal":
+                    WindowTitleBackground = Color.FromArgb(14, 22, 14);
+                    WindowTitleTopHighlight = Color.FromArgb(33, 60, 33);
+                    WindowTitleBottomBorder = Color.FromArgb(7, 11, 7);
+                    WindowTitleText = Color.FromArgb(214, 255, 214);
+                    WindowButtonBackground = Color.FromArgb(21, 40, 21);
+
+                    Surface = Color.FromArgb(22, 28, 22);
+                    SurfaceMuted = Color.FromArgb(32, 42, 32);
+                    SurfaceBorder = Color.FromArgb(67, 103, 67);
+                    TextPrimary = Color.FromArgb(192, 240, 192);
+                    TextSecondary = Color.FromArgb(130, 175, 130);
+
+                    Accent = Color.FromArgb(74, 214, 96);
+                    AccentDark = Color.FromArgb(47, 171, 67);
+                    AccentLight = Color.FromArgb(44, 79, 44);
+
+                    Success = Color.FromArgb(74, 214, 96);
+                    Warning = Color.FromArgb(204, 185, 79);
+                    CurrentThemeName = "Terminal";
                     break;
 
                 default:
