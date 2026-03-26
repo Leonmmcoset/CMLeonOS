@@ -18,6 +18,7 @@ namespace CMLeonOS.Gui.Apps
         private readonly List<Window> demoWindows = new List<Window>();
 
         private FileBrowser fileBrowser;
+        private ToolTip toolTip;
         private string headerTitle = "UILib Gallery";
         private string headerDescription = "Browse and test the current UILib controls.";
 
@@ -186,6 +187,21 @@ namespace CMLeonOS.Gui.Apps
             AddDemo(hint);
         }
 
+        private void ShowProgressDemo()
+        {
+            ClearPreview();
+            SetHeader("ProgressRing", "Animated busy indicator for indeterminate loading states.");
+
+            ProgressRing ring = new ProgressRing(previewHost, 24, 24, 56, 56);
+            ring.Active = true;
+            AddDemo(ring);
+
+            TextBlock hint = new TextBlock(previewHost, 100, 38, 320, 24);
+            hint.Text = "ProgressRing keeps animating while Active=true.";
+            hint.Foreground = UITheme.TextSecondary;
+            AddDemo(hint);
+        }
+
         private void ShowTableDemo()
         {
             ClearPreview();
@@ -239,6 +255,35 @@ namespace CMLeonOS.Gui.Apps
             statusBar.Text = "Ready";
             statusBar.DetailText = "UILib Demo";
             AddDemo(statusBar);
+
+            Separator separator = new Separator(previewHost, 20, 172, 360, 8);
+            separator.Background = Color.FromArgb(250, 252, 255);
+            separator.Foreground = UITheme.SurfaceBorder;
+            AddDemo(separator);
+        }
+
+        private void ShowTreeDemo()
+        {
+            ClearPreview();
+            SetHeader("TreeView", "Hierarchical tree control for folders, settings and project structures.");
+
+            TreeView tree = new TreeView(previewHost, 20, 24, 300, 180);
+
+            TreeNode rootA = new TreeNode("System");
+            rootA.Expanded = true;
+            rootA.Children.Add(new TreeNode("Apps"));
+            rootA.Children.Add(new TreeNode("Config"));
+
+            TreeNode rootB = new TreeNode("User");
+            rootB.Children.Add(new TreeNode("Desktop"));
+            rootB.Children.Add(new TreeNode("Documents"));
+            rootB.Children.Add(new TreeNode("Pictures"));
+
+            tree.Nodes.Add(rootA);
+            tree.Nodes.Add(rootB);
+            tree.NodeSelected = (node) => SetHeader("TreeView", "Selected node: " + node.Text);
+            tree.Render();
+            AddDemo(tree);
         }
 
         private void ShowDialogsDemo()
@@ -286,6 +331,20 @@ namespace CMLeonOS.Gui.Apps
                 notification.Show();
             };
             AddDemo(notificationButton);
+
+            Button toolTipButton = new Button(previewHost, 172, 68, 140, 28);
+            toolTipButton.Text = "ToolTip";
+            toolTipButton.OnClick = (_, _) =>
+            {
+                if (toolTip == null)
+                {
+                    toolTip = new ToolTip(this, wm);
+                }
+                toolTip.Show(toolTipButton, "Manual ToolTip demo");
+                SetHeader("Dialogs", "ToolTip shown near the button.");
+            };
+            toolTipButton.OnUnfocused = () => toolTip?.Hide();
+            AddDemo(toolTipButton);
         }
 
         private void CategorySelected(int index)
@@ -308,12 +367,18 @@ namespace CMLeonOS.Gui.Apps
                     ShowNumericDemo();
                     break;
                 case 5:
-                    ShowTableDemo();
+                    ShowProgressDemo();
                     break;
                 case 6:
-                    ShowBarsDemo();
+                    ShowTableDemo();
                     break;
                 case 7:
+                    ShowTreeDemo();
+                    break;
+                case 8:
+                    ShowBarsDemo();
+                    break;
+                case 9:
                     ShowDialogsDemo();
                     break;
             }
@@ -363,7 +428,9 @@ namespace CMLeonOS.Gui.Apps
             categoryTable.Cells.Add(new TableCell("Dropdown"));
             categoryTable.Cells.Add(new TableCell("Tabs"));
             categoryTable.Cells.Add(new TableCell("Numeric"));
+            categoryTable.Cells.Add(new TableCell("Progress"));
             categoryTable.Cells.Add(new TableCell("Table"));
+            categoryTable.Cells.Add(new TableCell("TreeView"));
             categoryTable.Cells.Add(new TableCell("Bars && Blocks"));
             categoryTable.Cells.Add(new TableCell("Dialogs"));
             wm.AddWindow(categoryTable);
