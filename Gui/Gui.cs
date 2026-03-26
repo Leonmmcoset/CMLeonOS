@@ -16,6 +16,7 @@
 
 using CMLeonOS;
 using CMLeonOS.Logger;
+using CMLeonOS.Settings;
 using System;
 
 namespace CMLeonOS.Gui
@@ -50,6 +51,9 @@ namespace CMLeonOS.Gui
 
             Console.WriteLine("Loading apps...");
             AppManager.LoadAllApps();
+
+            SettingsManager.LoadSettings();
+            UILib.UITheme.ApplyTheme(SettingsManager.GUI_Theme);
 
             ProcessManager.AddProcess(windowManager);
 

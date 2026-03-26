@@ -39,6 +39,7 @@ namespace CMLeonOS.Settings
             { "GUI_ScreenWidth", "1280" },
             { "GUI_ScreenHeight", "800" },
             { "GUI_WallpaperPath", "" },
+            { "GUI_Theme", "Default" },
             { "GUI_DarkNotepad", "false" },
             { "SkipToGui", "false" }
         };
@@ -204,6 +205,23 @@ namespace CMLeonOS.Settings
             set
             {
                 settings["GUI_WallpaperPath"] = value ?? string.Empty;
+                SaveSettings();
+            }
+        }
+
+        public static string GUI_Theme
+        {
+            get
+            {
+                if (settings.TryGetValue("GUI_Theme", out string value))
+                {
+                    return string.IsNullOrWhiteSpace(value) ? "Default" : value;
+                }
+                return "Default";
+            }
+            set
+            {
+                settings["GUI_Theme"] = string.IsNullOrWhiteSpace(value) ? "Default" : value;
                 SaveSettings();
             }
         }

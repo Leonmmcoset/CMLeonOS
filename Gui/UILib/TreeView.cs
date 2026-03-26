@@ -66,9 +66,16 @@ namespace CMLeonOS.Gui.UILib
             visibleNodes.Add(node);
             visibleLevels.Add(level);
 
-            if (node.Expanded)
+            if (node.Expanded || node.ExpandingAnimation || node.CollapsingAnimation)
             {
-                for (int i = 0; i < node.Children.Count; i++)
+                int visibleChildCount = node.Children.Count;
+
+                if (node.ExpandingAnimation || node.CollapsingAnimation)
+                {
+                    visibleChildCount = Math.Min(node.Children.Count, Math.Max(0, node.AnimatedChildCount));
+                }
+
+                for (int i = 0; i < visibleChildCount; i++)
                 {
                     AddVisibleNode(node.Children[i], level + 1);
                 }
@@ -90,7 +97,19 @@ namespace CMLeonOS.Gui.UILib
 
             if (node.Children.Count > 0 && x >= indentX && x <= indentX + 10)
             {
-                node.Expanded = !node.Expanded;
+                if (node.Expanded || node.ExpandingAnimation)
+                {
+                    node.ExpandingAnimation = false;
+                    node.CollapsingAnimation = true;
+                    node.AnimatedChildCount = node.Children.Count;
+                }
+                else
+                {
+                    node.Expanded = true;
+                    node.CollapsingAnimation = false;
+                    node.ExpandingAnimation = true;
+                    node.AnimatedChildCount = 0;
+                }
                 Render();
                 return;
             }
@@ -106,6 +125,7 @@ namespace CMLeonOS.Gui.UILib
             DrawRectangle(0, 0, Width, Height, Border);
 
             BuildVisibleNodes();
+            bool hasAnimation = false;
 
             int maxRows = Math.Min(visibleNodes.Count, Math.Max(0, Height / RowHeight));
             for (int i = 0; i < maxRows; i++)
@@ -124,7 +144,7 @@ namespace CMLeonOS.Gui.UILib
                 {
                     DrawRectangle(indentX, rowY + 6, 10, 10, Border);
                     DrawHorizontalLine(6, indentX + 2, rowY + 11, Foreground);
-                    if (!node.Expanded)
+                    if (!node.Expanded || node.CollapsingAnimation)
                     {
                         DrawVerticalLine(6, indentX + 5, rowY + 8, Foreground);
                     }
@@ -134,7 +154,46 @@ namespace CMLeonOS.Gui.UILib
                 DrawString(node.Text, Foreground, textX, rowY + 3);
             }
 
+            UpdateNodeAnimations(Nodes, ref hasAnimation);
+
+            if (hasAnimation)
+            {
+                WM.UpdateQueue.Enqueue(this);
+            }
+
             WM.Update(this);
+        }
+
+        private void UpdateNodeAnimations(List<TreeNode> nodes, ref bool hasAnimation)
+        {
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                TreeNode node = nodes[i];
+
+                if (node.ExpandingAnimation)
+                {
+                    hasAnimation = true;
+                    node.AnimatedChildCount++;
+                    if (node.AnimatedChildCount >= node.Children.Count)
+                    {
+                        node.AnimatedChildCount = node.Children.Count;
+                        node.ExpandingAnimation = false;
+                    }
+                }
+                else if (node.CollapsingAnimation)
+                {
+                    hasAnimation = true;
+                    node.AnimatedChildCount--;
+                    if (node.AnimatedChildCount <= 0)
+                    {
+                        node.AnimatedChildCount = 0;
+                        node.CollapsingAnimation = false;
+                        node.Expanded = false;
+                    }
+                }
+
+                UpdateNodeAnimations(node.Children, ref hasAnimation);
+            }
         }
     }
 }

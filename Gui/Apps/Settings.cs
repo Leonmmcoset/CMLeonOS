@@ -164,6 +164,14 @@ namespace CMLeonOS.Gui.Apps
             SettingsManager.GUI_MouseSensitivity = value;
         }
 
+        private void ThemeChanged(int index, string themeName)
+        {
+            SettingsManager.GUI_Theme = themeName;
+            UITheme.ApplyTheme(themeName);
+            UITheme.RefreshOpenWindows(wm);
+            ShowAppearanceCategory();
+        }
+
         private void ShowAppearanceCategory()
         {
             if (currentCategoryWindow != null)
@@ -193,16 +201,36 @@ namespace CMLeonOS.Gui.Apps
             skipToGui.CheckBoxChanged = SkipToGuiChanged;
             wm.AddWindow(skipToGui);
 
-            appearance.DrawString("Wallpaper", Color.Gray, 12, 132);
-            appearance.DrawString(GetWallpaperLabel(), Color.Black, 12, 152);
-            appearance.DrawString("Use a BMP file or restore the default wallpaper.", Color.Gray, 12, 170);
+            appearance.DrawString("Theme", Color.Gray, 12, 126);
 
-            Button chooseWallpaper = new Button(appearance, 12, 192, 132, 24);
+            Dropdown themeDropdown = new Dropdown(appearance, 12, 146, 180, 24);
+            string[] themes = UITheme.GetThemeNames();
+            for (int i = 0; i < themes.Length; i++)
+            {
+                themeDropdown.Items.Add(themes[i]);
+            }
+            themeDropdown.RefreshItems();
+            for (int i = 0; i < themes.Length; i++)
+            {
+                if (themes[i] == SettingsManager.GUI_Theme)
+                {
+                    themeDropdown.SelectedIndex = i;
+                    break;
+                }
+            }
+            themeDropdown.SelectionChanged = ThemeChanged;
+            wm.AddWindow(themeDropdown);
+
+            appearance.DrawString("Wallpaper", Color.Gray, 12, 184);
+            appearance.DrawString(GetWallpaperLabel(), Color.Black, 12, 204);
+            appearance.DrawString("Use a BMP file or restore the default wallpaper.", Color.Gray, 12, 222);
+
+            Button chooseWallpaper = new Button(appearance, 12, 244, 132, 24);
             chooseWallpaper.Text = "Choose BMP";
             chooseWallpaper.OnClick = (_, _) => OpenWallpaperBrowser();
             wm.AddWindow(chooseWallpaper);
 
-            Button defaultWallpaper = new Button(appearance, 154, 192, 132, 24);
+            Button defaultWallpaper = new Button(appearance, 154, 244, 132, 24);
             defaultWallpaper.Text = "Use Default";
             defaultWallpaper.OnClick = (_, _) => ApplyWallpaper(string.Empty);
             wm.AddWindow(defaultWallpaper);

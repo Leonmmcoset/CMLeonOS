@@ -357,5 +357,11 @@ namespace CMLeonOS.Gui.UILib
             }
             wm.Update(decorationWindow);
         }
+
+        internal void RefreshTheme()
+        {
+            wm.Update(this);
+            RenderDecoration();
+        }
     }
 }
