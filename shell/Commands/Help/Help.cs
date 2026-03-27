@@ -87,6 +87,18 @@ namespace CMLeonOS.Commands
             },
             new CommandInfo
             {
+                Command = "exporttestexe",
+                Parameters = "<output>",
+                Description = "Export test.exe to specified path"
+            },
+            new CommandInfo
+            {
+                Command = "exportbackground",
+                Parameters = "<output>",
+                Description = "Export background to specified path"
+            },
+            new CommandInfo
+            {
                 Command = "calcgui",
                 Parameters = "",
                 Description = "TUI calculator"

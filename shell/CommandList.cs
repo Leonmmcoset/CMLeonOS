@@ -239,6 +239,9 @@ namespace CMLeonOS.shell
                 case "markit":
                     shell.ProcessMarkit(args);
                     break;
+                case "runbin":
+                    shell.ProcessRunbin(args);
+                    break;
                 case "femboy":
                     shell.ProcessFemboy();
                     break;
@@ -256,6 +259,9 @@ namespace CMLeonOS.shell
                     break;
                 case "exportbackground":
                     shell.ProcessExportBackground(args);
+                    break;
+                case "exporttestexe":
+                    shell.ProcessExportTestExe(args);
                     break;
                 default:
                     shell.ShowError($"Unknown command: {command}");

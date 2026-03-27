@@ -764,6 +764,24 @@ branswe <file>
 branswe script.brs
 ```
 
+### runbin
+运行 MSE 二进制程序文件（由 ManagedSoftwareExecution 执行）。
+
+**用法：**
+```bash
+runbin <file>
+```
+
+**示例：**
+```bash
+runbin 0:\apps\demo.bin
+```
+
+**说明：**
+- `runbin` 会读取指定二进制文件并按指令逐条执行
+- 当前内置 3 个系统调用（syscall 0/1/2）
+- 详细 syscall 规范见 [Syscall 文档](/syscall.html)
+
 ## 实用工具命令
 
 ### calc
@@ -855,6 +873,26 @@ exportbackground 0:\mywallpaper.bmp
 **说明：**
 - 如果不指定输出路径，默认导出到 0:\background.bmp
 - 导出的壁纸为BMP格式
+
+
+### exporttestexe
+导出测试可执行文件到指定路径。
+
+**用法：**
+```bash
+exporttestexe [output_path]
+```
+
+**示例：**
+```bash
+exporttestexe
+exporttestexe 0:\test.exe
+```
+
+**说明：**
+- 如果不指定输出路径，默认导出到 0:\test.exe
+- 导出的可执行文件为MSE格式
+
 
 ### beep
 播放系统提示音。

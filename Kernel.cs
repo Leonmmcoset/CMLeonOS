@@ -29,6 +29,7 @@ using Cosmos.System.Graphics.Fonts;
 using Cosmos.System.Network.Config;
 using Cosmos.System.Network.IPv4;
 using Cosmos.System.Network.IPv4.UDP.DHCP;
+using Cosmos.System.Emulation;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -144,6 +145,11 @@ namespace CMLeonOS
                 UserSystem.Initialize();
                 userSystem = new UserSystem();
                 _logger.Success("Kernel", "User system initialized");
+
+                // 初始化指令集
+                _logger.Info("Kernel", "Initializing instruction set");
+                FGMSECInstructionSet.Install();
+                _logger.Success("Kernel", "Instruction set initialized");
                 
                 // 读取 Git Commit hash
                 if (gitCommitFile != null && gitCommitFile.Length > 0)
@@ -310,7 +316,7 @@ namespace CMLeonOS
                 }
                 else{
                     Console.Clear();
-                    Console.BackgroundColor = ConsoleColor.Red;
+                    Console.BackgroundColor = ConsoleColor.Blue;
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.Clear();
                     Console.Beep();

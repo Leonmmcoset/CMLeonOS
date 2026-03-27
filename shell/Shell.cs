@@ -427,6 +427,7 @@ namespace CMLeonOS
                 "ping", "wget", "ftp", "tcpserver", "tcpclient", "lua", "lua2cla", "cla",
                 "branswe", "beep", "env", "whoami", "uptime", "alias",
                 "unalias", "base64", "testgui", "ps", "kill", "hex", "exportbackground", "logs"
+                , "runbin"
             };
         }
 
@@ -1106,6 +1107,11 @@ namespace CMLeonOS
         public void ProcessMarkit(string args)
         {
             Commands.MarkitCommand.Execute(args, this, fileSystem);
+        }
+
+        public void ProcessRunbin(string args)
+        {
+            Commands.Script.RunbinCommand.Execute(args, fileSystem, ShowError);
         }
 
         public void CreateFTP()
@@ -1841,6 +1847,11 @@ namespace CMLeonOS
             {
                 ShowError($"DNS lookup error: {ex.Message}");
             }
+        }
+        
+        public void ProcessExportTestExe(string args)
+        {
+            Commands.ExportTestExeCommand.ExportTestExe(args);
         }
     }
 }
