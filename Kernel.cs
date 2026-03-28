@@ -357,27 +357,37 @@ namespace CMLeonOS
         {
             // 在显示 Boot Menu 之前初始化系统（VFS、用户系统等）
             InitializeSystem();
-            
-            BootMenuAction bootAction = BootMenu.Show();
 
-            switch (bootAction)
+            while (true)
             {
-                case BootMenuAction.Reboot:
-                    Sys.Power.Reboot();
-                    break;
-                case BootMenuAction.Shutdown:
-                    Sys.Power.Shutdown();
-                    break;
-                case BootMenuAction.GuiBoot:
-                    Console.Clear();
-                    Console.WriteLine("Starting GUI...");
-                    Console.WriteLine();
-                    Gui.Gui.StartGui();
-                    // GUI 启动后会阻塞在这里，直到 GUI 退出
-                    return;
-                case BootMenuAction.NormalBoot:
-                default:
-                    break;
+                BootMenuAction bootAction = BootMenu.Show();
+
+                switch (bootAction)
+                {
+                    case BootMenuAction.Reboot:
+                        Sys.Power.Reboot();
+                        return;
+                    case BootMenuAction.Shutdown:
+                        Sys.Power.Shutdown();
+                        return;
+                    case BootMenuAction.GuiBoot:
+                        Console.Clear();
+                        Console.WriteLine("Starting GUI...");
+                        Console.WriteLine();
+                        if (Gui.Gui.StartGui())
+                        {
+                            // GUI 启动后会阻塞在这里，直到 GUI 退出
+                            return;
+                        }
+
+                        // 低内存提示选择“返回 BootMenu”时会回到这里继续循环
+                        continue;
+                    case BootMenuAction.NormalBoot:
+                    default:
+                        break;
+                }
+
+                break;
             }
 
             Console.Clear();
