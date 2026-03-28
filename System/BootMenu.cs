@@ -33,46 +33,111 @@ namespace CMLeonOS
 
     internal static class BootMenu
     {
+        private const int MinPanelWidth = 58;
+        private const int MaxPanelWidth = 86;
+
         private static bool UserDatExists()
         {
             return File.Exists(@"0:\system\user.dat");
         }
-        private static void PrintOption(string text, bool selected)
+
+        private static string FitText(string text, int width)
         {
-            Console.SetCursorPosition(1, Console.GetCursorPosition().Top);
+            if (string.IsNullOrEmpty(text))
+            {
+                return string.Empty.PadRight(width);
+            }
 
-            Console.BackgroundColor = selected ? ConsoleColor.White : ConsoleColor.Black;
-            Console.ForegroundColor = selected ? ConsoleColor.Black : ConsoleColor.White;
+            if (text.Length > width)
+            {
+                if (width <= 3)
+                {
+                    return text.Substring(0, width);
+                }
+                return text.Substring(0, width - 3) + "...";
+            }
 
-            Console.WriteLine(text);
+            return text.PadRight(width);
+        }
+
+        private static void WriteAt(int x, int y, string text, ConsoleColor fg, ConsoleColor bg)
+        {
+            if (y < 0 || y >= Console.WindowHeight)
+            {
+                return;
+            }
+
+            Console.SetCursorPosition(Math.Max(0, x), y);
+            Console.ForegroundColor = fg;
+            Console.BackgroundColor = bg;
+            Console.Write(text);
+        }
+
+        private static void DrawPanelLine(int left, int top, int width, int row, string content, ConsoleColor contentFg, ConsoleColor contentBg)
+        {
+            int innerWidth = width - 2;
+            int y = top + row;
+
+            // Keep borders in a consistent theme color.
+            WriteAt(left, y, "|", ConsoleColor.Cyan, ConsoleColor.Black);
+            WriteAt(left + 1, y, FitText(content, innerWidth), contentFg, contentBg);
+            WriteAt(left + width - 1, y, "|", ConsoleColor.Cyan, ConsoleColor.Black);
+        }
+
+        private static void DrawHorizontalBorder(int left, int y, int width, bool topBorder, ConsoleColor fg, ConsoleColor bg)
+        {
+            string mid = new string('-', width - 2);
+            string line = topBorder ? ("+" + mid + "+") : ("+" + mid + "+");
+            WriteAt(left, y, line, fg, bg);
         }
 
         private static void Render(int selIdx, int remainingTime)
         {
             Console.BackgroundColor = ConsoleColor.Black;
-            Console.ForegroundColor = ConsoleColor.Cyan;
-
-            Console.SetCursorPosition(0, 0);
-
-            uint mem = Cosmos.Core.CPU.GetAmountOfRAM();
-            Console.WriteLine($"{Version.DisplayVersion} [{mem} MB memory]");
-            Console.WriteLine($"Build Time: {GetBuildTime()}");
-            Console.WriteLine();
-            Console.WriteLine($"Auto-select in {remainingTime} seconds...");
-            Console.WriteLine();
-            Console.WriteLine("Select an option:");
-            Console.WriteLine();
+            Console.ForegroundColor = ConsoleColor.White;
 
             bool userDatExists = UserDatExists();
-            int optionIndex = 0;
+            string[] options = userDatExists
+                ? new[] { "CMLeonOS Shell", "CMLeonOS Desktop", "Reboot", "Shutdown" }
+                : new[] { "CMLeonOS Shell", "Reboot", "Shutdown" };
 
-            PrintOption("CMLeonOS (Shell)", selIdx == optionIndex++);
-            if (userDatExists)
+            int width = Console.WindowWidth;
+            int height = Console.WindowHeight;
+            int panelWidth = Math.Min(MaxPanelWidth, Math.Max(MinPanelWidth, width - 8));
+            int panelLeft = Math.Max(0, (width - panelWidth) / 2);
+            int contentLines = 9 + options.Length;
+            int panelTop = Math.Max(0, (height - contentLines) / 2);
+
+            DrawHorizontalBorder(panelLeft, panelTop, panelWidth, true, ConsoleColor.Cyan, ConsoleColor.Black);
+            DrawPanelLine(panelLeft, panelTop, panelWidth, 1, " CMLeonOS Boot Manager ", ConsoleColor.Black, ConsoleColor.Cyan);
+            DrawPanelLine(panelLeft, panelTop, panelWidth, 2, string.Empty, ConsoleColor.White, ConsoleColor.Black);
+
+            uint mem = CPU.GetAmountOfRAM();
+            DrawPanelLine(panelLeft, panelTop, panelWidth, 3, $" Version : {Version.DisplayVersion}", ConsoleColor.Gray, ConsoleColor.Black);
+            DrawPanelLine(panelLeft, panelTop, panelWidth, 4, $" Memory  : {mem} MB", ConsoleColor.Gray, ConsoleColor.Black);
+            DrawPanelLine(panelLeft, panelTop, panelWidth, 5, $" Build   : {GetBuildTime()}", ConsoleColor.DarkGray, ConsoleColor.Black);
+            DrawPanelLine(panelLeft, panelTop, panelWidth, 6, string.Empty, ConsoleColor.White, ConsoleColor.Black);
+            DrawPanelLine(panelLeft, panelTop, panelWidth, 7, $" Auto boot in {remainingTime}s", ConsoleColor.Yellow, ConsoleColor.Black);
+            DrawPanelLine(panelLeft, panelTop, panelWidth, 8, " Use Up/Down to select, Enter to boot", ConsoleColor.DarkGray, ConsoleColor.Black);
+
+            for (int i = 0; i < options.Length; i++)
             {
-                PrintOption("CMLeonOS (Desktop)", selIdx == optionIndex++);
+                bool selected = i == selIdx;
+                string prefix = selected ? " > " : "   ";
+                string text = prefix + options[i];
+                DrawPanelLine(
+                    panelLeft,
+                    panelTop,
+                    panelWidth,
+                    9 + i,
+                    text,
+                    selected ? ConsoleColor.Black : ConsoleColor.White,
+                    selected ? ConsoleColor.White : ConsoleColor.Black
+                );
             }
-            PrintOption("Reboot", selIdx == optionIndex++);
-            PrintOption("Shutdown", selIdx == optionIndex++);
+
+            DrawHorizontalBorder(panelLeft, panelTop + contentLines, panelWidth, false, ConsoleColor.Cyan, ConsoleColor.Black);
+            Console.ResetColor();
         }
 
         private static BootMenuAction Confirm(int selIdx)

@@ -202,7 +202,7 @@ namespace CMLeonOS
             return extension switch
             {
                 // 这是一堆后缀名的颜色标注，但是许多后缀名还不支持，先保留
-                ".exe" => ConsoleColor.Green,
+                ".bin" => ConsoleColor.Green,
                 ".cla" => ConsoleColor.Green,
                 ".lua" => ConsoleColor.Cyan,
                 ".js" => ConsoleColor.Cyan,

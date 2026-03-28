@@ -22,7 +22,7 @@ namespace CMLeonOS.Commands
 {
     public static class ExportTestExeCommand
     {
-        [ManifestResourceStream(ResourceName = "CMLeonOS.sh.exe")]
+        [ManifestResourceStream(ResourceName = "CMLeonOS.sh.bin")]
         private static byte[] testExeBytes;
 
         public static void ExportTestExe(string outputPath)
@@ -31,18 +31,18 @@ namespace CMLeonOS.Commands
             {
                 if (testExeBytes == null || testExeBytes.Length == 0)
                 {
-                    Console.WriteLine("Error: No test.exe found in embedded resources.");
+                    Console.WriteLine("Error: No test.bin found in embedded resources.");
                     return;
                 }
 
-                string destinationPath = string.IsNullOrEmpty(outputPath) ? @"0:\test.exe" : outputPath;
+                string destinationPath = string.IsNullOrEmpty(outputPath) ? @"0:\test.bin" : outputPath;
 
                 File.WriteAllBytes(destinationPath, testExeBytes);
-                Console.WriteLine($"Test.exe exported successfully to: {destinationPath}");
+                Console.WriteLine($"Test.bin exported successfully to: {destinationPath}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error exporting test.exe: {ex.Message}");
+                Console.WriteLine($"Error exporting test.bin: {ex.Message}");
             }
         }
     }

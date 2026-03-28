@@ -135,7 +135,7 @@
       <EmbeddedResource Include="Gui\Resources\Wallpaper_1280_800.bmp" />
         <EmbeddedResource Include="GitCommit.txt" />
         <EmbeddedResource Include="BuildTime.txt" />
-        <EmbeddedResource Include="sh.exe" />
+        <EmbeddedResource Include="sh.bin" />
         <EmbeddedResource Include="LuaApps\*.lua" />
     </ItemGroup>
 
