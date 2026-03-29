@@ -97,6 +97,10 @@ namespace CMLeonOS
         
         private void InitializeSystem()
         {
+            // 修改VGA Text Mode字体样式（使用Spleen）
+            PCScreenFont font = PCScreenFont.Default;
+            VGAScreen.SetFont(font.CreateVGAFont(), font.Height);
+
             // 修改光标样式
             _logger.Info("Kernel", "Setting cursor size to 100");
             Console.CursorSize = 100;
