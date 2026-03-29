@@ -250,6 +250,10 @@ namespace CMLeonOS.Gui.Apps
                         {
                             ProcessManager.AddProcess(this, new MarkItViewer(path)).Start();
                         }
+                        else if (extension == ".mus")
+                        {
+                            ProcessManager.AddProcess(this, new MusicEditor(path)).Start();
+                        }
                         else
                         {
                             ShowOpenWithPrompt(path);
@@ -278,6 +282,9 @@ namespace CMLeonOS.Gui.Apps
                     break;
                 case "MarkIt Viewer":
                     ProcessManager.AddProcess(this, new MarkItViewer(path)).Start();
+                    break;
+                case "Music Editor":
+                    ProcessManager.AddProcess(this, new MusicEditor(path)).Start();
                     break;
                 default:
                     Logger.Logger.Instance.Warning("Files", $"Unsupported open-with app: {appName}");
@@ -332,6 +339,15 @@ namespace CMLeonOS.Gui.Apps
                 OpenWithApp(path, "MarkIt Viewer");
             };
             wm.AddWindow(markItButton);
+
+            Button musicButton = new Button(openWithWindow, 108, 98, 84, 24);
+            musicButton.Text = "Music";
+            musicButton.OnClick = (_, _) =>
+            {
+                wm.RemoveWindow(openWithWindow);
+                OpenWithApp(path, "Music Editor");
+            };
+            wm.AddWindow(musicButton);
 
             Button cancelButton = new Button(openWithWindow, openWithWindow.Width - 80 - 12, openWithWindow.Height - 20 - 12, 80, 20);
             cancelButton.Text = "Cancel";

@@ -141,6 +141,7 @@ namespace CMLeonOS.Gui
             RegisterApp(new AppMetadata("MarkIt Viewer", () => { return new MarkItViewer(); }, Icons.Icon_Default, Color.FromArgb(25, 25, 25)));
             RegisterApp(new AppMetadata("Environment Variables", () => { return new EnvironmentVariables(); }, Icons.Icon_Default, Color.FromArgb(25, 25, 25)));
             RegisterApp(new AppMetadata("UILib Gallery", () => { return new UILibGallery(); }, Icons.Icon_Default, Color.FromArgb(25, 25, 25)));
+            RegisterApp(new AppMetadata("Music Editor", () => { return new MusicEditor(); }, Icons.Icon_Default, Color.FromArgb(25, 25, 25)));
 
             Logger.Logger.Instance.Info("AppManager", $"{AppMetadatas.Count} apps were registered.");
 

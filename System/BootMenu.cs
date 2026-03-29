@@ -105,8 +105,9 @@ namespace CMLeonOS
             int height = Console.WindowHeight;
             int panelWidth = Math.Min(MaxPanelWidth, Math.Max(MinPanelWidth, width - 8));
             int panelLeft = Math.Max(0, (width - panelWidth) / 2);
-            int contentLines = 9 + options.Length;
-            int panelTop = Math.Max(0, (height - contentLines) / 2);
+            int contentLineCount = 8 + options.Length;
+            int panelHeight = contentLineCount + 2;
+            int panelTop = Math.Max(0, (height - panelHeight) / 2);
 
             DrawHorizontalBorder(panelLeft, panelTop, panelWidth, true, ConsoleColor.Cyan, ConsoleColor.Black);
             DrawPanelLine(panelLeft, panelTop, panelWidth, 1, " CMLeonOS Boot Manager ", ConsoleColor.Black, ConsoleColor.Cyan);
@@ -136,7 +137,7 @@ namespace CMLeonOS
                 );
             }
 
-            DrawHorizontalBorder(panelLeft, panelTop + contentLines, panelWidth, false, ConsoleColor.Cyan, ConsoleColor.Black);
+            DrawHorizontalBorder(panelLeft, panelTop + panelHeight - 1, panelWidth, false, ConsoleColor.Cyan, ConsoleColor.Black);
             Console.ResetColor();
         }
 
