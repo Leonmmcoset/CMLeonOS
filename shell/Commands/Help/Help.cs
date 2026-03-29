@@ -51,6 +51,18 @@ namespace CMLeonOS.Commands
             },
             new CommandInfo
             {
+                Command = "clear",
+                Parameters = "",
+                Description = "Clear screen"
+            },
+            new CommandInfo
+            {
+                Command = "cls",
+                Parameters = "",
+                Description = "Clear screen"
+            },
+            new CommandInfo
+            {
                 Command = "restart",
                 Parameters = "",
                 Description = "Restart system"
@@ -87,6 +99,12 @@ namespace CMLeonOS.Commands
             },
             new CommandInfo
             {
+                Command = "cal",
+                Parameters = "[year] [month]",
+                Description = "Show calendar"
+            },
+            new CommandInfo
+            {
                 Command = "exporttestexe",
                 Parameters = "<output>",
                 Description = "Export test.exe to specified path"
@@ -108,6 +126,12 @@ namespace CMLeonOS.Commands
                 Command = "history",
                 Parameters = "",
                 Description = "Show command history"
+            },
+            new CommandInfo
+            {
+                Command = "sleep",
+                Parameters = "<seconds>",
+                Description = "Sleep for specified seconds"
             },
             new CommandInfo
             {
@@ -139,6 +163,12 @@ namespace CMLeonOS.Commands
                 Parameters = "<file>",
                 Description = "Simple code editor",
                 SubCommands = new[] { new SubCommandInfo { Command = "", Description = "Tab key inserts 4 spaces" } }
+            },
+            new CommandInfo
+            {
+                Command = "nano",
+                Parameters = "<file>",
+                Description = "Open Nano editor"
             },
             new CommandInfo
             {
@@ -228,6 +258,12 @@ namespace CMLeonOS.Commands
             },
             new CommandInfo
             {
+                Command = "rename",
+                Parameters = "<old> <new>",
+                Description = "Rename file or directory"
+            },
+            new CommandInfo
+            {
                 Command = "touch",
                 Parameters = "<file>",
                 Description = "Create empty file"
@@ -237,6 +273,18 @@ namespace CMLeonOS.Commands
                 Command = "find",
                 Parameters = "<name>",
                 Description = "Find file"
+            },
+            new CommandInfo
+            {
+                Command = "tree",
+                Parameters = "[dir]",
+                Description = "Show directory tree"
+            },
+            new CommandInfo
+            {
+                Command = "tuitree",
+                Parameters = "[dir]",
+                Description = "Show TUI tree view"
             },
             new CommandInfo
             {
@@ -313,6 +361,18 @@ namespace CMLeonOS.Commands
             },
             new CommandInfo
             {
+                Command = "diff",
+                Parameters = "<file1> <file2>",
+                Description = "Compare two files"
+            },
+            new CommandInfo
+            {
+                Command = "com",
+                Parameters = "<file>",
+                Description = "Execute command script file"
+            },
+            new CommandInfo
+            {
                 Command = "branswe",
                 Parameters = "<filename>",
                 Description = "Execute Branswe code file"
@@ -328,6 +388,18 @@ namespace CMLeonOS.Commands
                 Command = "hex",
                 Parameters = "<filename>",
                 Description = "Hexadecimal file editor"
+            },
+            new CommandInfo
+            {
+                Command = "markit",
+                Parameters = "<file.mi>",
+                Description = "Open MarkIt document in shell renderer"
+            },
+            new CommandInfo
+            {
+                Command = "runbin",
+                Parameters = "<file>",
+                Description = "Run MSE binary file"
             },
             new CommandInfo
             {
@@ -382,6 +454,12 @@ namespace CMLeonOS.Commands
                 Command = "whoami",
                 Parameters = "",
                 Description = "Show current username"
+            },
+            new CommandInfo
+            {
+                Command = "hostname",
+                Parameters = "[new_name]",
+                Description = "Show or set hostname"
             },
             new CommandInfo
             {
@@ -451,6 +529,30 @@ namespace CMLeonOS.Commands
                 Parameters = "<page>",
                 Description = "Show help page (1-5)",
                 SubCommands = new[] { new SubCommandInfo { Command = "help all", Description = "Show all help pages" } }
+            },
+            new CommandInfo
+            {
+                Command = "ftp",
+                Parameters = "",
+                Description = "Start FTP service"
+            },
+            new CommandInfo
+            {
+                Command = "logs",
+                Parameters = "",
+                Description = "Show system logs"
+            },
+            new CommandInfo
+            {
+                Command = "testgui",
+                Parameters = "",
+                Description = "Run GUI test"
+            },
+            new CommandInfo
+            {
+                Command = "testtui",
+                Parameters = "",
+                Description = "Run TUI test"
             }
         };
 
