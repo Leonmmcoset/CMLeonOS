@@ -190,16 +190,40 @@ namespace CMLeonOS.Gui.Apps
         private void ShowProgressDemo()
         {
             ClearPreview();
-            SetHeader("ProgressRing", "Animated busy indicator for indeterminate loading states.");
+            SetHeader("Progress", "ProgressRing for indeterminate state and ProgressBar for determinate tasks.");
 
             ProgressRing ring = new ProgressRing(previewHost, 24, 24, 56, 56);
             ring.Active = true;
             AddDemo(ring);
 
-            TextBlock hint = new TextBlock(previewHost, 100, 38, 320, 24);
+            TextBlock hint = new TextBlock(previewHost, 100, 20, 380, 24);
             hint.Text = "ProgressRing keeps animating while Active=true.";
             hint.Foreground = UITheme.TextSecondary;
             AddDemo(hint);
+
+            ProgressBar bar = new ProgressBar(previewHost, 100, 56, 320, 24);
+            bar.Minimum = 0;
+            bar.Maximum = 100;
+            bar.Value = 36;
+            AddDemo(bar);
+
+            Button minus = new Button(previewHost, 100, 90, 28, 24);
+            minus.Text = "-";
+            minus.OnClick = (_, _) =>
+            {
+                bar.Value -= 10f;
+                SetHeader("Progress", "ProgressBar: " + ((int)(bar.GetPercent() * 100f)).ToString() + "%");
+            };
+            AddDemo(minus);
+
+            Button plus = new Button(previewHost, 136, 90, 28, 24);
+            plus.Text = "+";
+            plus.OnClick = (_, _) =>
+            {
+                bar.Value += 10f;
+                SetHeader("Progress", "ProgressBar: " + ((int)(bar.GetPercent() * 100f)).ToString() + "%");
+            };
+            AddDemo(plus);
         }
 
         private void ShowTableDemo()
