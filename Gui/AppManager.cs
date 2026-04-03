@@ -144,6 +144,8 @@ namespace CMLeonOS.Gui
             RegisterApp(new AppMetadata("Music Editor", () => { return new MusicEditor(); }, Icons.Icon_Default, Color.FromArgb(25, 25, 25)));
             RegisterApp(new AppMetadata("Function Grapher", () => { return new FunctionGrapher(); }, Icons.Icon_Default, Color.FromArgb(25, 25, 25)));
             RegisterApp(new AppMetadata("CodeBlocks", () => { return new CodeBlocks(); }, Icons.Icon_Default, Color.FromArgb(25, 25, 25)));
+            RegisterApp(new AppMetadata("Contacts", () => { return new Contacts(); }, Icons.Icon_Default, Color.FromArgb(25, 25, 25)));
+            RegisterApp(new AppMetadata("Sheet Editor", () => { return new SheetEditor(); }, Icons.Icon_Default, Color.FromArgb(25, 25, 25)));
 
             Logger.Logger.Instance.Info("AppManager", $"{AppMetadatas.Count} apps were registered.");
 
