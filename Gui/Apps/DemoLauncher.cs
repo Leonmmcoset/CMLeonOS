@@ -48,6 +48,8 @@ namespace CMLeonOS.Gui.Apps
         {
             new AppMetadata("Starfield", () => { return new Apps.Demos.Starfield(); }, Icons.Icon_Starfield, Color.Black ),
             new AppMetadata("Mandelbrot", () => { return new Apps.Demos.Mandelbrot(); }, Icons.Icon_Mandelbrot, Color.Black ),
+            new AppMetadata("Cube3D (OSGD)", () => { return new Apps.Demos.Cube3D(); }, AppManager.DefaultAppIcon, Color.Black ),
+            new AppMetadata("Pyramid3D (OSGD)", () => { return new Apps.Demos.Pyramid3D(); }, AppManager.DefaultAppIcon, Color.Black ),
         };
 
         private const string message = "Demo Launcher";
