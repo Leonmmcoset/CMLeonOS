@@ -148,6 +148,7 @@ namespace CMLeonOS.Gui
             RegisterApp(new AppMetadata("Notes", () => { return new Notes(); }, Icons.Icon_Default, Color.FromArgb(25, 25, 25)));
             RegisterApp(new AppMetadata("Sheet Editor", () => { return new SheetEditor(); }, Icons.Icon_Default, Color.FromArgb(25, 25, 25)));
             RegisterApp(new AppMetadata("Tetris", () => { return new Tetris(); }, Icons.Icon_Default, Color.FromArgb(25, 25, 25)));
+            RegisterApp(new AppMetadata("Ping Pong", () => { return new PingPong(); }, Icons.Icon_Default, Color.FromArgb(25, 25, 25)));
 
             Logger.Logger.Instance.Info("AppManager", $"{AppMetadatas.Count} apps were registered.");
 
