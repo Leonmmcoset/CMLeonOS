@@ -150,6 +150,7 @@ namespace CMLeonOS.Gui.UILib
 
         private bool maximised = false;
         private bool closeAnimationRunning = false;
+        private bool resizeAnimationRunning = false;
         private int originalX;
         private int originalY;
         private int originalWidth;
@@ -197,7 +198,7 @@ namespace CMLeonOS.Gui.UILib
 
         private void StartCloseAnimation()
         {
-            if (closeAnimationRunning)
+            if (closeAnimationRunning || resizeAnimationRunning)
             {
                 return;
             }
@@ -227,9 +228,85 @@ namespace CMLeonOS.Gui.UILib
             animation.Start();
         }
 
+        private Rectangle GetMaximizedBounds()
+        {
+            var taskbar = ProcessManager.GetProcess<ShellComponents.Taskbar>();
+            int taskbarHeight = taskbar.GetTaskbarHeight();
+
+            var dock = ProcessManager.GetProcess<ShellComponents.Dock.Dock>();
+            int dockHeight = dock.GetDockHeight();
+
+            return new Rectangle(
+                0,
+                taskbarHeight + titlebarHeight,
+                (int)wm.ScreenWidth,
+                (int)wm.ScreenHeight - titlebarHeight - taskbarHeight - dockHeight
+            );
+        }
+
+        private void StartResizeAnimation(Rectangle targetBounds)
+        {
+            if (resizeAnimationRunning)
+            {
+                return;
+            }
+
+            resizeAnimationRunning = true;
+
+            Rectangle startWindow = new Rectangle(X, Y, Width, Height);
+            Rectangle startDecoration = new Rectangle(decorationWindow.X, decorationWindow.Y, decorationWindow.Width, decorationWindow.Height);
+            Rectangle targetDecoration = new Rectangle(0, -titlebarHeight, targetBounds.Width, titlebarHeight);
+
+            int completedCount = 0;
+            Action finish = () =>
+            {
+                completedCount++;
+                if (completedCount < 2)
+                {
+                    return;
+                }
+
+                MoveAndResize(targetBounds.X, targetBounds.Y, targetBounds.Width, targetBounds.Height, sendWMEvent: false);
+                decorationWindow.MoveAndResize(targetDecoration.X, targetDecoration.Y, targetDecoration.Width, targetDecoration.Height, sendWMEvent: false);
+
+                resizeAnimationRunning = false;
+                UserResized?.Invoke();
+                RefreshWindowTree();
+                ProcessManager.GetProcess<WindowManager>().RerenderAll();
+            };
+
+            MovementAnimation windowAnimation = new MovementAnimation(this)
+            {
+                From = startWindow,
+                To = targetBounds,
+                Duration = 14,
+                EasingType = EasingType.Sine,
+                EasingDirection = EasingDirection.Out,
+                Completed = finish
+            };
+            windowAnimation.Advanced = () =>
+            {
+                UserResized?.Invoke();
+                RefreshWindowTree();
+            };
+
+            MovementAnimation decorationAnimation = new MovementAnimation(decorationWindow)
+            {
+                From = startDecoration,
+                To = targetDecoration,
+                Duration = 14,
+                EasingType = EasingType.Sine,
+                EasingDirection = EasingDirection.Out,
+                Completed = finish
+            };
+
+            windowAnimation.Start();
+            decorationAnimation.Start();
+        }
+
         private void DecorationClicked(int x, int y)
         {
-            if (closeAnimationRunning)
+            if (closeAnimationRunning || resizeAnimationRunning)
             {
                 return;
             }
@@ -245,41 +322,17 @@ namespace CMLeonOS.Gui.UILib
                 if (maximised)
                 {
                     maximised = false;
-
-                    MoveAndResize(originalX, originalY, originalWidth, originalHeight, sendWMEvent: false);
-
-                    decorationWindow.Resize(originalWidth, titlebarHeight, sendWMEvent: false);
-
-                    UserResized?.Invoke();
-                    ProcessManager.GetProcess<WindowManager>().RerenderAll();
+                    StartResizeAnimation(new Rectangle(originalX, originalY, originalWidth, originalHeight));
                 }
                 else
                 {
                     maximised = true;
 
-                    var taskbar = ProcessManager.GetProcess<ShellComponents.Taskbar>();
-                    int taskbarHeight = taskbar.GetTaskbarHeight();
-
-                    var dock = ProcessManager.GetProcess<ShellComponents.Dock.Dock>();
-                    int dockHeight = dock.GetDockHeight();
-
                     originalX = X;
                     originalY = Y;
                     originalWidth = Width;
                     originalHeight = Height;
-
-                    MoveAndResize(
-                        0,
-                        taskbarHeight + titlebarHeight,
-                        (int)wm.ScreenWidth,
-                        (int)wm.ScreenHeight - titlebarHeight - taskbarHeight - dockHeight,
-                        sendWMEvent: false
-                    );
-
-                    decorationWindow.Resize((int)wm.ScreenWidth, titlebarHeight, sendWMEvent: false);
-
-                    UserResized?.Invoke();
-                    ProcessManager.GetProcess<WindowManager>().RerenderAll();
+                    StartResizeAnimation(GetMaximizedBounds());
                 }
                 RenderDecoration();
             }
@@ -297,7 +350,7 @@ namespace CMLeonOS.Gui.UILib
                 buttonSpace += titlebarHeight;
             }
             if (x >= Width - buttonSpace || maximised || !_canMove) return;
-            if (closeAnimationRunning) return;
+            if (closeAnimationRunning || resizeAnimationRunning) return;
 
             uint startMouseX = MouseManager.X;
             uint startMouseY = MouseManager.Y;

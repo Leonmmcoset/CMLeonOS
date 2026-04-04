@@ -25,6 +25,7 @@ namespace CMLeonOS.UILib.Animations
     internal abstract class Animation
     {
         internal Action Completed { get; set; }
+        internal Action Advanced { get; set; }
         /// <summary>
         /// The easing type of the animation.
         /// </summary>

@@ -58,6 +58,7 @@ namespace CMLeonOS.UILib.Animations
                 {
                     control.Render();
                 }
+                Advanced?.Invoke();
             }
             else
             {
@@ -73,6 +74,7 @@ namespace CMLeonOS.UILib.Animations
                 {
                     control.Render();
                 }
+                Advanced?.Invoke();
             }
             return Finished;
         }
