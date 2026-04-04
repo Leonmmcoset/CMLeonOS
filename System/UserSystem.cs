@@ -827,6 +827,69 @@ namespace CMLeonOS
             }
         }
 
+        public bool CreateInitialAdminFromOobe(string username, string password, string hostname, out string error)
+        {
+            error = string.Empty;
+
+            username = (username ?? string.Empty).Trim();
+            password = (password ?? string.Empty).Trim();
+            hostname = (hostname ?? string.Empty).Trim();
+
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                error = "Username cannot be empty.";
+                return false;
+            }
+
+            if (ContainsInvalidChars(username))
+            {
+                error = "Username contains invalid characters.";
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                error = "Password cannot be empty.";
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(hostname))
+            {
+                error = "Hostname cannot be empty.";
+                return false;
+            }
+
+            foreach (User user in users)
+            {
+                if (user.Username.Equals(username, StringComparison.OrdinalIgnoreCase))
+                {
+                    error = "Username already exists.";
+                    return false;
+                }
+            }
+
+            try
+            {
+                User admin = new User
+                {
+                    Username = username,
+                    Password = password,
+                    IsAdmin = true,
+                    Hostname = hostname
+                };
+
+                users.Add(admin);
+                SaveUsers();
+                CreateUserFolder(username);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                error = ex.Message;
+                return false;
+            }
+        }
+
         public bool DeleteUser(string username)
         {
             Console.WriteLine("====================================");

@@ -212,8 +212,16 @@ namespace CMLeonOS.Gui
 
             Logger.Logger.Instance.Info("Gui", "Memory management service started");
 
-            Console.WriteLine("Starting lock screen...");
-            ProcessManager.AddProcess(windowManager, new ShellComponents.Lock()).Start();
+            if (!Kernel.userSystem.HasUsers)
+            {
+                Console.WriteLine("Starting OOBE...");
+                ProcessManager.AddProcess(windowManager, new ShellComponents.Oobe()).Start();
+            }
+            else
+            {
+                Console.WriteLine("Starting lock screen...");
+                ProcessManager.AddProcess(windowManager, new ShellComponents.Lock()).Start();
+            }
 
             guiRunning = true;
 

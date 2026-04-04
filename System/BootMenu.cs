@@ -96,10 +96,7 @@ namespace CMLeonOS
             Console.BackgroundColor = ConsoleColor.Black;
             Console.ForegroundColor = ConsoleColor.White;
 
-            bool userDatExists = UserDatExists();
-            string[] options = userDatExists
-                ? new[] { "CMLeonOS Shell", "CMLeonOS Desktop", "Reboot", "Shutdown" }
-                : new[] { "CMLeonOS Shell", "Reboot", "Shutdown" };
+            string[] options = new[] { "CMLeonOS Shell", "CMLeonOS Desktop", "Reboot", "Shutdown" };
 
             int width = Console.WindowWidth;
             int height = Console.WindowHeight;
@@ -152,14 +149,13 @@ namespace CMLeonOS
 
             Console.CursorVisible = true;
 
-            bool userDatExists = UserDatExists();
             int optionIndex = 0;
 
             if (selIdx == optionIndex++)
             {
                 return BootMenuAction.NormalBoot;
             }
-            if (userDatExists && selIdx == optionIndex++)
+            if (selIdx == optionIndex++)
             {
                 return BootMenuAction.GuiBoot;
             }
@@ -179,7 +175,7 @@ namespace CMLeonOS
 
         public static BootMenuAction Show()
         {
-            if (Settings.SettingsManager.SkipToGui && UserDatExists())
+            if (Settings.SettingsManager.SkipToGui)
             {
                 return BootMenuAction.GuiBoot;
             }
@@ -235,7 +231,7 @@ namespace CMLeonOS
                     }
                 }
 
-                int maxOptionIndex = UserDatExists() ? 3 : 2;
+                int maxOptionIndex = 3;
 
                 if (selIdx < 0)
                 {
