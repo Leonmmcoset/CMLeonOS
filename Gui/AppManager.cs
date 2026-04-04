@@ -145,6 +145,7 @@ namespace CMLeonOS.Gui
             RegisterApp(new AppMetadata("Function Grapher", () => { return new FunctionGrapher(); }, Icons.Icon_Default, Color.FromArgb(25, 25, 25)));
             RegisterApp(new AppMetadata("CodeBlocks", () => { return new CodeBlocks(); }, Icons.Icon_Default, Color.FromArgb(25, 25, 25)));
             RegisterApp(new AppMetadata("Contacts", () => { return new Contacts(); }, Icons.Icon_Default, Color.FromArgb(25, 25, 25)));
+            RegisterApp(new AppMetadata("Notes", () => { return new Notes(); }, Icons.Icon_Default, Color.FromArgb(25, 25, 25)));
             RegisterApp(new AppMetadata("Sheet Editor", () => { return new SheetEditor(); }, Icons.Icon_Default, Color.FromArgb(25, 25, 25)));
             RegisterApp(new AppMetadata("Tetris", () => { return new Tetris(); }, Icons.Icon_Default, Color.FromArgb(25, 25, 25)));
 
