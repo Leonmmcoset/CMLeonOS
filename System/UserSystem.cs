@@ -425,197 +425,231 @@ namespace CMLeonOS
             CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
             global::System.Console.Clear();
 
-            var termsBox = new CMLeonOS.UI.Window(new CMLeonOS.UI.Rect(5, 5, 70, 18), "User Terms and Conditions", () => { }, true);
-                termsBox.Render();
+            RenderOobeScreen("Welcome to CMLeonOS Setup", new string[]
+            {
+                "This wizard will configure your first administrator account.",
+                "Steps: Terms -> Admin User -> Hostname -> Finish.",
+                "",
+                "Press Enter to continue."
+            }, global::System.ConsoleColor.Cyan);
+            global::System.Console.ReadLine();
 
-                CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Gray, global::System.ConsoleColor.Black);
-                global::System.Console.SetCursorPosition(7, 7);
-                global::System.Console.WriteLine("1. This operating system is provided as-is without warranty");
-                global::System.Console.SetCursorPosition(7, 8);
-                global::System.Console.WriteLine("2. You are responsible for your data and backups");
-                global::System.Console.SetCursorPosition(7, 9);
-                global::System.Console.WriteLine("3. Unauthorized access attempts may be logged");
-                global::System.Console.SetCursorPosition(7, 10);
-                global::System.Console.WriteLine("4. System administrators have full access to all data");
-                global::System.Console.SetCursorPosition(7, 11);
-                global::System.Console.WriteLine("5. By using this system, you agree to these terms");
-                global::System.Console.SetCursorPosition(7, 12);
-                global::System.Console.WriteLine("6. Data privacy: Your personal data is stored locally");
-                global::System.Console.SetCursorPosition(7, 13);
-                global::System.Console.WriteLine("7. System updates may be installed automatically");
-                global::System.Console.SetCursorPosition(7, 14);
-                global::System.Console.WriteLine("8. No liability for data loss or corruption");
-                global::System.Console.SetCursorPosition(7, 15);
-                global::System.Console.WriteLine("9. Support available at: https://lbbs.ecuil.com/#/thread/category/10");
-                global::System.Console.SetCursorPosition(7, 16);
-                global::System.Console.WriteLine("10. This license is for personal use only");
-                global::System.Console.SetCursorPosition(7, 17);
-                global::System.Console.WriteLine("11. Use of this OS requires recognition of the one-China principle");
+            RenderOobeScreen("User Terms", new string[]
+            {
+                "1. This operating system is provided as-is without warranty.",
+                "2. You are responsible for your data and backups.",
+                "3. Unauthorized access attempts may be logged.",
+                "4. Administrators have full access to local data.",
+                "5. By using this system, you agree to these terms.",
+                "6. Data is stored locally on this machine.",
+                "7. Support: https://lbbs.ecuil.com/#/thread/category/10"
+            }, global::System.ConsoleColor.Cyan);
 
-                bool termsAccepted = false;
-                while (!termsAccepted)
+            if (!PromptYesNo(6, 19, "Accept terms? (yes/no): "))
+            {
+                WriteStatus(6, 21, "Terms were not accepted. Rebooting...", global::System.ConsoleColor.Red);
+                global::System.Threading.Thread.Sleep(2000);
+                Sys.Power.Reboot();
+                return;
+            }
+
+            string username = string.Empty;
+            while (true)
+            {
+                RenderOobeScreen("Create Administrator", new string[]
                 {
-                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
-                    global::System.Console.SetCursorPosition(5, 24);
-                    global::System.Console.Write("Do you accept the User Terms? (yes/no): ");
-                    string response = global::System.Console.ReadLine()?.ToLower();
+                    "Create your first admin account.",
+                    "Username cannot contain: < > : \" | ? * / \\ or space."
+                }, global::System.ConsoleColor.Cyan);
 
-                    if (response == "yes" || response == "y")
-                    {
-                        termsAccepted = true;
-                        CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Green, global::System.ConsoleColor.Black);
-                        global::System.Console.SetCursorPosition(5, 24);
-                        global::System.Console.Write("Terms accepted.                          ");
-                    }
-                    else if (response == "no" || response == "n")
-                    {
-                        CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Red, global::System.ConsoleColor.Black);
-                        global::System.Console.SetCursorPosition(5, 24);
-                        global::System.Console.Write("You must accept the User Terms to continue.");
-                        global::System.Threading.Thread.Sleep(2000);
-                        Sys.Power.Reboot();
-                    }
-                    else
-                    {
-                        CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Red, global::System.ConsoleColor.Black);
-                        global::System.Console.SetCursorPosition(5, 24);
-                        global::System.Console.Write("Invalid response. Please enter 'yes' or 'no'.");
-                    }
+                username = PromptText(6, 10, "Username: ");
+                if (string.IsNullOrWhiteSpace(username))
+                {
+                    WriteStatus(6, 21, "Username cannot be empty.", global::System.ConsoleColor.Red);
+                    global::System.Threading.Thread.Sleep(1200);
+                    continue;
+                }
+                if (ContainsInvalidChars(username))
+                {
+                    WriteStatus(6, 21, "Username contains invalid characters.", global::System.ConsoleColor.Red);
+                    global::System.Threading.Thread.Sleep(1200);
+                    continue;
+                }
+                break;
+            }
+
+            string password = string.Empty;
+            while (true)
+            {
+                RenderOobeScreen("Create Administrator", new string[]
+                {
+                    "Create your first admin account.",
+                    "Username: " + username
+                }, global::System.ConsoleColor.Cyan);
+
+                password = PromptPassword(6, 11, "Password: ");
+                string confirmPassword = PromptPassword(6, 12, "Confirm Password: ");
+
+                if (string.IsNullOrWhiteSpace(password))
+                {
+                    WriteStatus(6, 21, "Password cannot be empty.", global::System.ConsoleColor.Red);
+                    global::System.Threading.Thread.Sleep(1200);
+                    continue;
+                }
+                if (password != confirmPassword)
+                {
+                    WriteStatus(6, 21, "Passwords do not match.", global::System.ConsoleColor.Red);
+                    global::System.Threading.Thread.Sleep(1200);
+                    continue;
+                }
+                break;
+            }
+
+            string hostname = string.Empty;
+            while (true)
+            {
+                RenderOobeScreen("Device Name", new string[]
+                {
+                    "Choose a hostname for this device.",
+                    "Example: CMLEON-PC"
+                }, global::System.ConsoleColor.Cyan);
+
+                hostname = PromptText(6, 10, "Hostname: ");
+                if (string.IsNullOrWhiteSpace(hostname))
+                {
+                    WriteStatus(6, 21, "Hostname cannot be empty.", global::System.ConsoleColor.Red);
+                    global::System.Threading.Thread.Sleep(1200);
+                    continue;
+                }
+                break;
+            }
+
+            try
+            {
+                User adminUser = new User
+                {
+                    Username = username,
+                    Password = password,
+                    IsAdmin = true,
+                    Hostname = hostname
+                };
+
+                users.Add(adminUser);
+                SaveUsers();
+
+                RenderOobeScreen("Setup Complete", new string[]
+                {
+                    "Administrator account created successfully.",
+                    "User: " + username,
+                    "Hostname: " + hostname,
+                    "",
+                    "System will reboot in 3 seconds..."
+                }, global::System.ConsoleColor.Green);
+
+                global::System.Threading.Thread.Sleep(3000);
+                Sys.Power.Reboot();
+            }
+            catch (Exception ex)
+            {
+                RenderOobeScreen("Setup Error", new string[]
+                {
+                    "Failed to finish setup:",
+                    ex.Message,
+                    "",
+                    "Press Enter to reboot."
+                }, global::System.ConsoleColor.Red);
+                global::System.Console.ReadLine();
+                Sys.Power.Reboot();
+            }
+        }
+
+        private void RenderOobeScreen(string title, string[] lines, global::System.ConsoleColor accent)
+        {
+            global::System.Console.Clear();
+            CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Cyan, global::System.ConsoleColor.Black);
+
+            int left = 4;
+            int top = 2;
+            int width = 72;
+            int height = 22;
+
+            string horizontal = new string('-', width - 2);
+            global::System.Console.SetCursorPosition(left, top);
+            global::System.Console.Write("+" + horizontal + "+");
+            for (int y = 1; y < height - 1; y++)
+            {
+                global::System.Console.SetCursorPosition(left, top + y);
+                global::System.Console.Write("|" + new string(' ', width - 2) + "|");
+            }
+            global::System.Console.SetCursorPosition(left, top + height - 1);
+            global::System.Console.Write("+" + horizontal + "+");
+
+            CMLeonOS.UI.TUIHelper.SetColors(accent, global::System.ConsoleColor.Black);
+            global::System.Console.SetCursorPosition(left + 2, top + 1);
+            global::System.Console.Write(title);
+
+            CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Gray, global::System.ConsoleColor.Black);
+            int lineY = top + 3;
+            for (int i = 0; i < lines.Length; i++)
+            {
+                global::System.Console.SetCursorPosition(left + 2, lineY + i);
+                string line = lines[i] ?? string.Empty;
+                if (line.Length > width - 4)
+                {
+                    line = line.Substring(0, width - 4);
+                }
+                global::System.Console.Write(line.PadRight(width - 4));
+            }
+        }
+
+        private string PromptText(int x, int y, string label)
+        {
+            CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+            global::System.Console.SetCursorPosition(x, y);
+            global::System.Console.Write(new string(' ', 68));
+            global::System.Console.SetCursorPosition(x, y);
+            global::System.Console.Write(label);
+            return global::System.Console.ReadLine();
+        }
+
+        private string PromptPassword(int x, int y, string label)
+        {
+            CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
+            global::System.Console.SetCursorPosition(x, y);
+            global::System.Console.Write(new string(' ', 68));
+            global::System.Console.SetCursorPosition(x, y);
+            global::System.Console.Write(label);
+            return ReadPassword();
+        }
+
+        private void WriteStatus(int x, int y, string text, global::System.ConsoleColor color)
+        {
+            CMLeonOS.UI.TUIHelper.SetColors(color, global::System.ConsoleColor.Black);
+            global::System.Console.SetCursorPosition(x, y);
+            if (text.Length > 68)
+            {
+                text = text.Substring(0, 68);
+            }
+            global::System.Console.Write(text.PadRight(68));
+        }
+
+        private bool PromptYesNo(int x, int y, string label)
+        {
+            while (true)
+            {
+                string input = PromptText(x, y, label);
+                string answer = (input ?? string.Empty).Trim().ToLower();
+                if (answer == "yes" || answer == "y")
+                {
+                    return true;
+                }
+                if (answer == "no" || answer == "n")
+                {
+                    return false;
                 }
 
-                global::System.Console.Clear();
-
-                var setupBox = new CMLeonOS.UI.Window(new CMLeonOS.UI.Rect(5, 5, 70, 12), "Admin Account Setup", () => { }, true);
-                setupBox.Render();
-
-                CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
-                global::System.Console.SetCursorPosition(7, 7);
-                global::System.Console.Write("Username: ");
-                string username = global::System.Console.ReadLine();
-
-                while (string.IsNullOrWhiteSpace(username))
-                {
-                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Red, global::System.ConsoleColor.Black);
-                    global::System.Console.SetCursorPosition(7, 24);
-                    global::System.Console.Write("Username cannot be empty.                   ");
-                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
-                    global::System.Console.SetCursorPosition(7, 7);
-                    global::System.Console.Write("Username: ");
-                    username = global::System.Console.ReadLine();
-                }
-
-                while (ContainsInvalidChars(username))
-                {
-                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Red, global::System.ConsoleColor.Black);
-                    global::System.Console.SetCursorPosition(7, 24);
-                    global::System.Console.Write("Username contains invalid characters: < > : \" | ? * / \\ space");
-                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
-                    global::System.Console.SetCursorPosition(7, 7);
-                    global::System.Console.Write("Username: ");
-                    username = global::System.Console.ReadLine();
-                }
-
-                CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
-                global::System.Console.SetCursorPosition(7, 8);
-                global::System.Console.Write("Password: ");
-                string password = ReadPassword();
-
-                CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
-                global::System.Console.SetCursorPosition(7, 9);
-                global::System.Console.Write("Confirm Password: ");
-                string confirmPassword = ReadPassword();
-
-                while (password != confirmPassword)
-                {
-                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Red, global::System.ConsoleColor.Black);
-                    global::System.Console.SetCursorPosition(7, 24);
-                    global::System.Console.Write("Passwords do not match. Please try again.      ");
-                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
-                    global::System.Console.SetCursorPosition(7, 7);
-                    global::System.Console.Write("Username: ");
-                    username = global::System.Console.ReadLine();
-
-                    while (string.IsNullOrWhiteSpace(username))
-                    {
-                        CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Red, global::System.ConsoleColor.Black);
-                        global::System.Console.SetCursorPosition(7, 24);
-                        global::System.Console.Write("Username cannot be empty.                   ");
-                        CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
-                        global::System.Console.SetCursorPosition(7, 7);
-                        global::System.Console.Write("Username: ");
-                        username = global::System.Console.ReadLine();
-                    }
-
-                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
-                    global::System.Console.SetCursorPosition(7, 8);
-                    global::System.Console.Write("Password: ");
-                    password = ReadPassword();
-
-                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
-                    global::System.Console.SetCursorPosition(7, 9);
-                    global::System.Console.Write("Confirm Password: ");
-                    confirmPassword = ReadPassword();
-                }
-
-                try
-                {
-                    User adminUser = new User
-                    {
-                        Username = username,
-                        Password = password,
-                        IsAdmin = true
-                    };
-                    users.Add(adminUser);
-                    SaveUsers();
-                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Green, global::System.ConsoleColor.Black);
-                    global::System.Console.SetCursorPosition(7, 24);
-                    global::System.Console.Write("Admin user created successfully!            ");
-                    global::System.Console.Clear();
-
-                    var hostnameBox = new CMLeonOS.UI.Window(new CMLeonOS.UI.Rect(5, 5, 70, 8), "Hostname Setup", () => { }, true);
-                    hostnameBox.Render();
-
-                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
-                    global::System.Console.SetCursorPosition(7, 7);
-                    global::System.Console.Write("Hostname: ");
-                    string hostname = global::System.Console.ReadLine();
-
-                    while (string.IsNullOrWhiteSpace(hostname))
-                    {
-                        CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Red, global::System.ConsoleColor.Black);
-                        global::System.Console.SetCursorPosition(7, 24);
-                        global::System.Console.Write("Hostname cannot be empty.                   ");
-                        CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
-                        global::System.Console.SetCursorPosition(7, 7);
-                        global::System.Console.Write("Hostname: ");
-                        hostname = global::System.Console.ReadLine();
-                    }
-
-                    if (users.Count > 0)
-                    {
-                        users[0].Hostname = hostname;
-                        SaveUsers();
-                    }
-
-                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.Green, global::System.ConsoleColor.Black);
-                    global::System.Console.SetCursorPosition(7, 24);
-                    global::System.Console.Write("Hostname set successfully!                     ");
-                    global::System.Threading.Thread.Sleep(2000);
-
-                    CMLeonOS.UI.TUIHelper.SetColors(global::System.ConsoleColor.White, global::System.ConsoleColor.Black);
-                    global::System.Console.Clear();
-                    global::System.Console.SetCursorPosition(30, 12);
-                    global::System.Console.Write("Setup completed!");
-                    global::System.Console.SetCursorPosition(20, 13);
-                    global::System.Console.Write("System will restart in 3 seconds...");
-                    global::System.Threading.Thread.Sleep(3000);
-
-                    Sys.Power.Reboot();
-                }
-                catch (Exception ex)
-                {
-                    ShowError($"Error creating admin user: {ex.Message}");
-                }
+                WriteStatus(x, y + 2, "Please type yes or no.", global::System.ConsoleColor.Red);
+            }
         }
 
         private void CreateUserFolder(string username)

@@ -49,7 +49,7 @@ namespace CMLeonOS.Gui.ShellComponents.Dock
 
         internal static readonly int IconSize = 64;
         internal static readonly int IconImageMaxSize = 48;
-        private static readonly Color DockBackground = Color.FromArgb(211, 211, 211);
+        private static readonly Color DockBackground = Color.FromArgb(160, 128, 128, 128);
         private static readonly Color ActiveIconBackground = Color.FromArgb(160, 190, 255);
         private static readonly Color ActiveIndicator = Color.FromArgb(36, 88, 196);
 
