@@ -1,6 +1,7 @@
 using CMLeonOS;
 using CMLeonOS.Gui.UILib;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace CMLeonOS.Gui.Apps
@@ -9,66 +10,251 @@ namespace CMLeonOS.Gui.Apps
     {
         internal FunctionGrapher() : base("Function Grapher", ProcessType.Application) { }
 
-        private AppWindow window;
-        private readonly WindowManager wm = ProcessManager.GetProcess<WindowManager>();
+        private sealed class FunctionSeries
+        {
+            internal string Expression = "x";
+            internal string ColorName = "Blue";
+            internal Color Color = Color.FromArgb(44, 102, 217);
+        }
 
-        private TextBox expressionBox;
-        private NumericUpDown scaleInput;
-        private TextBox statusBox;
+        private sealed class GraphPoint
+        {
+            internal double X;
+            internal double Y;
+            internal string ColorName = "Red";
+            internal Color Color = Color.FromArgb(220, 74, 74);
+        }
+
+        private readonly WindowManager wm = ProcessManager.GetProcess<WindowManager>();
+        private readonly List<FunctionSeries> functions = new List<FunctionSeries>();
+        private readonly List<GraphPoint> points = new List<GraphPoint>();
+
+        private AppWindow window;
         private Window canvas;
 
-        private string currentExpression = "sin(x)";
+        private TextBox expressionBox;
+        private Dropdown functionColorDropdown;
+        private Button addFunctionButton;
+        private Button plotButton;
+        private Button removeFunctionButton;
+        private Table functionTable;
+
+        private TextBox pointXBox;
+        private TextBox pointYBox;
+        private Dropdown pointColorDropdown;
+        private Button addPointButton;
+        private Button clearPointsButton;
+        private Table pointTable;
+
+        private NumericUpDown scaleInput;
+        private TextBox statusBox;
+
+        private readonly Dictionary<string, Color> palette = new Dictionary<string, Color>
+        {
+            { "Blue", Color.FromArgb(44, 102, 217) },
+            { "Red", Color.FromArgb(220, 74, 74) },
+            { "Green", Color.FromArgb(58, 166, 108) },
+            { "Orange", Color.FromArgb(236, 145, 53) },
+            { "Purple", Color.FromArgb(145, 97, 204) },
+            { "Teal", Color.FromArgb(46, 164, 176) },
+            { "Black", Color.FromArgb(44, 44, 52) },
+            { "Pink", Color.FromArgb(223, 88, 168) }
+        };
+
         private readonly Color canvasBg = Color.FromArgb(250, 252, 255);
         private readonly Color axisColor = Color.FromArgb(156, 170, 188);
         private readonly Color gridColor = Color.FromArgb(226, 233, 244);
-        private readonly Color curveColor = Color.FromArgb(44, 102, 217);
 
         private void Layout()
         {
+            int pad = 8;
             int top = 34;
-            int side = 8;
             int inputH = 24;
-            int statusH = 24;
+            int leftPanelWidth = 322;
+            int panelX = pad;
+            int panelY = top;
 
-            expressionBox.MoveAndResize(side, top, window.Width - 200, inputH);
-            scaleInput.MoveAndResize(window.Width - 184, top, 86, inputH);
+            expressionBox.MoveAndResize(panelX, panelY, 138, inputH);
+            functionColorDropdown.MoveAndResize(panelX + 142, panelY, 82, inputH);
+            addFunctionButton.MoveAndResize(panelX + 228, panelY, 42, inputH);
+            removeFunctionButton.MoveAndResize(panelX + 274, panelY, 40, inputH);
 
-            int buttonY = top;
-            int buttonW = 40;
-            int buttonX = window.Width - 92;
+            functionTable.MoveAndResize(panelX, panelY + inputH + 6, leftPanelWidth - pad, 150);
+
+            int pointTop = panelY + inputH + 6 + 150 + 8;
+            pointXBox.MoveAndResize(panelX, pointTop, 66, inputH);
+            pointYBox.MoveAndResize(panelX + 70, pointTop, 66, inputH);
+            pointColorDropdown.MoveAndResize(panelX + 140, pointTop, 84, inputH);
+            addPointButton.MoveAndResize(panelX + 228, pointTop, 42, inputH);
+            clearPointsButton.MoveAndResize(panelX + 274, pointTop, 40, inputH);
+
+            int pointTableY = pointTop + inputH + 6;
+            int pointTableHeight = window.Height - pointTableY - 62;
+            pointTable.MoveAndResize(panelX, pointTableY, leftPanelWidth - pad, Math.Max(90, pointTableHeight));
+
+            int rightX = panelX + leftPanelWidth + 4;
+            int rightWidth = window.Width - rightX - pad;
+
+            scaleInput.MoveAndResize(rightX, top, 74, inputH);
+            plotButton.MoveAndResize(rightX + 80, top, 64, inputH);
 
             int canvasY = top + inputH + 8;
-            int canvasH = window.Height - canvasY - statusH - 10;
-            canvas.MoveAndResize(side, canvasY, window.Width - (side * 2), canvasH);
-            statusBox.MoveAndResize(side, window.Height - statusH - 6, window.Width - (side * 2), statusH);
+            int statusH = 24;
+            int canvasHeight = window.Height - canvasY - statusH - 10;
+            canvas.MoveAndResize(rightX, canvasY, rightWidth, canvasHeight);
+            statusBox.MoveAndResize(rightX, window.Height - statusH - 6, rightWidth, statusH);
+        }
+
+        private void SetStatus(string text)
+        {
+            statusBox.Text = text ?? string.Empty;
+            statusBox.Render();
+            wm.Update(statusBox);
+        }
+
+        private string[] ColorNames()
+        {
+            string[] keys = new string[palette.Count];
+            int i = 0;
+            foreach (var kv in palette)
+            {
+                keys[i++] = kv.Key;
+            }
+            return keys;
+        }
+
+        private Color ResolveColor(string name)
+        {
+            if (name != null && palette.TryGetValue(name, out Color c))
+            {
+                return c;
+            }
+            return palette["Blue"];
+        }
+
+        private void RefreshFunctionTable()
+        {
+            functionTable.Cells.Clear();
+            for (int i = 0; i < functions.Count; i++)
+            {
+                FunctionSeries f = functions[i];
+                string line = $"{f.ColorName}: y={f.Expression}";
+                if (line.Length > 34)
+                {
+                    line = line.Substring(0, 34) + "...";
+                }
+                functionTable.Cells.Add(new TableCell(line, i));
+            }
+            functionTable.Render();
+        }
+
+        private void RefreshPointTable()
+        {
+            pointTable.Cells.Clear();
+            for (int i = 0; i < points.Count; i++)
+            {
+                GraphPoint p = points[i];
+                string line = $"{p.ColorName}: ({p.X}, {p.Y})";
+                if (line.Length > 34)
+                {
+                    line = line.Substring(0, 34) + "...";
+                }
+                pointTable.Cells.Add(new TableCell(line, i));
+            }
+            pointTable.Render();
         }
 
         private void DrawGridAndAxes(int centerX, int centerY, int pixelPerUnit)
         {
-            if (pixelPerUnit < 4)
-            {
-                pixelPerUnit = 4;
-            }
+            int step = Math.Max(4, pixelPerUnit);
 
-            for (int x = centerX; x < canvas.Width; x += pixelPerUnit)
+            for (int x = centerX; x < canvas.Width; x += step)
             {
                 canvas.DrawLine(x, 0, x, canvas.Height - 1, gridColor);
             }
-            for (int x = centerX; x >= 0; x -= pixelPerUnit)
+            for (int x = centerX; x >= 0; x -= step)
             {
                 canvas.DrawLine(x, 0, x, canvas.Height - 1, gridColor);
             }
-            for (int y = centerY; y < canvas.Height; y += pixelPerUnit)
+            for (int y = centerY; y < canvas.Height; y += step)
             {
                 canvas.DrawLine(0, y, canvas.Width - 1, y, gridColor);
             }
-            for (int y = centerY; y >= 0; y -= pixelPerUnit)
+            for (int y = centerY; y >= 0; y -= step)
             {
                 canvas.DrawLine(0, y, canvas.Width - 1, y, gridColor);
             }
 
             canvas.DrawLine(0, centerY, canvas.Width - 1, centerY, axisColor);
             canvas.DrawLine(centerX, 0, centerX, canvas.Height - 1, axisColor);
+        }
+
+        private void DrawFunctions(int centerX, int centerY, int pixelPerUnit)
+        {
+            for (int fi = 0; fi < functions.Count; fi++)
+            {
+                FunctionSeries series = functions[fi];
+                ExpressionParser parser = new ExpressionParser(series.Expression);
+                if (!parser.Parse())
+                {
+                    SetStatus("Parse error in: " + series.Expression + " (" + parser.ErrorMessage + ")");
+                    continue;
+                }
+
+                bool hasLast = false;
+                int lastX = 0;
+                int lastY = 0;
+
+                for (int sx = 0; sx < canvas.Width; sx++)
+                {
+                    double x = (sx - centerX) / (double)pixelPerUnit;
+                    double y;
+                    if (!parser.TryEvaluate(x, out y))
+                    {
+                        hasLast = false;
+                        continue;
+                    }
+
+                    if (double.IsNaN(y) || double.IsInfinity(y))
+                    {
+                        hasLast = false;
+                        continue;
+                    }
+
+                    int sy = centerY - (int)(y * pixelPerUnit);
+                    if (sy < -10000 || sy > 10000)
+                    {
+                        hasLast = false;
+                        continue;
+                    }
+
+                    if (hasLast && Math.Abs(sy - lastY) < canvas.Height)
+                    {
+                        canvas.DrawLine(lastX, lastY, sx, sy, series.Color);
+                    }
+
+                    hasLast = true;
+                    lastX = sx;
+                    lastY = sy;
+                }
+            }
+        }
+
+        private void DrawPoints(int centerX, int centerY, int pixelPerUnit)
+        {
+            for (int i = 0; i < points.Count; i++)
+            {
+                GraphPoint p = points[i];
+                int sx = centerX + (int)(p.X * pixelPerUnit);
+                int sy = centerY - (int)(p.Y * pixelPerUnit);
+                if (sx < 1 || sx >= canvas.Width - 1 || sy < 1 || sy >= canvas.Height - 1)
+                {
+                    continue;
+                }
+
+                canvas.DrawFilledRectangle(sx - 2, sy - 2, 5, 5, p.Color);
+                canvas.DrawRectangle(sx - 2, sy - 2, 5, 5, Color.Black);
+            }
         }
 
         private void RenderGraph()
@@ -84,67 +270,93 @@ namespace CMLeonOS.Gui.Apps
             int pixelPerUnit = Math.Max(8, scaleInput.Value);
 
             DrawGridAndAxes(centerX, centerY, pixelPerUnit);
+            DrawFunctions(centerX, centerY, pixelPerUnit);
+            DrawPoints(centerX, centerY, pixelPerUnit);
 
-            ExpressionParser parser = new ExpressionParser(currentExpression);
-            if (!parser.Parse())
+            wm.Update(canvas);
+            SetStatus($"Functions: {functions.Count}, Points: {points.Count}");
+        }
+
+        private void AddFunction()
+        {
+            string expr = (expressionBox.Text ?? string.Empty).Trim();
+            if (string.IsNullOrWhiteSpace(expr))
             {
-                statusBox.Text = "Parse error: " + parser.ErrorMessage;
-                statusBox.Render();
-                wm.Update(statusBox);
-                wm.Update(canvas);
+                SetStatus("Expression cannot be empty.");
                 return;
             }
 
-            bool hasLast = false;
-            int lastX = 0;
-            int lastY = 0;
-
-            for (int sx = 0; sx < canvas.Width; sx++)
+            ExpressionParser parser = new ExpressionParser(expr);
+            if (!parser.Parse())
             {
-                double x = (sx - centerX) / (double)pixelPerUnit;
-                double y;
-                if (!parser.TryEvaluate(x, out y))
-                {
-                    hasLast = false;
-                    continue;
-                }
-
-                if (double.IsNaN(y) || double.IsInfinity(y))
-                {
-                    hasLast = false;
-                    continue;
-                }
-
-                int sy = centerY - (int)(y * pixelPerUnit);
-                if (sy < -10000 || sy > 10000)
-                {
-                    hasLast = false;
-                    continue;
-                }
-
-                if (hasLast)
-                {
-                    if (Math.Abs(sy - lastY) < canvas.Height)
-                    {
-                        canvas.DrawLine(lastX, lastY, sx, sy, curveColor);
-                    }
-                }
-                hasLast = true;
-                lastX = sx;
-                lastY = sy;
+                SetStatus("Parse error: " + parser.ErrorMessage);
+                return;
             }
 
-            statusBox.Text = "OK: y = " + currentExpression;
-            statusBox.Render();
-            wm.Update(statusBox);
-            wm.Update(canvas);
+            string colorName = functionColorDropdown.SelectedIndex >= 0 ? functionColorDropdown.SelectedText : "Blue";
+            FunctionSeries item = new FunctionSeries
+            {
+                Expression = expr,
+                ColorName = colorName,
+                Color = ResolveColor(colorName)
+            };
+            functions.Add(item);
+
+            RefreshFunctionTable();
+            RenderGraph();
+        }
+
+        private void RemoveSelectedFunction()
+        {
+            int idx = functionTable.SelectedCellIndex;
+            if (idx < 0 || idx >= functions.Count)
+            {
+                SetStatus("Select a function first.");
+                return;
+            }
+            functions.RemoveAt(idx);
+            RefreshFunctionTable();
+            RenderGraph();
+        }
+
+        private void AddPoint()
+        {
+            if (!double.TryParse((pointXBox.Text ?? string.Empty).Trim(), out double x))
+            {
+                SetStatus("Invalid X.");
+                return;
+            }
+            if (!double.TryParse((pointYBox.Text ?? string.Empty).Trim(), out double y))
+            {
+                SetStatus("Invalid Y.");
+                return;
+            }
+
+            string colorName = pointColorDropdown.SelectedIndex >= 0 ? pointColorDropdown.SelectedText : "Red";
+            GraphPoint p = new GraphPoint
+            {
+                X = x,
+                Y = y,
+                ColorName = colorName,
+                Color = ResolveColor(colorName)
+            };
+            points.Add(p);
+            RefreshPointTable();
+            RenderGraph();
+        }
+
+        private void ClearPoints()
+        {
+            points.Clear();
+            RefreshPointTable();
+            RenderGraph();
         }
 
         public override void Start()
         {
             base.Start();
 
-            window = new AppWindow(this, 140, 80, 900, 560);
+            window = new AppWindow(this, 120, 70, 980, 600);
             window.Title = "Function Grapher";
             window.Icon = AppManager.DefaultAppIcon;
             window.CanResize = true;
@@ -156,61 +368,101 @@ namespace CMLeonOS.Gui.Apps
             window.Closing = TryStop;
             wm.AddWindow(window);
 
-            expressionBox = new TextBox(window, 8, 34, 680, 24);
-            expressionBox.Text = currentExpression;
-            expressionBox.PlaceholderText = "Enter expression, e.g. sin(x), x^2+2*x+1";
-            expressionBox.Submitted = () =>
-            {
-                currentExpression = expressionBox.Text.Trim();
-                if (string.IsNullOrWhiteSpace(currentExpression))
-                {
-                    currentExpression = "x";
-                    expressionBox.Text = currentExpression;
-                }
-                RenderGraph();
-            };
+            expressionBox = new TextBox(window, 0, 0, 1, 1);
+            expressionBox.Text = "sin(x)";
+            expressionBox.PlaceholderText = "f(x)";
+            expressionBox.Submitted = AddFunction;
             wm.AddWindow(expressionBox);
 
-            scaleInput = new NumericUpDown(window, 696, 34, 86, 24);
+            functionColorDropdown = new Dropdown(window, 0, 0, 1, 1);
+            string[] colors = ColorNames();
+            for (int i = 0; i < colors.Length; i++)
+            {
+                functionColorDropdown.Items.Add(colors[i]);
+            }
+            functionColorDropdown.RefreshItems();
+            functionColorDropdown.SelectedIndex = 0;
+            wm.AddWindow(functionColorDropdown);
+
+            addFunctionButton = new Button(window, 0, 0, 1, 1);
+            addFunctionButton.Text = "Add";
+            addFunctionButton.OnClick = (_, _) => AddFunction();
+            wm.AddWindow(addFunctionButton);
+
+            removeFunctionButton = new Button(window, 0, 0, 1, 1);
+            removeFunctionButton.Text = "Del";
+            removeFunctionButton.OnClick = (_, _) => RemoveSelectedFunction();
+            wm.AddWindow(removeFunctionButton);
+
+            functionTable = new Table(window, 0, 0, 1, 1);
+            functionTable.CellHeight = 24;
+            functionTable.AllowDeselection = true;
+            wm.AddWindow(functionTable);
+
+            pointXBox = new TextBox(window, 0, 0, 1, 1);
+            pointXBox.Text = "0";
+            pointXBox.PlaceholderText = "x";
+            wm.AddWindow(pointXBox);
+
+            pointYBox = new TextBox(window, 0, 0, 1, 1);
+            pointYBox.Text = "0";
+            pointYBox.PlaceholderText = "y";
+            wm.AddWindow(pointYBox);
+
+            pointColorDropdown = new Dropdown(window, 0, 0, 1, 1);
+            for (int i = 0; i < colors.Length; i++)
+            {
+                pointColorDropdown.Items.Add(colors[i]);
+            }
+            pointColorDropdown.RefreshItems();
+            pointColorDropdown.SelectedIndex = 1;
+            wm.AddWindow(pointColorDropdown);
+
+            addPointButton = new Button(window, 0, 0, 1, 1);
+            addPointButton.Text = "Add";
+            addPointButton.OnClick = (_, _) => AddPoint();
+            wm.AddWindow(addPointButton);
+
+            clearPointsButton = new Button(window, 0, 0, 1, 1);
+            clearPointsButton.Text = "Clr";
+            clearPointsButton.OnClick = (_, _) => ClearPoints();
+            wm.AddWindow(clearPointsButton);
+
+            pointTable = new Table(window, 0, 0, 1, 1);
+            pointTable.CellHeight = 24;
+            pointTable.AllowDeselection = true;
+            wm.AddWindow(pointTable);
+
+            scaleInput = new NumericUpDown(window, 0, 0, 1, 1);
             scaleInput.Minimum = 8;
-            scaleInput.Maximum = 80;
+            scaleInput.Maximum = 100;
             scaleInput.Value = 24;
             scaleInput.Step = 2;
-            scaleInput.Changed = (_) => RenderGraph();
+            scaleInput.Changed = _ => RenderGraph();
             wm.AddWindow(scaleInput);
 
-            Button plotButton = new Button(window, 790, 34, 46, 24);
-            plotButton.Text = "Plot";
-            plotButton.OnClick = (_, _) =>
-            {
-                currentExpression = expressionBox.Text.Trim();
-                if (string.IsNullOrWhiteSpace(currentExpression))
-                {
-                    currentExpression = "x";
-                    expressionBox.Text = currentExpression;
-                }
-                RenderGraph();
-            };
+            plotButton = new Button(window, 0, 0, 1, 1);
+            plotButton.Text = "Plot All";
+            plotButton.OnClick = (_, _) => RenderGraph();
             wm.AddWindow(plotButton);
 
-            Button clearButton = new Button(window, 842, 34, 50, 24);
-            clearButton.Text = "Clear";
-            clearButton.OnClick = (_, _) =>
-            {
-                expressionBox.Text = "x";
-                currentExpression = "x";
-                RenderGraph();
-            };
-            wm.AddWindow(clearButton);
-
-            canvas = new Window(this, window, 8, 66, window.Width - 16, window.Height - 98);
+            canvas = new Window(this, window, 0, 0, 1, 1);
             wm.AddWindow(canvas);
 
-            statusBox = new TextBox(window, 8, window.Height - 30, window.Width - 16, 24);
+            statusBox = new TextBox(window, 0, 0, 1, 1);
             statusBox.ReadOnly = true;
             statusBox.Text = "Ready";
             wm.AddWindow(statusBox);
 
+            functions.Add(new FunctionSeries
+            {
+                Expression = "sin(x)",
+                ColorName = "Blue",
+                Color = ResolveColor("Blue")
+            });
+
+            RefreshFunctionTable();
+            RefreshPointTable();
             Layout();
             RenderGraph();
             wm.Update(window);
