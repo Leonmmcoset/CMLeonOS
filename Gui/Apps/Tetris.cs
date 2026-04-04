@@ -20,6 +20,9 @@ namespace CMLeonOS.Gui.Apps
         private readonly Random random = new Random();
 
         private AppWindow window;
+        private Button slowButton;
+        private Button normalButton;
+        private Button fastButton;
         private readonly int[] board = new int[BoardWidth * BoardHeight];
 
         private int[] curX = new int[4];
@@ -33,6 +36,7 @@ namespace CMLeonOS.Gui.Apps
         private int level = 1;
         private int frameCounter = 0;
         private int dropFrames = 36;
+        private int speedMode = 1; // 0: Slow, 1: Normal, 2: Fast
 
         private bool dirty = true;
 
@@ -70,6 +74,59 @@ namespace CMLeonOS.Gui.Apps
         private static int Index(int x, int y)
         {
             return (y * BoardWidth) + x;
+        }
+
+        private int GetBaseDropFrames()
+        {
+            if (speedMode == 0) return 48;
+            if (speedMode == 2) return 24;
+            return 36;
+        }
+
+        private int GetMinDropFrames()
+        {
+            if (speedMode == 0) return 14;
+            if (speedMode == 2) return 7;
+            return 10;
+        }
+
+        private void UpdateDropFramesFromMode()
+        {
+            int baseFrames = GetBaseDropFrames();
+            int minFrames = GetMinDropFrames();
+            dropFrames = Math.Max(minFrames, baseFrames - ((level - 1) * 2));
+        }
+
+        private string GetSpeedModeLabel()
+        {
+            if (speedMode == 0) return "Slow";
+            if (speedMode == 2) return "Fast";
+            return "Normal";
+        }
+
+        private void SetSpeedButtonStyle()
+        {
+            if (slowButton == null || normalButton == null || fastButton == null) return;
+
+            slowButton.Background = speedMode == 0 ? UITheme.Accent : UITheme.SurfaceMuted;
+            slowButton.Border = speedMode == 0 ? UITheme.AccentDark : UITheme.SurfaceBorder;
+            slowButton.Foreground = speedMode == 0 ? Color.White : UITheme.TextPrimary;
+
+            normalButton.Background = speedMode == 1 ? UITheme.Accent : UITheme.SurfaceMuted;
+            normalButton.Border = speedMode == 1 ? UITheme.AccentDark : UITheme.SurfaceBorder;
+            normalButton.Foreground = speedMode == 1 ? Color.White : UITheme.TextPrimary;
+
+            fastButton.Background = speedMode == 2 ? UITheme.Accent : UITheme.SurfaceMuted;
+            fastButton.Border = speedMode == 2 ? UITheme.AccentDark : UITheme.SurfaceBorder;
+            fastButton.Foreground = speedMode == 2 ? Color.White : UITheme.TextPrimary;
+        }
+
+        private void SetSpeedMode(int mode)
+        {
+            speedMode = Math.Max(0, Math.Min(2, mode));
+            UpdateDropFramesFromMode();
+            SetSpeedButtonStyle();
+            dirty = true;
         }
 
         private bool InBounds(int x, int y)
@@ -174,7 +231,7 @@ namespace CMLeonOS.Gui.Apps
                 else score += 800 * level;
 
                 level = 1 + (lines / 10);
-                dropFrames = Math.Max(10, 36 - ((level - 1) * 2));
+                UpdateDropFramesFromMode();
                 dirty = true;
             }
         }
@@ -271,7 +328,7 @@ namespace CMLeonOS.Gui.Apps
             score = 0;
             lines = 0;
             level = 1;
-            dropFrames = 36;
+            UpdateDropFramesFromMode();
             frameCounter = 0;
             gameOver = false;
             SpawnPiece();
@@ -305,6 +362,15 @@ namespace CMLeonOS.Gui.Apps
                     break;
                 case ConsoleKeyEx.Spacebar:
                     HardDrop();
+                    break;
+                case ConsoleKeyEx.D1:
+                    SetSpeedMode(0);
+                    break;
+                case ConsoleKeyEx.D2:
+                    SetSpeedMode(1);
+                    break;
+                case ConsoleKeyEx.D3:
+                    SetSpeedMode(2);
                     break;
             }
         }
@@ -357,10 +423,12 @@ namespace CMLeonOS.Gui.Apps
             window.DrawString("Score: " + score.ToString(), Color.White, sideX, 62);
             window.DrawString("Lines: " + lines.ToString(), Color.White, sideX, 82);
             window.DrawString("Level: " + level.ToString(), Color.White, sideX, 102);
+            window.DrawString("Speed: " + GetSpeedModeLabel(), Color.White, sideX, 122);
             window.DrawString("Keys:", Color.FromArgb(186, 198, 216), sideX, 136);
             window.DrawString("Arrows Move", Color.FromArgb(186, 198, 216), sideX, 154);
             window.DrawString("Up Rotate", Color.FromArgb(186, 198, 216), sideX, 172);
             window.DrawString("Space Drop", Color.FromArgb(186, 198, 216), sideX, 190);
+            window.DrawString("1/2/3 Speed", Color.FromArgb(186, 198, 216), sideX, 208);
 
             if (gameOver)
             {
@@ -389,6 +457,22 @@ namespace CMLeonOS.Gui.Apps
             window.OnKeyPressed = OnKeyPressed;
             wm.AddWindow(window);
 
+            slowButton = new Button(window, 206, 338, 62, 20);
+            slowButton.Text = "Slow";
+            slowButton.OnClick = (_, _) => SetSpeedMode(0);
+            wm.AddWindow(slowButton);
+
+            normalButton = new Button(window, 274, 338, 72, 20);
+            normalButton.Text = "Normal";
+            normalButton.OnClick = (_, _) => SetSpeedMode(1);
+            wm.AddWindow(normalButton);
+
+            fastButton = new Button(window, 352, 338, 62, 20);
+            fastButton.Text = "Fast";
+            fastButton.OnClick = (_, _) => SetSpeedMode(2);
+            wm.AddWindow(fastButton);
+
+            SetSpeedButtonStyle();
             ResetGame();
             Render();
         }
