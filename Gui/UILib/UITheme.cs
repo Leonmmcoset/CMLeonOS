@@ -43,7 +43,7 @@ namespace CMLeonOS.Gui.UILib
 
         internal static string[] GetThemeNames()
         {
-            return new string[] { "Default", "Graphite", "Forest", "Sunset", "Rose", "Terminal" };
+            return new string[] { "Default", "Graphite", "Forest", "Sunset", "Rose", "Pink", "Terminal" };
         }
 
         internal static void ApplyTheme(string themeName)
@@ -138,6 +138,28 @@ namespace CMLeonOS.Gui.UILib
                     Success = Color.FromArgb(72, 151, 105);
                     Warning = Color.FromArgb(214, 145, 61);
                     CurrentThemeName = "Rose";
+                    break;
+
+                case "Pink":
+                    WindowTitleBackground = Color.FromArgb(106, 34, 82);
+                    WindowTitleTopHighlight = Color.FromArgb(156, 74, 128);
+                    WindowTitleBottomBorder = Color.FromArgb(58, 17, 44);
+                    WindowTitleText = Color.FromArgb(255, 242, 250);
+                    WindowButtonBackground = Color.FromArgb(132, 52, 104);
+
+                    Surface = Color.FromArgb(255, 244, 250);
+                    SurfaceMuted = Color.FromArgb(246, 226, 238);
+                    SurfaceBorder = Color.FromArgb(198, 154, 178);
+                    TextPrimary = Color.FromArgb(84, 32, 64);
+                    TextSecondary = Color.FromArgb(136, 92, 116);
+
+                    Accent = Color.FromArgb(232, 84, 164);
+                    AccentDark = Color.FromArgb(191, 56, 129);
+                    AccentLight = Color.FromArgb(255, 212, 236);
+
+                    Success = Color.FromArgb(72, 161, 118);
+                    Warning = Color.FromArgb(216, 142, 65);
+                    CurrentThemeName = "Pink";
                     break;
 
                 case "Terminal":

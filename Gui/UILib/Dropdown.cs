@@ -11,7 +11,7 @@ namespace CMLeonOS.Gui.UILib
         {
             hostWindow = parent;
             OnClick = (_, _) => ToggleExpanded();
-            OnUnfocused = Collapse;
+            OnUnfocused = HandleUnfocused;
         }
 
         private readonly Window hostWindow;
@@ -147,6 +147,17 @@ namespace CMLeonOS.Gui.UILib
 
             RebuildPopup();
             Render();
+        }
+
+        private void HandleUnfocused()
+        {
+            Window nextFocus = WM.PendingFocusTarget;
+            if (nextFocus == popupTable || nextFocus == popupWindow)
+            {
+                return;
+            }
+
+            Collapse();
         }
 
         private void ToggleExpanded()
@@ -288,6 +299,8 @@ namespace CMLeonOS.Gui.UILib
             popupTable.SelectedBorder = Highlight;
             popupTable.SelectedForeground = Foreground;
             popupTable.TableCellSelected = PopupSelected;
+            popupTable.OnUnfocused = Collapse;
+            popupWindow.OnUnfocused = Collapse;
 
             for (int i = 0; i < Items.Count; i++)
             {

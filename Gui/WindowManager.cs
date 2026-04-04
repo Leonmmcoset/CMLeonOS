@@ -59,6 +59,7 @@ namespace CMLeonOS.Gui
         internal uint ScreenHeight { get; private set; }
 
         internal Window Focus { get; set; }
+        internal Window PendingFocusTarget { get; private set; }
 
         private uint bytesPerPixel { get; set; }
 
@@ -233,6 +234,8 @@ namespace CMLeonOS.Gui
                 return;
             }
 
+            PendingFocusTarget = window;
+
             if (Focus != null && Focus != window)
             {
                 Focus.OnUnfocused?.Invoke();
@@ -240,6 +243,7 @@ namespace CMLeonOS.Gui
 
             Focus = window;
             window.OnFocused?.Invoke();
+            PendingFocusTarget = null;
 
             if (updateDock)
             {
