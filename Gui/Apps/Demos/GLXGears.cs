@@ -40,6 +40,14 @@ namespace CMLeonOS.Gui.Apps.Demos
             Renderer3D.DrawLine3D(window, a, b, color, FovScale, CameraDistance);
         }
 
+        private void Draw3DTriangle(Vec3 a, Vec3 b, Vec3 c, Color color)
+        {
+            a = TransformPoint(a);
+            b = TransformPoint(b);
+            c = TransformPoint(c);
+            Renderer3D.DrawTriangle3D(window, a, b, c, color, FovScale, CameraDistance);
+        }
+
         private void DrawGear(Vec3 center, double outerRadius, double innerRadius, double depth, int teeth, double angle, Color color)
         {
             int ringCount = teeth * 2;
@@ -69,6 +77,35 @@ namespace CMLeonOS.Gui.Apps.Demos
             for (int i = 0; i < ringCount; i++)
             {
                 int n = (i + 1) % ringCount;
+
+                Color frontFace = Color.FromArgb(
+                    color.R,
+                    color.G,
+                    color.B);
+                Color backFace = Color.FromArgb(
+                    Math.Max(0, color.R - 32),
+                    Math.Max(0, color.G - 32),
+                    Math.Max(0, color.B - 32));
+                Color sideFace = Color.FromArgb(
+                    Math.Max(0, color.R - 18),
+                    Math.Max(0, color.G - 18),
+                    Math.Max(0, color.B - 18));
+
+                // Front ring face (quad -> 2 triangles)
+                Draw3DTriangle(frontOuter[i], frontOuter[n], frontInner[n], frontFace);
+                Draw3DTriangle(frontOuter[i], frontInner[n], frontInner[i], frontFace);
+
+                // Back ring face
+                Draw3DTriangle(backOuter[i], backInner[n], backOuter[n], backFace);
+                Draw3DTriangle(backOuter[i], backInner[i], backInner[n], backFace);
+
+                // Outer wall
+                Draw3DTriangle(frontOuter[i], backOuter[n], frontOuter[n], sideFace);
+                Draw3DTriangle(frontOuter[i], backOuter[i], backOuter[n], sideFace);
+
+                // Inner wall
+                Draw3DTriangle(frontInner[i], frontInner[n], backInner[n], sideFace);
+                Draw3DTriangle(frontInner[i], backInner[n], backInner[i], sideFace);
 
                 Draw3DLine(frontOuter[i], frontOuter[n], color);
                 Draw3DLine(backOuter[i], backOuter[n], color);

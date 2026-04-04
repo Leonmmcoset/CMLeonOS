@@ -18,6 +18,7 @@ using Cosmos.System;
 using Cosmos.System.Graphics;
 using CMLeonOS;
 using CMLeonOS.Gui.ShellComponents;
+using CMLeonOS.Gui.UILib;
 using CMLeonOS.Settings;
 using CMLeonOS.Driver;
 using CMLeonOS.Logger;
@@ -193,6 +194,95 @@ namespace CMLeonOS.Gui
             UpdateDock();
         }
 
+        private bool IsDescendantOf(Window window, Window ancestor)
+        {
+            Window current = window;
+            while (current != null)
+            {
+                if (current == ancestor)
+                {
+                    return true;
+                }
+
+                current = current.RelativeTo;
+            }
+
+            return false;
+        }
+
+        internal AppWindow GetOwningAppWindow(Window window)
+        {
+            Window current = window;
+            while (current != null)
+            {
+                if (current is AppWindow appWindow)
+                {
+                    return appWindow;
+                }
+
+                current = current.RelativeTo;
+            }
+
+            return null;
+        }
+
+        internal void SetFocus(Window window, bool updateDock = true)
+        {
+            if (window == null || !Windows.Contains(window))
+            {
+                return;
+            }
+
+            if (Focus != null && Focus != window)
+            {
+                Focus.OnUnfocused?.Invoke();
+            }
+
+            Focus = window;
+            window.OnFocused?.Invoke();
+
+            if (updateDock)
+            {
+                UpdateDock();
+            }
+        }
+
+        internal void BringToFrontAndFocus(Window window)
+        {
+            if (window == null || !Windows.Contains(window))
+            {
+                return;
+            }
+
+            List<Window> toMove = new List<Window>();
+            for (int i = 0; i < Windows.Count; i++)
+            {
+                Window current = Windows[i];
+                if (current == window || IsDescendantOf(current, window))
+                {
+                    toMove.Add(current);
+                }
+            }
+
+            if (toMove.Count > 0)
+            {
+                for (int i = 0; i < toMove.Count; i++)
+                {
+                    Windows.Remove(toMove[i]);
+                }
+
+                for (int i = 0; i < toMove.Count; i++)
+                {
+                    Windows.Add(toMove[i]);
+                }
+            }
+
+            SetFocus(window, updateDock: false);
+
+            RerenderAll();
+            UpdateDock();
+        }
+
         internal void RemoveWindow(Window window, bool rerender = true)
         {
             Windows.Remove(window);
@@ -292,13 +382,12 @@ namespace CMLeonOS.Gui
                 else if (MouseManager.MouseState == MouseState.None && lastMouseState == MouseState.Left)
                 {
                     lastMouseState = MouseManager.MouseState;
-
-                    if (Focus != null && Focus != window)
+                    Window focusTarget = GetOwningAppWindow(window) ?? window;
+                    BringToFrontAndFocus(focusTarget);
+                    if (window != focusTarget && Windows.Contains(window))
                     {
-                        Focus.OnUnfocused?.Invoke();
+                        SetFocus(window);
                     }
-                    Focus = window;
-                    window.OnFocused?.Invoke();
 
                     window.OnClick?.Invoke(relativeX, relativeY);
 

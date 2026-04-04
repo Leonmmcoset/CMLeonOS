@@ -32,7 +32,7 @@ namespace CMLeonOS.Gui.ShellComponents.Dock
 
         internal override void Clicked()
         {
-            ProcessManager.GetProcess<WindowManager>().Focus = AppWindow;
+            ProcessManager.GetProcess<WindowManager>().BringToFrontAndFocus(AppWindow);
         }
     }
 }

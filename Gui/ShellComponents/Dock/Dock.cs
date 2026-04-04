@@ -49,6 +49,9 @@ namespace CMLeonOS.Gui.ShellComponents.Dock
 
         internal static readonly int IconSize = 64;
         internal static readonly int IconImageMaxSize = 48;
+        private static readonly Color DockBackground = Color.FromArgb(211, 211, 211);
+        private static readonly Color ActiveIconBackground = Color.FromArgb(160, 190, 255);
+        private static readonly Color ActiveIndicator = Color.FromArgb(36, 88, 196);
 
         private void Render()
         {
@@ -63,11 +66,22 @@ namespace CMLeonOS.Gui.ShellComponents.Dock
                 window.MoveAndResize((int)(wm.ScreenWidth / 2 - newDockWidth / 2), window.Y, newDockWidth, window.Height);
             }
 
-            window.Clear(Color.FromArgb(211, 211, 211));
+            window.Clear(DockBackground);
+
+            AppWindow focusedApp = wm.GetOwningAppWindow(wm.Focus);
 
             int x = 0;
             foreach (var icon in Icons)
             {
+                int iconWidth = (int)icon.Size;
+                bool isSelected = icon is AppDockIcon appDockIcon && appDockIcon.AppWindow == focusedApp;
+
+                if (isSelected && iconWidth > 4 && window.Height > 4)
+                {
+                    window.DrawFilledRectangle(x + 2, 2, iconWidth - 4, window.Height - 4, ActiveIconBackground);
+                    window.DrawFilledRectangle(x + 10, window.Height - 5, Math.Max(8, iconWidth - 20), 3, ActiveIndicator);
+                }
+
                 if (icon.Image != null)
                 {
                     Bitmap resizedImage = icon.Image.ResizeWidthKeepRatio((uint)Math.Min(IconImageMaxSize, icon.Size));
@@ -76,7 +90,7 @@ namespace CMLeonOS.Gui.ShellComponents.Dock
                     window.DrawImageAlpha(resizedImage, imageX, (int)((window.Height / 2) - (resizedImage.Height / 2)));
                 }
 
-                x += (int)icon.Size;
+                x += iconWidth;
             }
 
             wm.Update(window);
